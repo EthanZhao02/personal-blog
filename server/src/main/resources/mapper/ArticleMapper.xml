@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.ArticleMapper">
+
+    <!-- 分页查询文章列表 -->
+    <select id="selectArticlePage" resultType="com.blog.vo.ArticleVO">
+        SELECT 
+            a.id,
+            a.title,
+            a.content,
+            a.summary,
+            a.cover_image AS coverImage,
+            a.category_id AS categoryId,
+            c.name AS categoryName,
+            a.user_id AS userId,
+            u.nickname AS authorName,
+            a.view_count AS viewCount,
+            a.is_published AS isPublished,
+            a.create_time AS createTime,
+            a.update_time AS updateTime
+        FROM article a
+        LEFT JOIN category c ON a.category_id = c.id
+        LEFT JOIN user u ON a.user_id = u.id
+        WHERE a.is_published = 1
+        <if test="categoryId != null">
+            AND a.category_id = #{categoryId}
+        </if>
+        <if test="tagId != null">
+            AND EXISTS (
+                SELECT 1 FROM article_tag at 
+                WHERE at.article_id = a.id AND at.tag_id = #{tagId}
+            )
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (a.title LIKE CONCAT('%', #{keyword}, '%') 
+                 OR a.content LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY a.create_time DESC
+    </select>
+
+    <!-- 查询文章详情 -->
+    <select id="selectArticleDetail" resultType="com.blog.vo.ArticleVO">
+        SELECT 
+            a.id,
+            a.title,
+            a.content,
+            a.summary,
+            a.cover_image AS coverImage,
+            a.category_id AS categoryId,
+            c.name AS categoryName,
+            a.user_id AS userId,
+            u.nickname AS authorName,
+            a.view_count AS viewCount,
+            a.is_published AS isPublished,
+            a.create_time AS createTime,
+            a.update_time AS updateTime,
+            a.attachments
+        FROM article a
+        LEFT JOIN category c ON a.category_id = c.id
+        LEFT JOIN user u ON a.user_id = u.id
+        WHERE a.id = #{id}
+    </select>
+
+</mapper>

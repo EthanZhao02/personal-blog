@@ -1,0 +1,35 @@
+# Maven
+server/target/
+server/.mvn/
+*.class
+*.jar
+*.war
+
+# Node
+client/node_modules/
+client/dist/
+client/.env.local
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.suo
+*.user
+
+# 上传文件（不上传本地图片）
+server/uploads/
+uploads/
+
+# 敏感配置（用 example 替代）
+server/src/main/resources/application.yml
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 临时脚本
+GenHash.java
+gen_hash.ps1
+gen_hash.py
+GenHash.java
