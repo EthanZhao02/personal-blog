@@ -1,35 +1,24 @@
-# Maven
+# Maven build
 server/target/
 server/.mvn/
-*.class
-*.jar
-*.war
 
-# Node
+# Node modules & build
 client/node_modules/
 client/dist/
 client/.env.local
+client/.env
 
 # IDE
 .idea/
 *.iml
 .vscode/
-*.suo
-*.user
 
-# 上传文件（不上传本地图片）
+# 上传文件
 server/uploads/
-uploads/
 
-# 敏感配置（用 example 替代）
-server/src/main/resources/application.yml
+# 敏感配置示例
+# server/src/main/resources/application.yml
 
 # 系统文件
 .DS_Store
 Thumbs.db
-
-# 临时脚本
-GenHash.java
-gen_hash.ps1
-gen_hash.py
-GenHash.java

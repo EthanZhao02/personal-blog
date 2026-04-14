@@ -1,0 +1,47 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  tomcat:
+    static-resource-cache:
+      enabled: false
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+  web:
+    resources:
+      static-locations: classpath:/static/,classpath:/public/,file:uploads/
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&connectionCollation=utf8mb4_unicode_ci
+    username: root
+    password: ""
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+jwt:
+  secret: blog-secret-key-2024-this-is-a-long-secret-key-for-jwt-signing
+  expiration: 604800000
+
+file:
+  upload:
+    path: uploads/
+    base-url: /uploads/
