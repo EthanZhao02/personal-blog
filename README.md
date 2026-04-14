@@ -269,6 +269,79 @@ npm run dev
 - 检查数据库是否有用户数据
 - 检查密码是否正确（默认 123456）
 
+## 上传到 GitHub
+
+### 方法一：命令行（推荐）
+
+#### 1. 在 GitHub 创建仓库
+1. 打开 https://github.com/new
+2. 填写仓库名称：`personal-blog`
+3. 选择 Private（私有）或 Public（公开）
+4. **不要勾选** "Add a README file"（项目已有）
+5. 点击 "Create repository"
+
+#### 2. 本地初始化并推送
+```bash
+# 进入项目目录
+cd personal-blog
+
+# 初始化 Git 仓库（如果还没有）
+git init
+
+# 添加所有文件
+git add .
+
+# 提交
+git commit -m "first commit: 个人博客系统"
+
+# 关联远程仓库（把下面这段复制到 GitHub 创建仓库后显示的指令）
+git remote add origin https://github.com/YOUR_USERNAME/personal-blog.git
+
+# 推送到 GitHub
+git push -u origin master
+```
+
+#### 3. 如果遇到 Token 失效问题
+GitHub 已于 2021 年取消密码认证，需使用 Personal Access Token：
+
+1. 打开 https://github.com/settings/tokens/new
+2. 输入 Token 名称（如：my-pc）
+3. 勾选 `repo` 全部权限
+4. 点击 "Generate token"，**复制保存好 Token**
+
+推送时，URL 格式改为：
+```
+https://ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@github.com/YOUR_USERNAME/personal-blog.git
+```
+把 `ghp_xxx...` 换成你的 Token。
+
+或者用 GitHub CLI 登录：
+```bash
+# 安装 GitHub CLI（Windows）
+winget install GitHub.cli
+
+# 登录
+gh auth login
+
+# 之后 push 就不需要手动输入密码了
+git push origin master
+```
+
+### 方法二：可视化工具
+
+#### GitHub Desktop
+1. 下载 https://desktop.github.com
+2. File → Add Local Repository → 选择 personal-blog 文件夹
+3. Publish repository 到 GitHub
+
+#### VS Code
+1. 用 VS Code 打开 personal-blog 文件夹
+2. 侧边栏 Source Control 点 ✓
+3. 输入提交信息，点击提交
+4. 点击 Publish to GitHub
+
+---
+
 ## 作者
 
 个人博客系统 - Vue3 + SpringBoot + MySQL
