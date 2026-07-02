@@ -23,11 +23,11 @@
         <header class="article-header">
           <h1 class="article-title">{{ article.title }}</h1>
           <div class="article-meta">
-            <span class="meta-item">👤 {{ article.authorName }}</span>
+            <span class="meta-item">BY {{ article.authorName }}</span>
             <span class="meta-sep">·</span>
             <span class="meta-item">{{ formatDate(article.createTime) }}</span>
             <span class="meta-sep">·</span>
-            <span class="meta-item">👁 {{ article.viewCount || 0 }} 阅读</span>
+            <span class="meta-item">{{ article.viewCount || 0 }} 阅读</span>
             <span class="meta-sep" v-if="article.categoryName">·</span>
             <router-link
               :to="`/category/${encodeURIComponent(article.categoryName)}`"
@@ -50,7 +50,7 @@
 
         <!-- 附件（修复下载） -->
         <div class="article-attachments" v-if="attachments.length > 0">
-          <p class="attach-title">📎 附件</p>
+          <p class="attach-title">附件</p>
           <div class="attach-list">
             <a
               v-for="(att, i) in attachments"
@@ -61,7 +61,7 @@
               class="attach-item"
               @click.prevent="downloadFile(att)"
             >
-              <span class="att-icon">📄</span>
+              <span class="att-icon">DOC</span>
               <span class="att-name">{{ att.name || att.fileName }}</span>
               <span class="att-size" v-if="att.size">({{ formatFileSize(att.size) }})</span>
             </a>
@@ -162,7 +162,7 @@
 
         <!-- 目录 -->
         <div class="aside-card toc-card" v-if="toc.length > 0">
-          <p class="aside-card-title">📑 目录</p>
+          <p class="aside-card-title">目录</p>
           <nav class="toc-nav">
             <a
               v-for="item in toc"
@@ -176,7 +176,7 @@
 
         <!-- 关于 -->
         <div class="aside-card">
-          <p class="aside-card-title">👤 关于我</p>
+          <p class="aside-card-title">关于我</p>
           <div class="about-brief">
             <div class="about-avatar">
               <img :src="siteConfig.avatar" :alt="siteConfig.name" />
@@ -188,7 +188,7 @@
 
         <!-- 最新 -->
         <div class="aside-card">
-          <p class="aside-card-title">🕐 最新文章</p>
+          <p class="aside-card-title">最新文章</p>
           <div class="recent-list">
             <router-link
               v-for="a in recentArticles"
@@ -318,13 +318,13 @@ const resolveContentUrl = (url) => {
   return url
 }
 
-// ✅ 修复附件URL
+// 修复附件URL
 const getAttachmentUrl = (url) => resolveContentUrl(url)
 
-// ✅ 修复封面URL
+// 修复封面URL
 const getCoverUrl = (url) => resolveContentUrl(url)
 
-// ✅ 修复附件下载
+// 修复附件下载
 const downloadFile = async (attachment) => {
   try {
     const url = attachment.url
@@ -515,7 +515,7 @@ const cancelReply = () => {
   commentContent.value = ''
 }
 
-// ✅ 修复：只有博主能删除评论
+// 只有博主能删除评论
 const canDeleteComment = (comment) => {
   if (!isLoggedIn.value) return false
   return userStore.isAdmin
@@ -620,7 +620,7 @@ const renderMarkdown = (text) => {
   return html
 }
 
-// ✅ 防重载：合并 watch 和 onMounted 的初始化逻辑
+// 防重载：合并 watch 和 onMounted 的初始化逻辑
 let initialized = false
 
 const init = () => {
@@ -665,6 +665,13 @@ watch(() => route.params.id, () => {
 
 .article-main {
   min-width: 0;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(8, 14, 27, 0.72);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .article-aside {
@@ -682,7 +689,7 @@ watch(() => route.params.id, () => {
   margin-bottom: 20px;
 }
 .breadcrumb a { color: var(--text-lighter); }
-.breadcrumb a:hover { color: var(--accent-dark); }
+.breadcrumb a:hover { color: var(--accent); }
 .breadcrumb span { margin: 0 4px; }
 
 .article-header {
@@ -762,11 +769,11 @@ watch(() => route.params.id, () => {
 :deep(.article-body em) { font-style: italic; }
 :deep(.article-body code) {
   font-family: 'Fira Code', monospace;
-  background: rgba(0,0,0,0.06);
+  background: rgba(56, 248, 255, 0.09);
   padding: 2px 6px;
   border-radius: 3px;
   font-size: 0.88em;
-  color: #c0392b;
+  color: var(--accent-soft);
 }
 :deep(.article-body pre) {
   background: #1e1e1e;
@@ -813,7 +820,7 @@ watch(() => route.params.id, () => {
 .article-attachments {
   margin-top: 32px;
   padding: 20px;
-  background: var(--bg);
+  background: rgba(8, 14, 27, 0.62);
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
@@ -872,7 +879,7 @@ watch(() => route.params.id, () => {
 
 /* 评论表单 - 与留言板一致 */
 .comment-form {
-  background: var(--card);
+  background: rgba(8, 14, 27, 0.72);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 24px;
@@ -934,10 +941,10 @@ watch(() => route.params.id, () => {
 .reply-notice {
   margin-top: 8px;
   padding: 6px 12px;
-  background: rgba(200,169,126,0.08);
+  background: rgba(56, 248, 255, 0.08);
   border-radius: 6px;
   font-size: 13px;
-  color: var(--accent-dark);
+  color: var(--accent);
 }
 .cancel-reply {
   margin-left: 8px;
@@ -984,6 +991,10 @@ watch(() => route.params.id, () => {
 .comment-item {
   display: flex;
   gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(8, 14, 27, 0.56);
   animation: fadeUp 0.35s both;
 }
 @keyframes fadeUp {
@@ -1038,8 +1049,8 @@ watch(() => route.params.id, () => {
 .comment-badge {
   font-size: 11px;
   padding: 1px 8px;
-  background: rgba(200,169,126,0.15);
-  color: var(--accent-dark);
+  background: rgba(56, 248, 255, 0.1);
+  color: var(--accent);
   border-radius: 10px;
   font-weight: 600;
 }
@@ -1161,8 +1172,8 @@ watch(() => route.params.id, () => {
   transition: all 0.2s;
 }
 .page-btn:hover:not(:disabled) {
-  background: var(--text);
-  color: #fff;
+  background: rgba(56, 248, 255, 0.16);
+  color: var(--accent-soft);
 }
 .page-btn:disabled {
   opacity: 0.4;
@@ -1174,7 +1185,7 @@ watch(() => route.params.id, () => {
 }
 
 .aside-card {
-  background: var(--card);
+  background: rgba(8, 14, 27, 0.72);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 18px;

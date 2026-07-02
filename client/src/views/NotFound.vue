@@ -2,7 +2,7 @@
   <div class="notfound-page">
     <div class="notfound-inner">
       <div class="notfound-art">
-        <div class="art-emoji">?</div>
+        <div class="art-symbol">?</div>
         <div class="art-shadow"></div>
       </div>
       <div class="notfound-content">
@@ -52,7 +52,7 @@
   justify-content: center;
 }
 
-.art-emoji {
+.art-symbol {
   font-size: 5rem;
   line-height: 1;
   animation: float 3s ease-in-out infinite;

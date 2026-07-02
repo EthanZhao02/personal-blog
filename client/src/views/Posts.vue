@@ -56,7 +56,7 @@
 
         <!-- 空状态 -->
         <div class="empty" v-if="filteredArticles.length === 0 && !loading">
-          <p class="empty-icon">📭</p>
+          <p class="empty-icon">--</p>
           <p class="empty-text">还没有文章</p>
         </div>
 
@@ -252,7 +252,7 @@ onMounted(() => {
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: rgba(255, 250, 241, 0.68);
+  background: rgba(8, 14, 27, 0.72);
   box-shadow: var(--shadow);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -270,7 +270,7 @@ onMounted(() => {
   padding: 7px 15px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(255, 250, 241, 0.68);
+  background: rgba(8, 14, 27, 0.62);
   color: var(--text-light);
   font-size: 13px;
   cursor: pointer;
@@ -284,16 +284,16 @@ onMounted(() => {
 }
 
 .filter-chip.active {
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--violet));
   border-color: var(--accent);
-  color: #fff;
+  color: #06101f;
 }
 
 .tag-select {
   padding: 7px 12px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.62);
   color: var(--text);
   font-size: 13px;
   cursor: pointer;
@@ -319,7 +319,7 @@ onMounted(() => {
   top: 38px;
   bottom: 8px;
   width: 1px;
-  background: linear-gradient(180deg, rgba(201, 133, 36, 0.5), transparent);
+  background: linear-gradient(180deg, rgba(56, 248, 255, 0.6), rgba(155, 92, 255, 0.24), transparent);
 }
 
 .year-title {
@@ -357,21 +357,21 @@ onMounted(() => {
   padding: 14px 16px;
   border: 1px solid transparent;
   border-radius: 8px;
-  background: rgba(255, 250, 241, 0.42);
+  background: rgba(8, 14, 27, 0.44);
   transition: transform 0.24s var(--ease-out), box-shadow 0.24s var(--ease-out), border-color 0.24s, background 0.24s;
 }
 
 .article-item:hover {
-  background: rgba(255, 250, 241, 0.9);
-  border-color: rgba(201, 133, 36, 0.22);
-  box-shadow: 0 14px 28px rgba(88, 66, 38, 0.08);
+  background: rgba(16, 28, 50, 0.78);
+  border-color: rgba(56, 248, 255, 0.28);
+  box-shadow: 0 14px 36px rgba(56, 248, 255, 0.1);
   transform: translateX(8px);
 }
 
 .article-date {
   flex-shrink: 0;
   font-size: 13px;
-  color: var(--accent-dark);
+  color: var(--accent);
   font-family: 'SF Mono', 'Consolas', monospace;
   min-width: 48px;
 }
@@ -391,7 +391,7 @@ onMounted(() => {
 }
 
 .article-item:hover .article-title {
-  color: var(--accent-dark);
+  color: var(--accent-soft);
 }
 
 /* 空状态 */
@@ -402,8 +402,10 @@ onMounted(() => {
 }
 
 .empty-icon {
-  font-size: 3rem;
+  font-size: 1.6rem;
   margin-bottom: 12px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
 }
 
 .empty-text {

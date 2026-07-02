@@ -3,11 +3,11 @@
     <div class="ambient-layer" aria-hidden="true">
       <span class="ambient-line line-a"></span>
       <span class="ambient-line line-b"></span>
-      <span class="ambient-stamp">保持热爱<br />奔赴山海</span>
+      <span class="ambient-stamp">ETHAN LAB<br />FUTURE 2026</span>
     </div>
 
     <!-- 特效容器 -->
-    <div class="candy-container">
+    <div class="candy-container" aria-hidden="true">
       <span
         v-for="candy in candies"
         :key="candy.id"
@@ -17,17 +17,17 @@
           top: candy.y + 'px',
           animationDuration: candy.dur + 's',
           animationDelay: candy.delay + 's',
-          fontSize: candy.size + 'px',
+          '--particle-size': candy.size + 'px',
           opacity: candy.opacity,
           color: candy.color,
           '--dx': candy.dx + 'px',
           '--dy': candy.dy + 'px',
           '--rot': candy.rot + 'deg'
         }"
-      >{{ candy.emoji }}</span>
+      ></span>
     </div>
 
-    <!-- ✅ 顶部固定导航 - 添加 @click.stop 防止触发特效 -->
+    <!-- 顶部固定导航 -->
     <header class="souta-nav" @click.stop @touchstart.stop>
       <nav class="souta-nav-inner" @click.stop @touchstart.stop>
         <router-link
@@ -107,12 +107,11 @@ const isActive = (path) => {
   return route.path.startsWith(path)
 }
 
-// 萤火虫/金粉特效配置
-// 使用微小符号和星星，配合暖金色系
-const DUST_EMOJIS = ['✦', '·', '•', '∗']
+// 光点特效配置
+const DUST_COLORS = ['#38f8ff', '#9b5cff', '#8df8c7', '#ffbd66']
 
 const dropCandy = (e) => {
-  // ✅ 排除导航、按钮、链接、输入框等交互元素
+  // 排除导航、按钮、链接、输入框等交互元素
   const excludeSelectors = [
     '.souta-nav',
     '.nav-item',
@@ -147,21 +146,14 @@ const dropCandy = (e) => {
     const dy = -48 - Math.random() * 110
     const rot = (Math.random() - 0.5) * 220
     
-    // 🎨 随机颜色：使用与你博客主题匹配的金色/琥珀色系
-    // HSL: 色相40-55(金色/琥珀色), 饱和度80%, 亮度50-80%
-    const hue = 40 + Math.random() * 15
-    const lightness = 50 + Math.random() * 30
-    const color = `hsl(${hue}, 80%, ${lightness}%)`
+    const color = DUST_COLORS[Math.floor(Math.random() * DUST_COLORS.length)]
     
     const dur = 0.95 + Math.random() * 0.75
     const delay = Math.random() * 0.08
     const size = 6 + Math.random() * 10
     const opacity = 0.45 + Math.random() * 0.55
     
-    // 随机选择 Emoji
-    const emoji = DUST_EMOJIS[Math.floor(Math.random() * DUST_EMOJIS.length)]
-    
-    candies.value.push({ id, x, y, dx, dy, rot, emoji, color, dur, delay, size, opacity })
+    candies.value.push({ id, x, y, dx, dy, rot, color, dur, delay, size, opacity })
   }
   
   // 性能优化：限制最大数量
@@ -187,10 +179,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ================================================
-   souta.cc 风格 App.vue - 萤火虫金粉特效版
-   ================================================ */
-
 .souta-app {
   min-height: 100vh;
   display: flex;
@@ -210,10 +198,11 @@ onMounted(() => {
 .ambient-line {
   position: absolute;
   display: block;
-  width: 240px;
+  width: 360px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(153, 97, 22, 0.28), transparent);
+  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.44), rgba(155, 92, 255, 0.3), transparent);
   transform-origin: center;
+  filter: drop-shadow(0 0 12px rgba(56, 248, 255, 0.3));
 }
 
 .line-a {
@@ -236,15 +225,17 @@ onMounted(() => {
   position: absolute;
   top: 18%;
   right: 4.5%;
-  padding: 10px 8px;
-  border: 1px solid rgba(153, 97, 22, 0.28);
+  padding: 12px 9px;
+  border: 1px solid rgba(56, 248, 255, 0.32);
   border-radius: 8px;
-  color: rgba(153, 97, 22, 0.46);
-  font-family: var(--font-serif);
-  font-size: 14px;
+  color: rgba(199, 251, 255, 0.64);
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 11px;
   line-height: 1.55;
   writing-mode: vertical-rl;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
+  background: rgba(8, 14, 27, 0.45);
+  box-shadow: 0 0 28px rgba(56, 248, 255, 0.08);
 }
 
 @keyframes lineDrift {
@@ -267,11 +258,14 @@ onMounted(() => {
 /* 微粒基础样式 */
 .candy {
   position: absolute;
+  width: var(--particle-size, 8px);
+  height: var(--particle-size, 8px);
+  border-radius: 999px;
+  background: currentColor;
   pointer-events: none;
   user-select: none;
   will-change: transform, opacity;
-  font-weight: bold;
-  filter: blur(0.15px) drop-shadow(0 0 5px rgba(255, 190, 50, 0.55));
+  filter: blur(0.1px) drop-shadow(0 0 8px currentColor);
   animation-fill-mode: forwards;
 }
 
@@ -314,12 +308,25 @@ onMounted(() => {
   gap: 6px;
   max-width: min(100%, 820px);
   padding: 8px 10px;
-  border: 1px solid rgba(85, 71, 54, 0.14);
+  border: 1px solid rgba(126, 238, 255, 0.24);
   border-radius: 999px;
-  background: rgba(255, 250, 241, 0.72);
+  background:
+    linear-gradient(135deg, rgba(15, 24, 45, 0.88), rgba(8, 12, 24, 0.74));
   backdrop-filter: blur(18px) saturate(1.25);
   -webkit-backdrop-filter: blur(18px) saturate(1.25);
-  box-shadow: 0 18px 40px rgba(88, 66, 38, 0.12);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28), 0 0 34px rgba(56, 248, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.souta-nav-inner::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.12), transparent);
+  opacity: 0.65;
+  pointer-events: none;
 }
 
 .nav-item {
@@ -340,22 +347,22 @@ onMounted(() => {
 }
 
 .nav-icon {
-  color: var(--accent-dark);
+  color: var(--accent);
   font-size: 13px;
   line-height: 1;
   opacity: 0.72;
 }
 
 .nav-item:hover {
-  color: var(--text, #333);
-  background: rgba(201, 133, 36, 0.1);
+  color: var(--accent-soft);
+  background: rgba(56, 248, 255, 0.1);
   transform: translateY(-1px);
 }
 
 .nav-item.active {
-  background: rgba(41, 36, 29, 0.93);
-  color: #fffaf1;
-  box-shadow: 0 10px 24px rgba(41, 36, 29, 0.22);
+  background: linear-gradient(135deg, rgba(56, 248, 255, 0.22), rgba(155, 92, 255, 0.24));
+  color: #ffffff;
+  box-shadow: 0 10px 28px rgba(56, 248, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .nav-item.active .nav-icon {
@@ -365,18 +372,18 @@ onMounted(() => {
 
 /* 写文章按钮高亮 */
 .nav-write {
-  color: var(--accent-dark, #d97706);
+  color: var(--accent);
   font-weight: 500;
 }
 
 .nav-write:hover {
-  color: var(--accent-dark, #d97706);
-  background: var(--accent-dim, #fef3c7);
+  color: var(--accent-soft);
+  background: var(--accent-dim);
 }
 
 .nav-write.active {
-  background: var(--accent-dark, #d97706);
-  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--violet));
+  color: #06101f;
 }
 
 /* 退出登录按钮 */
@@ -397,8 +404,8 @@ onMounted(() => {
 }
 
 .nav-login:hover {
-  color: var(--accent-dark, #d97706);
-  background: var(--accent-dim, #fef3c7);
+  color: var(--accent);
+  background: var(--accent-dim);
 }
 
 /* ================================================
@@ -418,8 +425,9 @@ onMounted(() => {
   text-align: center;
   font-size: 13px;
   color: var(--text-lighter, #999);
-  border-top: 1px solid var(--border, #eee);
+  border-top: 1px solid var(--border);
   margin-top: 40px;
+  background: linear-gradient(180deg, transparent, rgba(7, 8, 18, 0.72));
 }
 
 .souta-footer p {

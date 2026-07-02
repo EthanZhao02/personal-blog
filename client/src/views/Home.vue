@@ -2,6 +2,7 @@
   <div class="home-page">
     <div class="home-layout">
       <div class="home-left">
+        <div class="hero-kicker reveal-up">ETHAN FUTURE LAB / PERSONAL BLOG</div>
         <div class="hero-greeting reveal-up">
           <span>Hi, there </span>
           <span class="hero-wave" aria-hidden="true">/</span>
@@ -15,6 +16,11 @@
 
         <div class="hero-subtitle reveal-up" style="animation-delay: 240ms">
           {{ siteConfig.subtitle }}
+        </div>
+
+        <div class="hero-actions reveal-up" style="animation-delay: 300ms">
+          <router-link to="/posts" class="hero-action primary">进入文章</router-link>
+          <router-link to="/projects" class="hero-action">查看项目</router-link>
         </div>
 
         <div class="hero-socials reveal-up" style="animation-delay: 360ms">
@@ -147,8 +153,11 @@ const getSocialIcon = (icon) => {
     telegram: '<svg width="25" height="25" viewBox="0 -102 1024 1024" fill="currentColor"><path d="M834.24 127.872a95.168 95.168 0 0 0-29.856 7.136h-0.128c-9.12 3.616-52.48 21.856-118.4 49.504l-236.224 99.488c-169.504 71.36-336.128 141.632-336.128 141.632l1.984-0.768s-11.488 3.776-23.488 12a64.96 64.96 0 0 0-18.752 18.144c-5.888 8.64-10.624 21.856-8.864 35.52 2.88 23.104 17.856 36.96 28.608 44.608 10.88 7.744 21.248 11.36 21.248 11.36h0.256l156.256 52.64c7.008 22.496 47.616 156 57.376 186.752 5.76 18.368 11.36 29.856 18.368 38.624 3.392 4.48 7.36 8.224 12.128 11.232a35.808 35.808 0 0 0 7.872 3.392l-1.6-0.384c0.48 0.128 0.864 0.512 1.216 0.64 1.28 0.352 2.144 0.48 3.776 0.736 24.736 7.488 44.608-7.872 44.608-7.872l1.12-0.896 92.256-84 154.624 118.624 3.52 1.504c32.224 14.144 64.864 6.272 82.112-7.616 17.376-13.984 24.128-31.872 24.128-31.872l1.12-2.88 119.488-612.128c3.392-15.104 4.256-29.248 0.512-42.976a57.824 57.824 0 0 0-24.992-33.504 59.904 59.904 0 0 0-34.144-8.64z m-3.232 65.6c-0.128 2.016 0.256 1.792-0.64 5.664v0.352l-118.368 605.76c-0.512 0.864-1.376 2.752-3.744 4.64-2.496 1.984-4.48 3.232-14.88-0.896l-189.12-144.992-114.24 104.128 24-153.28 308.992-288c12.736-11.84 8.48-14.336 8.48-14.336 0.896-14.528-19.232-4.256-19.232-4.256l-389.632 241.376-0.128-0.64-186.752-62.88v-0.128l-0.48-0.096a8.64 8.64 0 0 0 0.96-0.384l1.024-0.512 0.992-0.352s166.752-70.272 336.256-141.632c84.864-35.744 170.368-71.744 236.128-99.52 65.76-27.616 114.368-47.872 117.12-48.96 2.624-1.024 1.376-1.024 3.264-1.024z"/></svg>',
     email: '<svg width="25" height="25" viewBox="0 -102 1024 1024" fill="currentColor"><path d="M838.954667 234.666667H170.666667c-3.626667 0-7.168 0.448-10.56 1.322666l323.690666 323.669334a21.333333 21.333333 0 0 0 30.165334 0L838.954667 234.666667z m46.144 14.186666l-260.693334 260.693334 262.933334 262.912c5.44-7.168 8.661333-16.106667 8.661333-25.792V277.333333c0-10.944-4.117333-20.906667-10.88-28.48zM843.861333 789.333333l-249.6-249.621333-50.133333 50.133333a64 64 0 0 1-90.517333 0l-50.112-50.133333L156.373333 786.88c4.48 1.578667 9.28 2.453333 14.314667 2.453333h673.194667zM128.661333 754.218667L373.333333 509.525333 129.578667 265.813333A42.709333 42.709333 0 0 0 128 277.333333v469.333334c0 2.56 0.213333 5.098667 0.661333 7.552zM170.666667 192h682.666666a85.333333 85.333333 0 0 1 85.333334 85.333333v469.333334a85.333333 85.333333 0 0 1-85.333334 85.333333H170.666667a85.333333 85.333333 0 0 1-85.333334-85.333333V277.333333a85.333333 85.333333 0 0 1 85.333334-85.333333z"/></svg>',
     twitter: '<svg width="16" height="16" viewBox="0 -102 1024 1024" fill="currentColor"><path d="M919.759462 318.994613c0-9.605475-0.184234-19.102577-0.608696-28.534655 41.060787-30.595551 76.68666-68.894629 104.863684-112.720738a403.247526 403.247526 0 0 1-120.68436 33.017692c43.401647-26.708567 76.68666-69.423851 92.415219-120.68436-40.638132 24.645865-85.589515 42.265535-133.383889 51.446549-38.295465-43.575045-92.944441-71.329413-153.358869-72.360764-116.027926-1.918205-210.084998 96.132418-210.084999 218.973404 0 17.460724 1.826088 34.394031 5.451171 50.745736-174.722834-11.243716-329.55016-102.190479-433.116978-239.293373-18.071226 32.847907-28.438925 71.237296-28.438925 112.377556 0 77.811934 37.090717 146.970271 93.44657 187.779994-34.500598-1.560574-66.819283-12.009553-95.166091-29.141545v2.85744c0 108.752474 72.440238 199.870827 168.560013 221.13003-17.621477 5.012259-36.207475 7.62044-55.322696 7.526516a191.542349 191.542349 0 0 1-39.500214-4.325895c26.708567 89.120675 104.332655 154.231274 196.231295 156.400543-71.923659 59.635948-162.525433 95.258208-260.892145 95.00895-16.960401 0-33.720311-1.137918-50.15149-3.200621 93.011271 63.80109 203.418242 100.960443 322.104923 100.960443 386.350343 0.092117 597.636477-336.191629 597.636477-627.962902z"/></svg>',
+    gitlab: '<span class="social-letter">GL</span>',
+    gitee: '<span class="social-letter">GE</span>',
+    csdn: '<span class="social-letter">CN</span>',
   }
-    return icons[icon] || '<span>•</span>'
+    return icons[icon] || '<span class="social-letter">--</span>'
 }
 
 onMounted(() => {
@@ -193,11 +202,23 @@ onUnmounted(() => {
 .home-left {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   flex: 1;
   max-width: 560px;
   position: relative;
   z-index: 2;
+}
+
+.hero-kicker {
+  width: fit-content;
+  padding: 7px 12px;
+  border: 1px solid rgba(126, 238, 255, 0.24);
+  border-radius: 999px;
+  color: var(--accent-soft);
+  background: rgba(8, 14, 27, 0.58);
+  font: 600 11px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.08em;
+  box-shadow: 0 0 24px rgba(56, 248, 255, 0.08);
 }
 
 .hero-greeting {
@@ -218,6 +239,8 @@ onUnmounted(() => {
   display: inline-block;
   transform-origin: 70% 70%;
   animation: waveHello 2.8s ease-in-out infinite;
+  color: var(--accent);
+  text-shadow: 0 0 18px rgba(56, 248, 255, 0.4);
 }
 
 .hero-name {
@@ -232,8 +255,8 @@ onUnmounted(() => {
 .hero-name-underline {
   position: relative;
   display: inline-block;
-  color: var(--accent-dark);
-  text-shadow: 0 12px 26px rgba(153, 97, 22, 0.12);
+  color: var(--accent);
+  text-shadow: 0 12px 30px rgba(56, 248, 255, 0.16);
 }
 
 .hero-name-underline::after {
@@ -246,6 +269,7 @@ onUnmounted(() => {
   border-radius: 999px;
   background: linear-gradient(90deg, var(--accent), var(--sage), transparent);
   transform: rotate(-1.4deg);
+  box-shadow: 0 0 18px rgba(56, 248, 255, 0.22);
 }
 
 .hero-subtitle {
@@ -253,10 +277,46 @@ onUnmounted(() => {
   margin-top: 10px;
   padding: 8px 0 9px;
   font-size: clamp(1.2rem, 2.2vw, 1.85rem);
-  color: var(--text);
+  color: var(--text-light);
   font-family: var(--font-serif);
-  letter-spacing: 0.08em;
-  border-bottom: 2px solid rgba(111, 129, 119, 0.38);
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(126, 238, 255, 0.32);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.hero-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 108px;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid rgba(126, 238, 255, 0.24);
+  border-radius: 8px;
+  color: var(--text-light);
+  background: rgba(8, 14, 27, 0.62);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+  transition: transform 0.24s var(--ease-out), border-color 0.24s, box-shadow 0.24s, color 0.24s;
+}
+
+.hero-action.primary {
+  color: #07101c;
+  border-color: rgba(56, 248, 255, 0.7);
+  background: linear-gradient(135deg, var(--accent), var(--violet));
+  box-shadow: 0 16px 36px rgba(56, 248, 255, 0.18);
+}
+
+.hero-action:hover {
+  transform: translateY(-3px);
+  color: var(--accent-soft);
+  border-color: var(--accent);
+  box-shadow: 0 18px 42px rgba(56, 248, 255, 0.14);
 }
 
 .hero-socials {
@@ -273,11 +333,11 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  border: 1px solid rgba(41, 36, 29, 0.12);
-  background: rgba(255, 250, 241, 0.76);
-  color: var(--text);
+  border: 1px solid rgba(126, 238, 255, 0.22);
+  background: rgba(8, 14, 27, 0.72);
+  color: var(--text-light);
   transition: box-shadow 0.25s var(--ease-out), transform 0.25s var(--ease-out), color 0.2s, border-color 0.2s;
-  box-shadow: 0 10px 22px rgba(88, 66, 38, 0.08);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -311,9 +371,10 @@ onUnmounted(() => {
 
 .stage-ring {
   position: absolute;
-  border: 1px solid rgba(153, 97, 22, 0.2);
+  border: 1px solid rgba(56, 248, 255, 0.26);
   border-radius: 50%;
   z-index: -2;
+  box-shadow: inset 0 0 32px rgba(56, 248, 255, 0.08), 0 0 32px rgba(155, 92, 255, 0.12);
 }
 
 .ring-one {
@@ -325,14 +386,15 @@ onUnmounted(() => {
 .ring-two {
   width: 320px;
   height: 320px;
-  border-color: rgba(47, 72, 88, 0.16);
+  border-color: rgba(155, 92, 255, 0.26);
   animation: slowSpin 30s linear infinite reverse;
 }
 
 .stage-line {
   position: absolute;
-  background: rgba(153, 97, 22, 0.24);
+  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.5), transparent);
   z-index: -1;
+  box-shadow: 0 0 16px rgba(56, 248, 255, 0.22);
 }
 
 .line-one {
@@ -356,14 +418,15 @@ onUnmounted(() => {
   z-index: 3;
   margin: 0;
   padding: 18px 20px;
-  border: 1px solid rgba(85, 71, 54, 0.12);
+  border: 1px solid rgba(126, 238, 255, 0.22);
   border-radius: 8px;
-  background: rgba(255, 250, 241, 0.78);
+  background:
+    linear-gradient(135deg, rgba(15, 24, 45, 0.92), rgba(8, 13, 25, 0.78));
   color: var(--ink-blue);
   font-family: 'Consolas', 'SF Mono', monospace;
   font-size: 13px;
   line-height: 1.75;
-  box-shadow: 0 18px 40px rgba(88, 66, 38, 0.12);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28), 0 0 30px rgba(56, 248, 255, 0.08);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   transform: rotate(1.8deg);
@@ -374,14 +437,14 @@ onUnmounted(() => {
   width: 380px;
   height: 500px;
   background:
-    linear-gradient(180deg, rgba(255, 250, 241, 0.66), rgba(240, 230, 215, 0.4)),
-    rgba(255, 250, 241, 0.5);
-  border: 1px solid rgba(85, 71, 54, 0.14);
+    linear-gradient(180deg, rgba(22, 34, 61, 0.76), rgba(8, 13, 25, 0.74)),
+    rgba(8, 14, 27, 0.62);
+  border: 1px solid rgba(126, 238, 255, 0.28);
   border-radius: 8px;
   position: relative;
   cursor: pointer;
   overflow: hidden;
-  box-shadow: 0 30px 70px rgba(88, 66, 38, 0.16);
+  box-shadow: 0 30px 82px rgba(0, 0, 0, 0.34), 0 0 48px rgba(56, 248, 255, 0.1);
   transform: rotate(2.2deg);
   transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
   animation: photoFloat 6s ease-in-out infinite;
@@ -391,7 +454,7 @@ onUnmounted(() => {
   content: '';
   position: absolute;
   inset: 12px;
-  border: 1px solid rgba(255, 250, 241, 0.82);
+  border: 1px solid rgba(56, 248, 255, 0.34);
   border-radius: 6px;
   pointer-events: none;
   z-index: 2;
@@ -403,14 +466,14 @@ onUnmounted(() => {
   inset: auto 28px 20px;
   height: 18px;
   border-radius: 50%;
-  background: rgba(47, 72, 88, 0.16);
-  filter: blur(16px);
+  background: rgba(56, 248, 255, 0.16);
+  filter: blur(18px);
   z-index: 0;
 }
 
 .photo-wrapper:hover {
   transform: rotate(0deg) translateY(-8px) scale(1.015);
-  box-shadow: 0 36px 82px rgba(88, 66, 38, 0.2);
+  box-shadow: 0 40px 94px rgba(0, 0, 0, 0.4), 0 0 64px rgba(56, 248, 255, 0.18);
 }
 
 .photo-inner {
@@ -432,7 +495,7 @@ onUnmounted(() => {
   object-position: bottom center;
   opacity: 0;
   padding: 20px 18px 0;
-  filter: drop-shadow(0 18px 24px rgba(41, 36, 29, 0.18));
+  filter: drop-shadow(0 20px 26px rgba(56, 248, 255, 0.12));
   transition: opacity 0.42s ease, transform 0.55s var(--ease-out), filter 0.45s;
   transform: translateY(18px) scale(0.97);
 }
@@ -442,7 +505,7 @@ onUnmounted(() => {
   transform: translateY(0) scale(1);
 }
 
-/* 🎈 自然柔和的缩放动画 */
+/* 自然柔和的缩放动画 */
 @keyframes popBounce {
   0%   { 
     opacity: 0; 
@@ -475,7 +538,7 @@ onUnmounted(() => {
   padding: 0;
   border: 0;
   border-radius: 999px;
-  background: rgba(41, 36, 29, 0.28);
+  background: rgba(126, 238, 255, 0.22);
   cursor: pointer;
   transition: width 0.24s var(--ease-out), background 0.24s;
 }
@@ -492,7 +555,7 @@ onUnmounted(() => {
   display: grid;
   gap: 7px;
   transform: translateX(-50%);
-  color: var(--accent-dark);
+  color: var(--accent);
 }
 
 .scroll-cue span {

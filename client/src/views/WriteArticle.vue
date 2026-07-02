@@ -107,10 +107,10 @@
           </button>
           <span class="tool-sep"></span>
           <button class="tool-btn" @click="insertFormat('[', '](url)')" title="Link">
-            🔗
+            URL
           </button>
           <button class="tool-btn" @click="triggerImageUpload" title="Image">
-            🖼️
+            IMG
           </button>
           <button class="tool-btn" @click="insertFormat('\n```\n', '\n```\n')" title="Code Block">
             { }
@@ -150,7 +150,7 @@
           <label>{{ t('attachments') }}</label>
           <div class="attachment-list" v-if="attachments.length > 0">
             <div v-for="(file, idx) in attachments" :key="idx" class="attachment-item">
-              <span class="file-icon">📄</span>
+              <span class="file-icon">DOC</span>
               <a :href="file.url || '#'" target="_blank" class="file-name" :title="file.name">{{ file.name }}</a>
               <span class="file-size">{{ formatSize(file.size) }}</span>
               <button class="file-remove" @click="removeAttachment(idx)">×</button>
@@ -1221,11 +1221,11 @@ onMounted(async () => {
   vertical-align: middle;
 }
 .item-status.published {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgba(141, 248, 199, 0.14);
+  color: var(--ink-blue);
 }
 .item-status.draft {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(255, 189, 102, 0.14);
+  color: var(--amber);
 }
 </style>

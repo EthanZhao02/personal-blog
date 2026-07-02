@@ -491,7 +491,7 @@ onMounted(() => { loadProjects() })
   margin-bottom: 32px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: rgba(255, 250, 241, 0.68);
+  background: rgba(8, 14, 27, 0.72);
   box-shadow: var(--shadow);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -506,7 +506,7 @@ onMounted(() => { loadProjects() })
 .stat-count {
   font-size: 20px;
   font-weight: 700;
-  color: var(--accent-dark);
+  color: var(--accent);
 }
 .stat-label {
   font-size: 13px;
@@ -520,7 +520,7 @@ onMounted(() => { loadProjects() })
   margin-left: auto;
 }
 .filter-btn {
-  background: rgba(255, 250, 241, 0.74);
+  background: rgba(8, 14, 27, 0.62);
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 7px 16px;
@@ -535,9 +535,9 @@ onMounted(() => { loadProjects() })
   transform: translateY(-1px);
 }
 .filter-btn.active {
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--violet));
   border-color: var(--accent);
-  color: #fff;
+  color: #06101f;
 }
 
 /* 项目分组 */
@@ -585,7 +585,7 @@ onMounted(() => { loadProjects() })
 }
 
 .project-card {
-  background: rgba(255, 250, 241, 0.76);
+  background: rgba(8, 14, 27, 0.72);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
@@ -597,14 +597,14 @@ onMounted(() => { loadProjects() })
 .project-card:hover {
   box-shadow: var(--shadow-hover);
   transform: translateY(-6px);
-  border-color: rgba(201, 133, 36, 0.32);
+  border-color: rgba(56, 248, 255, 0.36);
 }
 
 /* 项目截图 */
 .project-gallery {
   margin: 0;
   background:
-    linear-gradient(135deg, rgba(47, 72, 88, 0.08), rgba(201, 133, 36, 0.08)),
+    linear-gradient(135deg, rgba(56, 248, 255, 0.08), rgba(155, 92, 255, 0.1)),
     var(--bg-soft);
 }
 .gallery-container {
@@ -640,7 +640,7 @@ onMounted(() => { loadProjects() })
   transition: color 0.2s;
 }
 .project-card:hover .project-name a {
-  color: var(--accent-dark);
+  color: var(--accent-soft);
 }
 .project-badges {
   display: flex;
@@ -654,21 +654,21 @@ onMounted(() => { loadProjects() })
   font-weight: 500;
 }
 .badge-year {
-  background: var(--bg);
+  background: rgba(8, 14, 27, 0.7);
   color: var(--text-light);
   border: 1px solid var(--border);
 }
 .badge-blue {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+  background: rgba(56, 248, 255, 0.12);
+  color: var(--accent);
 }
 .badge-green {
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
+  background: rgba(141, 248, 199, 0.12);
+  color: var(--ink-blue);
 }
 .badge-yellow {
-  background: rgba(234, 179, 8, 0.1);
-  color: #eab308;
+  background: rgba(255, 189, 102, 0.12);
+  color: var(--amber);
 }
 
 /* 项目统计 */
@@ -717,7 +717,7 @@ onMounted(() => { loadProjects() })
 .tech-tag {
   font-size: 11px;
   padding: 3px 8px;
-  background: rgba(255, 250, 241, 0.7);
+  background: rgba(8, 14, 27, 0.62);
   border: 1px solid var(--border);
   border-radius: 999px;
   color: var(--text-light);
@@ -746,7 +746,7 @@ onMounted(() => { loadProjects() })
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.62);
   border: 1px solid var(--border);
   color: var(--text-light);
   text-decoration: none;
@@ -754,7 +754,7 @@ onMounted(() => { loadProjects() })
 }
 .link-btn:hover {
   border-color: var(--accent);
-  color: var(--accent-dark);
+  color: var(--accent);
   transform: translateY(-2px);
 }
 .link-btn svg {
@@ -788,19 +788,19 @@ onMounted(() => { loadProjects() })
 /* 管理区 */
 .admin-section { margin-top: 48px; }
 .admin-toggle {
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.72);
   border: 1px dashed var(--accent);
   border-radius: 8px;
   padding: 12px 20px;
   cursor: pointer;
   font-size: 14px;
-  color: var(--accent-dark);
+  color: var(--accent);
   display: flex;
   align-items: center;
   gap: 8px;
   user-select: none;
 }
-.admin-toggle:hover { background: rgba(200,169,126,0.06); }
+.admin-toggle:hover { background: rgba(56, 248, 255, 0.08); }
 .toggle-arrow {
   margin-left: auto;
   transition: transform 0.2s;
@@ -809,7 +809,7 @@ onMounted(() => { loadProjects() })
 .toggle-arrow.open { transform: rotate(180deg); }
 
 .admin-panel {
-  background: rgba(255, 250, 241, 0.82);
+  background: rgba(8, 14, 27, 0.82);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
@@ -918,7 +918,7 @@ onMounted(() => { loadProjects() })
   margin-bottom: 10px;
 }
 .form-input {
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.62);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 14px;
@@ -930,7 +930,7 @@ onMounted(() => { loadProjects() })
 }
 .form-input:focus { outline: none; border-color: var(--accent); }
 .form-textarea {
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.62);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 14px;
@@ -991,7 +991,28 @@ onMounted(() => { loadProjects() })
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
   .admin-item { flex-direction: column; align-items: flex-start; }
   .item-actions { flex-wrap: wrap; }
-  .stats-bar { flex-direction: column; align-items: flex-start; }
-  .stats-actions { margin-left: 0; margin-top: 8px; }
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 10px;
+  }
+  .stat-divider { display: none; }
+  .stat-item {
+    flex-direction: column;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(8, 14, 27, 0.42);
+  }
+  .stats-actions {
+    grid-column: 1 / -1;
+    margin-left: 0;
+    margin-top: 2px;
+  }
+  .filter-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>

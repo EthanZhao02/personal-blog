@@ -333,7 +333,7 @@ onMounted(() => {
 
 /* 留言表单 */
 .message-form {
-  background: rgba(255, 250, 241, 0.78);
+  background: rgba(8, 14, 27, 0.72);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 24px;
@@ -356,7 +356,7 @@ onMounted(() => {
   padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.62);
   color: var(--text);
   font-size: 14px;
   font-family: inherit;
@@ -378,7 +378,7 @@ onMounted(() => {
   padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.62);
   color: var(--text);
   font-size: 14px;
   font-family: inherit;
@@ -411,8 +411,8 @@ onMounted(() => {
 
 .submit-btn {
   padding: 8px 20px;
-  background: var(--accent);
-  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--violet));
+  color: #06101f;
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -422,9 +422,9 @@ onMounted(() => {
 }
 
 .submit-btn:hover:not(:disabled) {
-  background: var(--accent-dark);
+  background: linear-gradient(135deg, var(--accent), var(--ink-blue));
   transform: translateY(-2px);
-  box-shadow: 0 14px 24px rgba(153, 97, 22, 0.18);
+  box-shadow: 0 14px 30px rgba(56, 248, 255, 0.16);
 }
 
 .submit-btn:disabled {
@@ -482,8 +482,8 @@ onMounted(() => {
   padding: 18px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: rgba(255, 250, 241, 0.62);
-  box-shadow: 0 10px 24px rgba(88, 66, 38, 0.06);
+  background: rgba(8, 14, 27, 0.64);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   animation: fadeUp 0.45s var(--ease-out) both;
@@ -493,7 +493,7 @@ onMounted(() => {
 .message-item:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow);
-  border-color: rgba(201, 133, 36, 0.28);
+  border-color: rgba(56, 248, 255, 0.28);
 }
 
 @keyframes fadeUp {
@@ -511,7 +511,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 22px rgba(88, 66, 38, 0.12);
+  border: 1px solid rgba(56, 248, 255, 0.24);
+  box-shadow: 0 10px 28px rgba(56, 248, 255, 0.1);
 }
 
 .msg-avatar img {
@@ -553,7 +554,7 @@ onMounted(() => {
 .msg-ip {
   font-size: 11px;
   color: var(--text-lighter);
-  background: rgba(47, 72, 88, 0.08);
+  background: rgba(56, 248, 255, 0.08);
   padding: 1px 6px;
   border-radius: 4px;
 }
@@ -606,13 +607,13 @@ onMounted(() => {
 .msg-reply {
   margin-top: 8px;
   padding: 8px 12px;
-  background: rgba(201, 133, 36, 0.08);
+  background: rgba(56, 248, 255, 0.08);
   border-radius: 8px;
   border-left: 3px solid var(--accent);
 }
 .reply-badge {
   font-size: 11px;
-  color: var(--accent-dark);
+  color: var(--accent);
   font-weight: 600;
   margin-right: 6px;
 }
@@ -633,21 +634,21 @@ onMounted(() => {
   border-radius: 6px;
   font-size: 13px;
   font-family: inherit;
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.62);
   color: var(--text);
 }
 .reply-input:focus { outline: none; border-color: var(--accent); }
 .reply-send {
   padding: 6px 16px;
-  background: var(--accent);
-  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--violet));
+  color: #06101f;
   border: none;
   border-radius: 6px;
   font-size: 13px;
   cursor: pointer;
   font-family: inherit;
 }
-.reply-send:hover { background: var(--accent-dark); }
+.reply-send:hover { background: linear-gradient(135deg, var(--accent), var(--ink-blue)); }
 
 /* 子留言样式 */
 .msg-children {
@@ -657,7 +658,7 @@ onMounted(() => {
 }
 .child-message {
   padding: 8px 12px;
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.62);
   border-radius: 6px;
   margin-bottom: 8px;
 }

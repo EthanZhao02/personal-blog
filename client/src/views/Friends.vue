@@ -436,7 +436,7 @@ onMounted(() => {
   fetchFriends()
 })
 
-// ✅ 打开管理面板时加载全部数据
+// 打开管理面板时加载全部数据
 watch(showAdmin, (val) => {
   if (val) fetchAllLinks()
 })
@@ -480,7 +480,7 @@ watch(showAdmin, (val) => {
 }
 
 .apply-postcard {
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.72);
   border: 1px dashed var(--accent);
   border-radius: 8px;
   padding: 20px 24px;
@@ -497,19 +497,19 @@ watch(showAdmin, (val) => {
 .apply-postcard:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-hover);
-  border-color: rgba(201, 133, 36, 0.52);
+  border-color: rgba(56, 248, 255, 0.52);
 }
 
 .postcard-stamp {
   font-size: 28px;
   width: 48px;
   height: 48px;
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--violet));
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: #06101f;
   transform: rotate(-5deg);
   box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
 }
@@ -541,7 +541,7 @@ watch(showAdmin, (val) => {
 }
 
 .apply-panel {
-  background: rgba(255, 250, 241, 0.82);
+  background: rgba(8, 14, 27, 0.82);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 24px;
@@ -566,7 +566,7 @@ watch(showAdmin, (val) => {
   padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.62);
   color: var(--text);
   font-size: 14px;
   font-family: inherit;
@@ -629,8 +629,8 @@ watch(showAdmin, (val) => {
   align-items: center;
   justify-content: center;
   padding: 0 14px;
-  background: var(--accent);
-  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--violet));
+  color: #06101f;
   border-radius: 8px;
   font-size: 13px;
   cursor: pointer;
@@ -640,7 +640,7 @@ watch(showAdmin, (val) => {
 }
 
 .upload-avatar-btn:hover {
-  background: var(--accent-dark);
+  background: linear-gradient(135deg, var(--accent), var(--ink-blue));
   transform: translateY(-1px);
 }
 
@@ -661,8 +661,8 @@ watch(showAdmin, (val) => {
 .apply-btn {
   width: 100%;
   padding: 12px;
-  background: var(--accent);
-  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--violet));
+  color: #06101f;
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -673,9 +673,9 @@ watch(showAdmin, (val) => {
 }
 
 .apply-btn:hover {
-  background: var(--accent-dark);
+  background: linear-gradient(135deg, var(--accent), var(--ink-blue));
   transform: translateY(-2px);
-  box-shadow: 0 14px 24px rgba(153, 97, 22, 0.18);
+  box-shadow: 0 14px 30px rgba(56, 248, 255, 0.16);
 }
 
 .apply-note {
@@ -724,7 +724,7 @@ watch(showAdmin, (val) => {
   align-items: center;
   text-decoration: none;
   padding: 20px 16px;
-  background: rgba(255, 250, 241, 0.76);
+  background: rgba(8, 14, 27, 0.72);
   border: 1px solid var(--border);
   border-radius: 8px;
   box-shadow: var(--shadow);
@@ -738,7 +738,7 @@ watch(showAdmin, (val) => {
 .friend-simple-card:hover {
   transform: translateY(-6px) rotate(-0.6deg);
   box-shadow: var(--shadow-hover);
-  border-color: rgba(201, 133, 36, 0.36);
+  border-color: rgba(56, 248, 255, 0.36);
 }
 
 .simple-avatar {
@@ -746,9 +746,9 @@ watch(showAdmin, (val) => {
   height: 64px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid rgba(255, 250, 241, 0.92);
+  border: 2px solid rgba(56, 248, 255, 0.34);
   background: var(--bg-soft);
-  box-shadow: 0 10px 22px rgba(88, 66, 38, 0.12);
+  box-shadow: 0 10px 26px rgba(56, 248, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -792,22 +792,22 @@ watch(showAdmin, (val) => {
 }
 
 .admin-toggle {
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.72);
   border: 1px dashed var(--accent);
   border-radius: 8px;
   padding: 12px 20px;
   cursor: pointer;
   font-size: 14px;
-  color: var(--accent-dark);
+  color: var(--accent);
   transition: all 0.2s;
 }
 
 .admin-toggle:hover {
-  background: rgba(200, 169, 126, 0.08);
+  background: rgba(56, 248, 255, 0.08);
 }
 
 .admin-panel {
-  background: rgba(255, 250, 241, 0.82);
+  background: rgba(8, 14, 27, 0.82);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 16px;
@@ -870,7 +870,7 @@ watch(showAdmin, (val) => {
   padding: 4px 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: rgba(255, 250, 241, 0.72);
+  background: rgba(8, 14, 27, 0.62);
   font-size: 12px;
   cursor: pointer;
   color: var(--text);

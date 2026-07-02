@@ -17,8 +17,8 @@ export const isStaticMode =
 
 const avatar = resolveAssetUrl('/photos/avatar-profile.jpg')
 const photos = [
-  avatar,
   resolveAssetUrl('/photos/photo1.png'),
+  avatar,
   resolveAssetUrl('/photos/photo2.png'),
   resolveAssetUrl('/photos/photo3.png'),
 ]
@@ -27,8 +27,68 @@ const socials = [
   {
     name: 'GitHub',
     url: 'https://github.com/EthanZhao02',
-    color: '#1F2328',
+    color: '#38f8ff',
     icon: 'github',
+  },
+  {
+    name: 'B站',
+    url: 'https://space.bilibili.com/1671173639?spm_id_from=333.1007.0.0',
+    color: '#00a1d6',
+    icon: 'bilibili',
+  },
+  {
+    name: '小红书',
+    url: 'https://www.xiaohongshu.com/user/profile/66effb0c000000001d032156',
+    color: '#ff2e4d',
+    icon: 'xiaohongshu',
+  },
+  {
+    name: '微博',
+    url: 'https://weibo.com/u/6857384033',
+    color: '#ff8200',
+    icon: 'weibo',
+  },
+  {
+    name: '知乎',
+    url: 'https://www.zhihu.com/people/84-27-88-27-17',
+    color: '#1772f6',
+    icon: 'zhihu',
+  },
+  {
+    name: '抖音',
+    url: 'https://www.douyin.com/user/self?from_tab_name=main&showSubTab=video&showTab=post',
+    color: '#38f8ff',
+    icon: 'douyin',
+  },
+  {
+    name: '邮箱',
+    url: 'mailto:ethan912yydegree@gmail.com',
+    color: '#8df8c7',
+    icon: 'email',
+  },
+  {
+    name: 'CSDN',
+    url: 'https://blog.csdn.net/m0_60650009?type=blog',
+    color: '#ff5a33',
+    icon: 'csdn',
+  },
+  {
+    name: 'GitLab',
+    url: 'https://gitlab.com/dashboard/projects',
+    color: '#fc6d26',
+    icon: 'gitlab',
+  },
+  {
+    name: 'Gitee',
+    url: 'http://gitee.com/Ethan_36',
+    color: '#c71d23',
+    icon: 'gitee',
+  },
+  {
+    name: 'X',
+    url: 'https://x.com/Chason4436911',
+    color: '#ffffff',
+    icon: 'twitter',
   },
 ]
 
@@ -217,13 +277,13 @@ const comments = {
 export const siteConfig = {
   name: 'Ethan',
   avatar,
-  subtitle: '菜就多练，练就必赚',
+  subtitle: '代码、热爱与未来感的个人实验室',
   photos,
   socials,
   projects,
   friends,
   about: {
-    bio: '我是 Ethan，一个热爱技术也偶尔摸鱼的后端开发。',
+    bio: '我是 Ethan，喜欢后端与全栈实践，也在把学习、项目和生活碎片整理成长期可访问的作品。',
     skills: ['Java', 'Spring Boot', 'Vue3', 'MySQL', 'Redis'],
     interests: ['编程', '游戏', '新技术'],
     location: '地球',
