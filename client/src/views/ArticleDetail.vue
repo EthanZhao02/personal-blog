@@ -219,7 +219,7 @@ import { getArticleDetail } from '../api/article'
 import { getCommentList, addComment, deleteComment as apiDeleteComment } from '../api/comment'
 import { getArticleList } from '../api/article'
 import { useUserStore } from '../stores/user'
-import siteConfig from '../config/site.config.js'
+import siteConfig, { fallbackArticles, fallbackComments, resolveAssetUrl } from '../config/site.config.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -276,6 +276,7 @@ const pendingParentId = ref(null) // 修复：临时保存 parentId，API返回�
 
 // 最新文章
 const recentArticles = ref([])
+const apiAssetBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/api\/?$/, '')
 
 // 能否提交
 const canSubmit = computed(() => {
@@ -285,24 +286,25 @@ const canSubmit = computed(() => {
   return commentNickname.value.trim() && commentEmail.value.trim()
 })
 
-// ✅ 修复附件URL
-const getAttachmentUrl = (url) => {
+const getFallbackArticle = () => fallbackArticles.find(a => String(a.id) === String(route.params.id))
+
+const resolveContentUrl = (url) => {
   if (!url) return '#'
-  // 如果是相对路径，添加完整域名
+  if (/^(https?:|mailto:|tel:|#)/.test(url)) return url
+  if (url.startsWith('/uploads') || url.startsWith('/upload')) {
+    return `${apiAssetBase}${url}`
+  }
   if (url.startsWith('/')) {
-    return `http://localhost:8080${url}`
+    return resolveAssetUrl(url)
   }
   return url
 }
 
+// ✅ 修复附件URL
+const getAttachmentUrl = (url) => resolveContentUrl(url)
+
 // ✅ 修复封面URL
-const getCoverUrl = (url) => {
-  if (!url) return ''
-  if (url.startsWith('/')) {
-    return `http://localhost:8080${url}`
-  }
-  return url
-}
+const getCoverUrl = (url) => resolveContentUrl(url)
 
 // ✅ 修复附件下载
 const downloadFile = async (attachment) => {
@@ -313,8 +315,7 @@ const downloadFile = async (attachment) => {
       return
     }
 
-    // 如果是相对路径，添加完整域名
-    const downloadUrl = url.startsWith('/') ? `http://localhost:8080${url}` : url
+    const downloadUrl = resolveContentUrl(url)
     
     console.log('下载附件:', downloadUrl)
     
@@ -341,9 +342,16 @@ const loadArticle = async () => {
       article.value = res.data
       await nextTick()
       renderHeadingIds()
+    } else {
+      article.value = getFallbackArticle()
+      await nextTick()
+      renderHeadingIds()
     }
   } catch (e) {
-    console.error('加载文章失败', e)
+    article.value = getFallbackArticle()
+    if (import.meta.env.DEV) console.info('使用静态文章详情', e?.message || e)
+    await nextTick()
+    renderHeadingIds()
   }
 }
 
@@ -362,9 +370,14 @@ const loadComments = async () => {
       markAdmin(list)
       comments.value = list
       totalComments.value = countAll(list)
+    } else {
+      comments.value = fallbackComments[route.params.id] || []
+      totalComments.value = countAll(comments.value)
     }
   } catch (e) {
-    console.error('加载评论失败', e)
+    comments.value = fallbackComments[route.params.id] || []
+    totalComments.value = countAll(comments.value)
+    if (import.meta.env.DEV) console.info('使用静态评论数据', e?.message || e)
   }
 }
 
@@ -479,10 +492,15 @@ const formatFileSize = (bytes) => {
 const loadRecent = async () => {
   try {
     const res = await getArticleList(1, 5)
-    recentArticles.value = (res.data?.records || [])
+    const list = res.data?.records?.length ? res.data.records : fallbackArticles
+    recentArticles.value = list
       .filter(a => a.id !== Number(route.params.id))
       .slice(0, 5)
-  } catch (e) { /* silent */ }
+  } catch (e) {
+    recentArticles.value = fallbackArticles
+      .filter(a => a.id !== Number(route.params.id))
+      .slice(0, 5)
+  }
 }
 
 const renderHeadingIds = () => {
@@ -517,7 +535,7 @@ const renderMarkdown = (text) => {
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/!\[(.*?)\]\((.*?)\)/g,
       (_, alt, src) => {
-        const url = src.startsWith('/') ? `http://localhost:8080${src}` : src
+        const url = resolveContentUrl(src)
         return `<img src="${url}" alt="${alt}" style="max-width:100%;border-radius:4px;margin:8px 0" loading="lazy" />`
       })
     .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')

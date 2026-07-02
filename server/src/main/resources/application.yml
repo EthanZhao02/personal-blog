@@ -26,8 +26,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&connectionCollation=utf8mb4_unicode_ci
-    username: root
-    password: ""
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
 
 mybatis-plus:
   configuration:
@@ -38,8 +38,8 @@ mybatis-plus:
       id-type: auto
 
 jwt:
-  secret: blog-secret-key-2024-this-is-a-long-secret-key-for-jwt-signing
-  expiration: 604800000
+  secret: ${JWT_SECRET:change-this-jwt-secret-before-production-use-2026}
+  expiration: ${JWT_EXPIRATION:604800000}
 
 file:
   upload:

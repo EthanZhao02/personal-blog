@@ -1,24 +1,23 @@
 <template>
   <div class="home-page">
     <div class="home-layout">
-      <!-- 左侧：个人介绍 -->
       <div class="home-left">
-        <div class="hero-greeting animate__animated animate__fadeInUp">
+        <div class="hero-greeting reveal-up">
           <span>Hi, there </span>
-          <span class="hero-wave animate__animated animate__tada">👋</span>
+          <span class="hero-wave" aria-hidden="true">👋</span>
         </div>
 
-        <div class="hero-name animate__animated animate__fadeInUp" style="animation-delay: 150ms">
+        <div class="hero-name reveal-up" style="animation-delay: 120ms">
           <span>I'm </span>
           <span class="hero-name-underline">{{ siteConfig.name }}</span>
           <span> !</span>
         </div>
 
-        <div class="hero-subtitle animate__animated animate__fadeInUp" style="animation-delay: 300ms">
+        <div class="hero-subtitle reveal-up" style="animation-delay: 240ms">
           {{ siteConfig.subtitle }}
         </div>
 
-        <div class="hero-socials animate__animated animate__fadeInUp" style="animation-delay: 450ms">
+        <div class="hero-socials reveal-up" style="animation-delay: 360ms">
           <a
             v-for="social in siteConfig.socials"
             :key="social.name"
@@ -34,29 +33,55 @@
         </div>
       </div>
 
-      <!-- 右侧：照片墙 -->
-      <div class="home-right animate__animated animate__jackInTheBox" style="animation-delay: 200ms">
-        <div
-          class="photo-wrapper"
-          @mouseenter="stopCarousel"
-          @mouseleave="startCarousel"
-          @click="handlePhotoClick"
-        >
-          <!-- 移除了阴影层 -->
-          
-          <div ref="photoInnerRef" class="photo-inner">
-            <img
-              v-for="(photo, i) in siteConfig.photos"
+      <div class="home-right reveal-up" style="animation-delay: 180ms">
+        <div class="photo-stage">
+          <span class="stage-ring ring-one" aria-hidden="true"></span>
+          <span class="stage-ring ring-two" aria-hidden="true"></span>
+          <span class="stage-line line-one" aria-hidden="true"></span>
+          <span class="stage-line line-two" aria-hidden="true"></span>
+
+          <pre class="code-note" aria-hidden="true"><code>const Ethan = {
+  passion: 'Code',
+  focus: 'Vue',
+  motto: 'Practice'
+}</code></pre>
+
+          <div
+            class="photo-wrapper"
+            @mouseenter="stopCarousel"
+            @mouseleave="startCarousel"
+            @click="handlePhotoClick"
+          >
+            <div ref="photoInnerRef" class="photo-inner">
+              <img
+                v-for="(photo, i) in siteConfig.photos"
+                :key="i"
+                :src="photo"
+                :alt="`photo ${i + 1}`"
+                class="photo-img"
+                :class="{ active: i === currentPhoto }"
+              />
+            </div>
+          </div>
+
+          <div class="photo-dots" aria-label="照片切换">
+            <button
+              v-for="(_, i) in siteConfig.photos"
               :key="i"
-              :src="photo"
-              :alt="`photo ${i + 1}`"
-              class="photo-img"
+              class="photo-dot"
               :class="{ active: i === currentPhoto }"
-            />
+              :aria-label="`切换到第 ${i + 1} 张照片`"
+              @click.stop="selectPhoto(i)"
+            ></button>
           </div>
         </div>
       </div>
     </div>
+
+    <router-link to="/posts" class="scroll-cue" aria-label="查看文章">
+      <span></span>
+      <span></span>
+    </router-link>
   </div>
 </template>
 
@@ -68,6 +93,7 @@ const siteConfigData = siteConfig
 const currentPhoto = ref(0)
 const photoInnerRef = ref(null)
 let carouselTimer = null
+let waveTimer = null
 
 // 触发自然缩放动画
 const triggerPopBounce = () => {
@@ -82,6 +108,7 @@ const triggerPopBounce = () => {
 
 // 自动轮播 (5秒)
 const startCarousel = () => {
+  if (siteConfigData.photos.length <= 1 || carouselTimer) return
   carouselTimer = setInterval(() => {
     currentPhoto.value = (currentPhoto.value + 1) % siteConfigData.photos.length
     triggerPopBounce()
@@ -99,6 +126,13 @@ const stopCarousel = () => {
 const handlePhotoClick = () => {
   currentPhoto.value = (currentPhoto.value + 1) % siteConfigData.photos.length
   triggerPopBounce()
+}
+
+const selectPhoto = (index) => {
+  currentPhoto.value = index
+  triggerPopBounce()
+  stopCarousel()
+  startCarousel()
 }
 
 // 社交图标
@@ -119,98 +153,133 @@ const getSocialIcon = (icon) => {
 
 onMounted(() => {
   startCarousel()
-  // 心跳动画
-  setInterval(() => {
+  waveTimer = setInterval(() => {
     const hand = document.querySelector('.hero-wave')
     if (hand) {
-      hand.classList.remove('animate__tada')
+      hand.classList.remove('wave-pop')
       void hand.offsetWidth
-      hand.classList.add('animate__tada')
+      hand.classList.add('wave-pop')
     }
-  }, 2000)
+  }, 2400)
 })
 
 onUnmounted(() => {
   stopCarousel()
+  if (waveTimer) clearInterval(waveTimer)
 })
 </script>
 
 <style scoped>
 .home-page {
-  min-height: calc(100vh - 72px - 60px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
+  min-height: calc(100vh - 78px);
+  display: grid;
+  place-items: center;
+  padding: 24px 0 86px;
+  overflow: hidden;
 }
 
 .home-layout {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 1100px;
+  max-width: 1180px;
   width: 100%;
   margin: 0 auto;
-  padding: 40px 24px;
-  gap: 40px;
+  padding: 34px 32px;
+  gap: clamp(32px, 6vw, 88px);
 }
 
-/* 左侧 */
 .home-left {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
   flex: 1;
+  max-width: 560px;
+  position: relative;
+  z-index: 2;
 }
 
 .hero-greeting {
-  font-size: 2rem;
+  font-size: clamp(2rem, 4.2vw, 4.6rem);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 14px;
   color: var(--text);
+  font-family: var(--font-serif);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0;
 }
 
 .hero-wave {
-  font-size: 2rem;
+  font-size: 0.72em;
   cursor: pointer;
   display: inline-block;
+  transform-origin: 70% 70%;
+  animation: waveHello 2.8s ease-in-out infinite;
 }
 
 .hero-name {
-  font-size: 3.5rem;
-  font-weight: 600;
+  font-size: clamp(3.2rem, 7vw, 6.7rem);
+  font-weight: 700;
   color: var(--text);
-  line-height: 1.1;
+  line-height: 0.98;
+  font-family: var(--font-serif);
+  letter-spacing: 0;
 }
 
 .hero-name-underline {
-  text-decoration: underline wavy rgba(245, 184, 61, 0.5);
-  text-underline-offset: 8px;
+  position: relative;
+  display: inline-block;
+  color: var(--accent-dark);
+  text-shadow: 0 12px 26px rgba(153, 97, 22, 0.12);
+}
+
+.hero-name-underline::after {
+  content: '';
+  position: absolute;
+  left: -0.08em;
+  right: -0.12em;
+  bottom: -0.08em;
+  height: 0.08em;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--sage), transparent);
+  transform: rotate(-1.4deg);
 }
 
 .hero-subtitle {
-  font-size: 1.25rem;
-  color: var(--text-light);
+  width: fit-content;
+  margin-top: 10px;
+  padding: 8px 0 9px;
+  font-size: clamp(1.2rem, 2.2vw, 1.85rem);
+  color: var(--text);
+  font-family: var(--font-serif);
+  letter-spacing: 0.08em;
+  border-bottom: 2px solid rgba(111, 129, 119, 0.38);
 }
 
 .hero-socials {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
-  margin-top: 4px;
+  margin-top: 18px;
 }
 
 .social-btn {
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: var(--social-color, var(--text));
-  color: #fff;
-  transition: box-shadow 0.25s ease, transform 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  border: 1px solid rgba(41, 36, 29, 0.12);
+  background: rgba(255, 250, 241, 0.76);
+  color: var(--text);
+  transition: box-shadow 0.25s var(--ease-out), transform 0.25s var(--ease-out), color 0.2s, border-color 0.2s;
+  box-shadow: 0 10px 22px rgba(88, 66, 38, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 .social-btn svg {
   width: 18px;
@@ -218,29 +287,130 @@ onUnmounted(() => {
 }
 
 .social-btn:hover {
-  box-shadow: 0 0 20px color-mix(in srgb, var(--social-color) 70%, transparent);
-  transform: translateY(-2px);
-  color: #fff;
+  border-color: color-mix(in srgb, var(--social-color) 46%, transparent);
+  box-shadow: 0 16px 28px color-mix(in srgb, var(--social-color) 22%, transparent);
+  transform: translateY(-4px) rotate(-2deg);
+  color: var(--social-color);
 }
 
-/* ========== 右侧照片墙 ========== */
 .home-right {
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.photo-stage {
+  position: relative;
+  width: min(42vw, 470px);
+  min-width: 340px;
+  height: 560px;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+
+.stage-ring {
+  position: absolute;
+  border: 1px solid rgba(153, 97, 22, 0.2);
+  border-radius: 50%;
+  z-index: -2;
+}
+
+.ring-one {
+  width: 420px;
+  height: 420px;
+  animation: slowSpin 24s linear infinite;
+}
+
+.ring-two {
+  width: 320px;
+  height: 320px;
+  border-color: rgba(47, 72, 88, 0.16);
+  animation: slowSpin 30s linear infinite reverse;
+}
+
+.stage-line {
+  position: absolute;
+  background: rgba(153, 97, 22, 0.24);
+  z-index: -1;
+}
+
+.line-one {
+  width: 280px;
+  height: 1px;
+  top: 116px;
+  right: -22px;
+}
+
+.line-two {
+  width: 1px;
+  height: 260px;
+  right: 42px;
+  bottom: 86px;
+}
+
+.code-note {
+  position: absolute;
+  right: -12px;
+  bottom: 64px;
+  z-index: 3;
+  margin: 0;
+  padding: 18px 20px;
+  border: 1px solid rgba(85, 71, 54, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 250, 241, 0.78);
+  color: var(--ink-blue);
+  font-family: 'Consolas', 'SF Mono', monospace;
+  font-size: 13px;
+  line-height: 1.75;
+  box-shadow: 0 18px 40px rgba(88, 66, 38, 0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transform: rotate(1.8deg);
+  animation: noteFloat 5.5s ease-in-out infinite;
 }
 
 .photo-wrapper {
-  width: 350px;
-  height: 450px;
-  background: transparent;
+  width: 380px;
+  height: 500px;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 241, 0.66), rgba(240, 230, 215, 0.4)),
+    rgba(255, 250, 241, 0.5);
+  border: 1px solid rgba(85, 71, 54, 0.14);
+  border-radius: 8px;
   position: relative;
   cursor: pointer;
-  overflow: visible;
+  overflow: hidden;
+  box-shadow: 0 30px 70px rgba(88, 66, 38, 0.16);
+  transform: rotate(2.2deg);
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
+  animation: photoFloat 6s ease-in-out infinite;
 }
 
-/* 移除光晕和边框 */
-.photo-wrapper::before,
+.photo-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(255, 250, 241, 0.82);
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 2;
+}
+
 .photo-wrapper::after {
-  display: none;
+  content: '';
+  position: absolute;
+  inset: auto 28px 20px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(47, 72, 88, 0.16);
+  filter: blur(16px);
+  z-index: 0;
+}
+
+.photo-wrapper:hover {
+  transform: rotate(0deg) translateY(-8px) scale(1.015);
+  box-shadow: 0 36px 82px rgba(88, 66, 38, 0.2);
 }
 
 .photo-inner {
@@ -248,9 +418,8 @@ onUnmounted(() => {
   height: 100%;
   background: transparent;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
   z-index: 1;
-  /* 关键：以脚部为中心进行缩放 */
   transform-origin: bottom center;
 }
 
@@ -259,16 +428,18 @@ onUnmounted(() => {
   inset: 0;
   width: 100%;
   height: 100%;
-  /* 完整显示透明 PNG，底部对齐 */
   object-fit: contain;
   object-position: bottom center;
   opacity: 0;
-  /* 基础过渡效果，防止非动画状态下图片消失太生硬 */
-  transition: opacity 0.3s ease;
+  padding: 20px 18px 0;
+  filter: drop-shadow(0 18px 24px rgba(41, 36, 29, 0.18));
+  transition: opacity 0.42s ease, transform 0.55s var(--ease-out), filter 0.45s;
+  transform: translateY(18px) scale(0.97);
 }
 
 .photo-img.active {
   opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 /* 🎈 自然柔和的缩放动画 */
@@ -288,22 +459,141 @@ onUnmounted(() => {
   animation: popBounce 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* 响应式 */
+.photo-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 4;
+  display: flex;
+  gap: 10px;
+  transform: translateX(-50%);
+}
+
+.photo-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(41, 36, 29, 0.28);
+  cursor: pointer;
+  transition: width 0.24s var(--ease-out), background 0.24s;
+}
+
+.photo-dot.active {
+  width: 28px;
+  background: var(--accent);
+}
+
+.scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 30px;
+  display: grid;
+  gap: 7px;
+  transform: translateX(-50%);
+  color: var(--accent-dark);
+}
+
+.scroll-cue span {
+  display: block;
+  width: 17px;
+  height: 17px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  animation: cuePulse 1.6s ease-in-out infinite;
+}
+
+.scroll-cue span:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+@keyframes waveHello {
+  0%, 70%, 100% { transform: rotate(0deg); }
+  76% { transform: rotate(15deg); }
+  82% { transform: rotate(-9deg); }
+  88% { transform: rotate(10deg); }
+  94% { transform: rotate(-4deg); }
+}
+
+.wave-pop {
+  animation: waveHello 0.8s ease-in-out;
+}
+
+@keyframes photoFloat {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -12px; }
+}
+
+@keyframes noteFloat {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 9px; }
+}
+
+@keyframes slowSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes cuePulse {
+  0%, 100% { opacity: 0.32; transform: translateY(0) rotate(45deg); }
+  50% { opacity: 1; transform: translateY(7px) rotate(45deg); }
+}
+
 @media (max-width: 768px) {
+  .home-page {
+    padding: 16px 0 78px;
+  }
+
   .home-layout {
     flex-direction: column-reverse;
     text-align: center;
-    gap: 32px;
+    gap: 22px;
+    padding: 18px 20px;
   }
-  .home-left { align-items: center; }
-  .hero-greeting { font-size: 1.5rem; }
-  .hero-name { font-size: 2.5rem; }
-  .hero-subtitle { font-size: 1rem; }
+
+  .home-left {
+    align-items: center;
+  }
+
   .hero-socials { justify-content: center; }
+  .hero-subtitle { letter-spacing: 0.03em; }
+
+  .photo-stage {
+    width: min(88vw, 350px);
+    min-width: 0;
+    height: 380px;
+  }
   
   .photo-wrapper { 
-    width: 280px; 
-    height: 360px; 
+    width: min(78vw, 280px);
+    height: 340px;
+    transform: rotate(1.4deg);
+  }
+
+  .code-note,
+  .stage-line {
+    display: none;
+  }
+
+  .ring-one {
+    width: 310px;
+    height: 310px;
+  }
+
+  .ring-two {
+    width: 236px;
+    height: 236px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-wave,
+  .photo-wrapper,
+  .code-note,
+  .stage-ring,
+  .scroll-cue span {
+    animation: none !important;
   }
 }
 </style>

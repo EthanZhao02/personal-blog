@@ -1,87 +1,247 @@
 /**
- * 站点配置文件
+ * Site configuration and static fallback content.
+ *
+ * GitHub Pages can only serve static files, so the public-facing pages use
+ * this data whenever the Spring Boot API is not available.
  */
+export const resolveAssetUrl = (path = '') => {
+  if (!path) return ''
+  if (/^(https?:|mailto:|tel:|#)/.test(path)) return path
+  const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
+  return `${base}/${path.replace(/^\//, '')}`
+}
+
+const avatar = resolveAssetUrl('/photos/avatar.png')
+const photos = [
+  resolveAssetUrl('/photos/photo1.png'),
+  resolveAssetUrl('/photos/photo2.png'),
+  resolveAssetUrl('/photos/photo3.png'),
+]
+
+const socials = [
+  {
+    name: 'GitHub',
+    url: 'https://github.com/EthanZhao02',
+    color: '#1F2328',
+    icon: 'github',
+  },
+]
+
+const categories = [
+  { id: 1, name: '技术笔记', sort: 1 },
+  { id: 2, name: '项目复盘', sort: 2 },
+  { id: 3, name: '生活记录', sort: 3 },
+]
+
+const tags = [
+  { id: 1, name: 'Vue3' },
+  { id: 2, name: 'Spring Boot' },
+  { id: 3, name: 'GitHub Pages' },
+  { id: 4, name: '个人博客' },
+]
+
+const articles = [
+  {
+    id: 1,
+    title: '把个人博客部署到 GitHub Pages',
+    summary: '记录这个站点从本地项目到 GitHub Pages 静态发布的关键步骤。',
+    content: `# 把个人博客部署到 GitHub Pages
+
+这个博客原本是 Vue3 + Spring Boot + MySQL 的全栈项目。本次上线先把访客会看到的页面做成静态可访问版本，再通过 GitHub Actions 自动构建并部署。
+
+## 为什么要做静态兜底
+
+GitHub Pages 不能运行 Java 后端，也不能托管 MySQL。为了避免上线后文章、项目、友链和留言页空白，前端会在接口不可用时读取本地配置里的公开内容。
+
+## 当前部署流程
+
+每次推送到 master 分支后，GitHub Actions 会进入 client 目录，安装依赖，执行生产构建，然后把 dist 发布到 GitHub Pages。
+
+## 后续可以继续增强
+
+如果以后需要真实评论、登录、写文章和后台管理，可以把 Spring Boot 后端部署到 Render、Railway、Fly.io、云服务器或其他 Java 运行平台，再把 VITE_API_BASE_URL 指到后端地址。`,
+    categoryId: 1,
+    categoryName: '技术笔记',
+    authorName: 'Ethan',
+    tags: [
+      { id: 1, name: 'Vue3' },
+      { id: 3, name: 'GitHub Pages' },
+      { id: 4, name: '个人博客' },
+    ],
+    viewCount: 128,
+    createTime: '2026-07-02T09:30:00',
+  },
+  {
+    id: 2,
+    title: '个人博客项目结构说明',
+    summary: '前端、后端和数据库脚本各自承担的角色，以及上线时的取舍。',
+    content: `# 个人博客项目结构说明
+
+项目主要分为三个部分：client、server 和 database。
+
+## client
+
+前端使用 Vue3、Vue Router、Pinia 和 Vite。首页、归档、项目、友链、留言板和关于页都在这里实现。
+
+## server
+
+后端使用 Spring Boot，负责文章、评论、留言、友链、用户登录和上传等接口。它适合部署在支持 Java 的服务器上。
+
+## database
+
+database/init.sql 是初始化 MySQL 数据的脚本。线上如果要启用后台管理和动态内容，需要先准备数据库。`,
+    categoryId: 2,
+    categoryName: '项目复盘',
+    authorName: 'Ethan',
+    tags: [
+      { id: 2, name: 'Spring Boot' },
+      { id: 4, name: '个人博客' },
+    ],
+    viewCount: 86,
+    createTime: '2026-06-28T20:15:00',
+  },
+  {
+    id: 3,
+    title: '关于这个站点',
+    summary: '这里会放一些学习、实践和项目记录。',
+    content: `# 关于这个站点
+
+这里会记录我在编程、项目实践和技术学习中的一些笔记。站点会先保持轻量、好读、能稳定访问，再逐步补充真实文章和项目沉淀。
+
+保持热爱，奔赴山海。`,
+    categoryId: 3,
+    categoryName: '生活记录',
+    authorName: 'Ethan',
+    tags: [
+      { id: 4, name: '个人博客' },
+    ],
+    viewCount: 42,
+    createTime: '2026-06-18T18:00:00',
+  },
+]
+
+const projects = [
+  {
+    id: 1,
+    name: '个人博客系统',
+    description: 'Vue3 + Spring Boot 个人博客，支持 Markdown 文章、评论、留言和友链模块。',
+    icon: '📝',
+    tag: 'Vue',
+    techStack: 'Vue3, Vite, Spring Boot, MySQL, GitHub Pages',
+    category: 'web',
+    status: '已上线',
+    isOpenSource: 1,
+    isActive: 1,
+    url: 'https://ethanzhao02.github.io/personal-blog/',
+    githubUrl: 'https://github.com/EthanZhao02/personal-blog',
+    stats: 'Personal Blog',
+    createTime: '2026-07-02T09:00:00',
+  },
+  {
+    id: 2,
+    name: '开发工具集',
+    description: '日常开发中积累的脚本、模板和排错经验，后续会逐步整理成可复用工具。',
+    icon: '🛠️',
+    tag: 'Tools',
+    techStack: 'JavaScript, PowerShell, Markdown',
+    category: 'tool',
+    status: '开发中',
+    isOpenSource: 0,
+    isActive: 1,
+    url: '#',
+    stats: 'WIP',
+    createTime: '2026-06-20T10:00:00',
+  },
+]
+
+const friends = [
+  {
+    id: 1,
+    name: 'Souta',
+    description: '可能是一个笨蛋',
+    avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=souta',
+    url: 'https://souta.cc',
+    category: 'tech',
+    isActive: 1,
+  },
+  {
+    id: 2,
+    name: '理想之 clover',
+    description: '关于 AI 与技术的思考',
+    avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=clover',
+    url: 'https://idealclover.top',
+    category: 'tech',
+    isActive: 1,
+  },
+  {
+    id: 3,
+    name: 'qwqwq',
+    description: '有趣的项目与想法',
+    avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=qwqwq',
+    url: 'https://qwqwq.com',
+    category: 'other',
+    isActive: 1,
+  },
+]
+
+const messages = [
+  {
+    id: 1,
+    nickname: 'Ethan',
+    avatar,
+    content: '欢迎来到我的留言板。静态部署模式下，你的留言会先保存在当前浏览器本地。',
+    createTime: '2026-07-02T09:00:00',
+  },
+]
+
+const comments = {
+  1: [
+    {
+      id: 1,
+      nickname: 'Ethan',
+      userAvatar: avatar,
+      content: '这一版先保证博客能稳定上线；后端部署后，评论会切回真实接口。',
+      createTime: '2026-07-02T10:00:00',
+      children: [],
+    },
+  ],
+  2: [],
+  3: [],
+}
+
 export const siteConfig = {
-  // ── 基础信息 ──
   name: 'Ethan',
-  avatar: '/photos/avatar.png',        // 替换为真实头像路径
+  avatar,
   subtitle: '菜就多练，练就必赚',
-
-  // ── 首页右侧照片墙（留空则使用占位图）──
-  photos: [
-    '/photos/photo1.png',
-    '/photos/photo2.png',
-    '/photos/photo3.png',
-  ],
-
-  // ── 社交链接 ──
-  socials: [
-    { name: 'GitHub',     url: 'https://github.com/your-id',     color: '#1F2328', icon: 'github' },
-    { name: '知乎',        url: 'https://www.zhihu.com/people/your-id', color: '#0084FF', icon: 'zhihu' },
-    { name: 'Bilibili',    url: 'https://space.bilibili.com/your-id', color: '#00AEEC', icon: 'bilibili' },
-    { name: '微博',        url: 'https://weibo.com/u/your-id',     color: '#E6162D', icon: 'weibo' },
-    { name: '抖音',        url: 'https://www.douyin.com/user/your-id', color: '#161823', icon: 'douyin' },
-    { name: '小红书',      url: 'https://www.xiaohongshu.com/user/profile/your-id', color: '#FF2442', icon: 'xiaohongshu' },
-    { name: 'X',           url: 'https://x.com/your-id',           color: '#000000', icon: 'twitter' },
-    { name: 'Telegram',    url: 'https://t.me/your-id',            color: '#26A5E4', icon: 'telegram' },
-    { name: '邮箱',        url: 'mailto:your@email.com',           color: '#F5B83D', icon: 'email' },
-  ],
-
-  // ── 项目展示 ──
-  projects: [
-    {
-      name: '博客系统',
-      description: 'Vue3 + Spring Boot 个人博客，支持 Markdown 编辑与评论',
-      icon: '📝',
-      tag: 'Web',
-      badge: null,
-      url: '#',
-      stats: '⭐ 10',
-    },
-    {
-      name: '工具集',
-      description: '日常开发中积累的实用工具和脚本',
-      icon: '🛠️',
-      tag: 'Tools',
-      url: '#',
-      stats: '⭐ 5',
-    },
-  ],
-
-  // ── 友链 ──
-  friends: [
-    {
-      name: 'Souta',
-      description: '可能是一个笨蛋',
-      avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=souta',
-      url: 'https://souta.cc',
-    },
-    {
-      name: '理想之 clover',
-      description: '关于 AI 与技术的思考',
-      avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=clover',
-      url: 'https://idealclover.top',
-    },
-    {
-      name: 'qwqwq',
-      description: '有趣的项目与想法',
-      avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=qwqwq',
-      url: 'https://qwqwq.com',
-    },
-  ],
-
-  // ── 关于页 ──
+  photos,
+  socials,
+  projects,
+  friends,
   about: {
     bio: '我是 Ethan，一个热爱技术也偶尔摸鱼的后端开发。',
     skills: ['Java', 'Spring Boot', 'Vue3', 'MySQL', 'Redis'],
     interests: ['编程', '游戏', '新技术'],
     location: '地球',
   },
-
-  // ── 赞助 ──
   donateIntro: '如果我的博客对你有帮助，欢迎请我喝杯咖啡 ☕',
-  wechatPay: '',   // 微信收款码，留空不显示
-  alipay: '',      // 支付宝收款码，留空不显示
+  wechatPay: '',
+  alipay: '',
+  content: {
+    articles,
+    categories,
+    tags,
+    messages,
+    comments,
+  },
 }
+
+export const visibleSocials = socials.filter(s => s.url && !s.url.includes('your-id') && !s.url.includes('your@email.com'))
+export const fallbackArticles = articles
+export const fallbackCategories = categories
+export const fallbackTags = tags
+export const fallbackProjects = projects
+export const fallbackFriends = friends
+export const fallbackMessages = messages
+export const fallbackComments = comments
 
 export default siteConfig

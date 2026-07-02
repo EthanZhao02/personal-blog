@@ -233,6 +233,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { getProjects, getAllProjects, addProject, updateProject, deleteProject } from '../api/project.js'
 import { useUserStore } from '../stores/user.js'
+import { fallbackProjects } from '../config/site.config.js'
 
 const userStore = useUserStore()
 const isAdmin = computed(() => userStore.isAdmin)
@@ -331,15 +332,17 @@ const toggleGroup = (key) => {
   }
 }
 
+const activeFallbackProjects = () => fallbackProjects.filter(p => p.isActive !== 0)
+
 // 加载数据
 const loadProjects = async () => {
   loading.value = true
   try {
     const res = await getProjects()
-    projects.value = res.data || []
+    projects.value = res.data?.length ? res.data : activeFallbackProjects()
   } catch (e) {
-    console.error('[Projects] 加载失败', e)
-    projects.value = []
+    projects.value = activeFallbackProjects()
+    if (import.meta.env.DEV) console.info('[Projects] 使用静态项目数据', e?.message || e)
   } finally {
     loading.value = false
   }
@@ -348,9 +351,10 @@ const loadProjects = async () => {
 const loadAll = async () => {
   try {
     const res = await getAllProjects()
-    allProjects.value = res.data || []
+    allProjects.value = res.data?.length ? res.data : fallbackProjects
   } catch (e) {
-    console.error('[Projects] 加载全部失败', e)
+    allProjects.value = fallbackProjects
+    if (import.meta.env.DEV) console.info('[Projects] 使用静态项目管理数据', e?.message || e)
   }
 }
 
@@ -445,23 +449,28 @@ onMounted(() => { loadProjects() })
 <style scoped>
 .projects-page {
   min-height: calc(100vh - 72px);
-  padding: 40px 0;
+  padding: 56px 0 86px;
 }
 .projects-inner {
   max-width: 1100px;
   margin: 0 auto;
   padding: 0 32px;
 }
-.projects-header { margin-bottom: 24px; }
+.projects-header {
+  margin-bottom: 28px;
+  animation: fadeInUp 0.68s var(--ease-out) both;
+}
 .projects-title {
-  font-size: 1.8rem;
+  font-size: clamp(2rem, 4vw, 3.15rem);
   font-weight: 700;
   color: var(--text);
   margin-bottom: 6px;
+  font-family: var(--font-serif);
+  line-height: 1.1;
 }
 .projects-desc {
-  font-size: 14px;
-  color: var(--text-lighter);
+  font-size: 15px;
+  color: var(--text-light);
 }
 
 /* 统计栏 */
@@ -469,10 +478,16 @@ onMounted(() => { loadProjects() })
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px 0;
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--border);
+  padding: 16px 18px;
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 250, 241, 0.68);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   flex-wrap: wrap;
+  animation: fadeInUp 0.68s var(--ease-out) 0.08s both;
 }
 .stat-item {
   display: flex;
@@ -482,7 +497,7 @@ onMounted(() => { loadProjects() })
 .stat-count {
   font-size: 20px;
   font-weight: 700;
-  color: var(--text);
+  color: var(--accent-dark);
 }
 .stat-label {
   font-size: 13px;
@@ -496,18 +511,19 @@ onMounted(() => { loadProjects() })
   margin-left: auto;
 }
 .filter-btn {
-  background: var(--bg);
+  background: rgba(255, 250, 241, 0.74);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 6px 16px;
+  border-radius: 999px;
+  padding: 7px 16px;
   font-size: 13px;
   color: var(--text-light);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.22s var(--ease-out), color 0.22s, border-color 0.22s, background 0.22s;
 }
 .filter-btn:hover {
   border-color: var(--accent);
   color: var(--accent-dark);
+  transform: translateY(-1px);
 }
 .filter-btn.active {
   background: var(--accent);
@@ -517,7 +533,8 @@ onMounted(() => { loadProjects() })
 
 /* 项目分组 */
 .project-group {
-  margin-bottom: 32px;
+  margin-bottom: 38px;
+  animation: fadeInUp 0.72s var(--ease-out) both;
 }
 .group-title {
   display: flex;
@@ -527,8 +544,9 @@ onMounted(() => { loadProjects() })
   font-weight: 600;
   color: var(--text);
   margin-bottom: 16px;
-  padding-bottom: 8px;
+  padding: 0 0 10px;
   border-bottom: 1px solid var(--border);
+  font-family: var(--font-serif);
 }
 .group-icon { font-size: 1.2em; }
 .group-count {
@@ -540,7 +558,7 @@ onMounted(() => { loadProjects() })
   margin-left: auto;
   background: none;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 6px;
   width: 24px;
   height: 24px;
   cursor: pointer;
@@ -551,31 +569,34 @@ onMounted(() => { loadProjects() })
 }
 .collapse-icon { font-size: 14px; }
 
-/* 项目列表 */
 .project-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 20px;
 }
 
-/* 项目卡片 */
 .project-card {
-  background: var(--card);
+  background: rgba(255, 250, 241, 0.76);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
-  transition: all 0.25s ease;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out), border-color 0.28s;
 }
 .project-card:hover {
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  transform: translateY(-2px);
-  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-6px);
+  border-color: rgba(201, 133, 36, 0.32);
 }
 
 /* 项目截图 */
 .project-gallery {
   margin: 0;
-  background: var(--bg);
+  background:
+    linear-gradient(135deg, rgba(47, 72, 88, 0.08), rgba(201, 133, 36, 0.08)),
+    var(--bg-soft);
 }
 .gallery-container {
   aspect-ratio: 16/9;
@@ -588,7 +609,7 @@ onMounted(() => { loadProjects() })
   transition: transform 0.3s;
 }
 .project-card:hover .gallery-container img {
-  transform: scale(1.02);
+  transform: scale(1.035);
 }
 
 /* 项目头部 */
@@ -600,7 +621,7 @@ onMounted(() => { loadProjects() })
   gap: 8px;
 }
 .project-name {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   margin: 0;
 }
@@ -620,7 +641,7 @@ onMounted(() => { loadProjects() })
 .badge {
   font-size: 10px;
   padding: 2px 8px;
-  border-radius: 10px;
+  border-radius: 999px;
   font-weight: 500;
 }
 .badge-year {
@@ -686,10 +707,10 @@ onMounted(() => { loadProjects() })
 }
 .tech-tag {
   font-size: 11px;
-  padding: 2px 8px;
-  background: var(--bg);
+  padding: 3px 8px;
+  background: rgba(255, 250, 241, 0.7);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 999px;
   color: var(--text-light);
 }
 
@@ -716,7 +737,7 @@ onMounted(() => { loadProjects() })
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg);
+  background: rgba(255, 250, 241, 0.72);
   border: 1px solid var(--border);
   color: var(--text-light);
   text-decoration: none;
@@ -725,6 +746,7 @@ onMounted(() => { loadProjects() })
 .link-btn:hover {
   border-color: var(--accent);
   color: var(--accent-dark);
+  transform: translateY(-2px);
 }
 .link-btn svg {
   width: 16px;
@@ -757,7 +779,7 @@ onMounted(() => { loadProjects() })
 /* 管理区 */
 .admin-section { margin-top: 48px; }
 .admin-toggle {
-  background: var(--card);
+  background: rgba(255, 250, 241, 0.72);
   border: 1px dashed var(--accent);
   border-radius: 8px;
   padding: 12px 20px;
@@ -778,7 +800,7 @@ onMounted(() => { loadProjects() })
 .toggle-arrow.open { transform: rotate(180deg); }
 
 .admin-panel {
-  background: var(--card);
+  background: rgba(255, 250, 241, 0.82);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
@@ -887,7 +909,7 @@ onMounted(() => { loadProjects() })
   margin-bottom: 10px;
 }
 .form-input {
-  background: var(--bg);
+  background: rgba(255, 250, 241, 0.72);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 14px;
@@ -899,7 +921,7 @@ onMounted(() => { loadProjects() })
 }
 .form-input:focus { outline: none; border-color: var(--accent); }
 .form-textarea {
-  background: var(--bg);
+  background: rgba(255, 250, 241, 0.72);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 14px;

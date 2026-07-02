@@ -1,18 +1,28 @@
 <template>
   <div class="souta-app" @click="dropCandy" @touchstart="dropCandy">
+    <div class="ambient-layer" aria-hidden="true">
+      <span class="ambient-line line-a"></span>
+      <span class="ambient-line line-b"></span>
+      <span class="ambient-stamp">保持热爱<br />奔赴山海</span>
+    </div>
+
     <!-- ✨ 特效容器 -->
-    <div class="candy-container" ref="candyRef">
+    <div class="candy-container">
       <span
         v-for="candy in candies"
         :key="candy.id"
         class="candy"
         :style="{
           left: candy.x + 'px',
+          top: candy.y + 'px',
           animationDuration: candy.dur + 's',
           animationDelay: candy.delay + 's',
           fontSize: candy.size + 'px',
           opacity: candy.opacity,
-          color: candy.color
+          color: candy.color,
+          '--dx': candy.dx + 'px',
+          '--dy': candy.dy + 'px',
+          '--rot': candy.rot + 'deg'
         }"
       >{{ candy.emoji }}</span>
     </div>
@@ -26,7 +36,10 @@
           :to="link.path"
           class="nav-item"
           :class="{ active: isActive(link.path) }"
-        >{{ link.name }}</router-link>
+        >
+          <span class="nav-icon" aria-hidden="true">{{ link.icon }}</span>
+          <span>{{ link.name }}</span>
+        </router-link>
 
         <!-- 已登录显示写文章入口 -->
         <router-link
@@ -77,17 +90,16 @@ const handleLogout = () => {
   router.push('/login')
 }
 
-const candyRef = ref(null)
 const candies = ref([])
 let candyId = 0
 
 const navLinks = [
-  { name: '首页', path: '/' },
-  { name: '文章', path: '/posts' },
-  { name: '项目', path: '/projects' },
-  { name: '友链', path: '/friends' },
-  { name: '留言板', path: '/message' },
-  { name: '关于', path: '/about' },
+  { name: '首页', path: '/', icon: '⌂' },
+  { name: '文章', path: '/posts', icon: '☷' },
+  { name: '项目', path: '/projects', icon: '◇' },
+  { name: '友链', path: '/friends', icon: '∞' },
+  { name: '留言板', path: '/message', icon: '✎' },
+  { name: '关于', path: '/about', icon: '○' },
 ]
 
 const isActive = (path) => {
@@ -97,7 +109,7 @@ const isActive = (path) => {
 
 // ✨ 萤火虫/金粉特效配置
 // 使用微小符号和星星，配合暖金色系
-const DUST_EMOJIS = ['✨', '·', '•', '∗', '']
+const DUST_EMOJIS = ['✦', '·', '•', '∗']
 
 const dropCandy = (e) => {
   // ✅ 排除导航、按钮、链接、输入框等交互元素
@@ -121,15 +133,19 @@ const dropCandy = (e) => {
   
   // 获取点击坐标（兼容触摸事件）
   const clientX = e.clientX || (e.touches && e.touches[0]?.clientX)
-  if (!clientX) return
+  const clientY = e.clientY || (e.touches && e.touches[0]?.clientY)
+  if (!clientX || !clientY) return
   
-  // 点击产生 4-8 个微粒
-  const count = Math.floor(Math.random() * 5) + 4
+  // 点击产生 5-9 个微粒
+  const count = Math.floor(Math.random() * 5) + 5
   
   for (let i = 0; i < count; i++) {
     const id = ++candyId
-    // 随机分布范围（比星星更宽）
-    const x = clientX + (Math.random() - 0.5) * 100
+    const x = clientX + (Math.random() - 0.5) * 26
+    const y = clientY + (Math.random() - 0.5) * 18
+    const dx = (Math.random() - 0.5) * 130
+    const dy = -48 - Math.random() * 110
+    const rot = (Math.random() - 0.5) * 220
     
     // 🎨 随机颜色：使用与你博客主题匹配的金色/琥珀色系
     // HSL: 色相40-55(金色/琥珀色), 饱和度80%, 亮度50-80%
@@ -137,15 +153,15 @@ const dropCandy = (e) => {
     const lightness = 50 + Math.random() * 30
     const color = `hsl(${hue}, 80%, ${lightness}%)`
     
-    const dur = 2 + Math.random() * 1.5  // 飘得比较慢（2-3.5秒）
-    const delay = Math.random() * 0.5
-    const size = 6 + Math.random() * 12   // 大小不一，像尘埃（6-18px）
-    const opacity = 0.4 + Math.random() * 0.6 // 半透明（0.4-1.0）
+    const dur = 0.95 + Math.random() * 0.75
+    const delay = Math.random() * 0.08
+    const size = 6 + Math.random() * 10
+    const opacity = 0.45 + Math.random() * 0.55
     
     // 随机选择 Emoji
     const emoji = DUST_EMOJIS[Math.floor(Math.random() * DUST_EMOJIS.length)]
     
-    candies.value.push({ id, x, emoji, color, dur, delay, size, opacity })
+    candies.value.push({ id, x, y, dx, dy, rot, emoji, color, dur, delay, size, opacity })
   }
   
   // 性能优化：限制最大数量
@@ -156,18 +172,17 @@ const dropCandy = (e) => {
   // 自动清理过期微粒
   setTimeout(() => {
     candies.value = candies.value.filter(c => c.id > candyId - 40)
-  }, 3500)
+  }, 1800)
 }
 
 onMounted(() => {
-  // 可选：页面加载时显示欢迎特效
-  // setTimeout(() => {
-  //   const event = { 
-  //     clientX: window.innerWidth / 2, 
-  //     target: { closest: () => null } 
-  //   }
-  //   dropCandy(event)
-  // }, 800)
+  setTimeout(() => {
+    dropCandy({
+      clientX: window.innerWidth / 2,
+      clientY: Math.min(window.innerHeight * 0.42, 380),
+      target: { closest: () => null }
+    })
+  }, 650)
 })
 </script>
 
@@ -182,6 +197,59 @@ onMounted(() => {
   flex-direction: column;
   position: relative;
   overflow-x: hidden;
+}
+
+.ambient-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambient-line {
+  position: absolute;
+  display: block;
+  width: 240px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(153, 97, 22, 0.28), transparent);
+  transform-origin: center;
+}
+
+.line-a {
+  --r: -7deg;
+  top: 20%;
+  right: 7%;
+  transform: rotate(-7deg);
+  animation: lineDrift 8s ease-in-out infinite;
+}
+
+.line-b {
+  --r: 4deg;
+  left: 6%;
+  bottom: 18%;
+  transform: rotate(4deg);
+  animation: lineDrift 9s ease-in-out 0.8s infinite reverse;
+}
+
+.ambient-stamp {
+  position: absolute;
+  top: 18%;
+  right: 4.5%;
+  padding: 10px 8px;
+  border: 1px solid rgba(153, 97, 22, 0.28);
+  border-radius: 8px;
+  color: rgba(153, 97, 22, 0.46);
+  font-family: var(--font-serif);
+  font-size: 14px;
+  line-height: 1.55;
+  writing-mode: vertical-rl;
+  letter-spacing: 2px;
+}
+
+@keyframes lineDrift {
+  0%, 100% { opacity: 0.35; transform: translateY(0) rotate(var(--r, -7deg)); }
+  50% { opacity: 0.75; transform: translateY(12px) rotate(var(--r, -7deg)); }
 }
 
 /* ✨ 特效容器 */
@@ -199,43 +267,31 @@ onMounted(() => {
 /* ✨ 微粒基础样式 */
 .candy {
   position: absolute;
-  top: -20px;
   pointer-events: none;
   user-select: none;
   will-change: transform, opacity;
   font-weight: bold;
-  /* 关键：添加柔和发光效果，让金色在米色背景上显现 */
-  filter: blur(0.5px) drop-shadow(0 0 2px rgba(255, 190, 50, 0.5));
+  filter: blur(0.15px) drop-shadow(0 0 5px rgba(255, 190, 50, 0.55));
   animation-fill-mode: forwards;
 }
 
-/* 🌟 萤火虫飘落动画：带左右摇摆 */
-@keyframes dustFall {
+@keyframes dustBurst {
   0% {
-    transform: translateY(-10px) translateX(0) scale(0.5) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(0.3) rotate(0deg);
     opacity: 0;
   }
-  10% {
+  18% {
     opacity: 1;
   }
-  25% {
-    transform: translateY(25vh) translateX(15px) scale(1) rotate(90deg);
-  }
-  50% {
-    transform: translateY(50vh) translateX(-15px) scale(0.9) rotate(180deg);
-  }
-  75% {
-    transform: translateY(75vh) translateX(10px) scale(1.1) rotate(270deg);
-  }
   100% {
-    transform: translateY(110vh) translateX(-10px) scale(0.8) rotate(360deg);
+    transform: translate3d(var(--dx), var(--dy), 0) scale(0.9) rotate(var(--rot));
     opacity: 0;
   }
 }
 
 .candy {
-  animation-name: dustFall;
-  animation-timing-function: linear;
+  animation-name: dustBurst;
+  animation-timing-function: var(--ease-out);
 }
 
 /* ================================================
@@ -249,44 +305,62 @@ onMounted(() => {
   z-index: 100;
   display: flex;
   justify-content: center;
-  padding: 10px 0;
+  padding: 14px 16px;
 }
 
 .souta-nav-inner {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 8px;
-  border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 10px;
-  background: rgba(255,255,255,0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  gap: 6px;
+  max-width: min(100%, 820px);
+  padding: 8px 10px;
+  border: 1px solid rgba(85, 71, 54, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 250, 241, 0.72);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow: 0 18px 40px rgba(88, 66, 38, 0.12);
 }
 
 .nav-item {
-  padding: 6px 14px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 15px;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text-light, #666);
-  border-radius: 6px;
-  transition: all 0.2s;
+  border-radius: 999px;
+  transition: color 0.22s, background 0.22s, transform 0.22s var(--ease-out);
   cursor: pointer;
   user-select: none;
   text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-icon {
+  color: var(--accent-dark);
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.72;
 }
 
 .nav-item:hover {
   color: var(--text, #333);
-  background: rgba(0,0,0,0.04);
+  background: rgba(201, 133, 36, 0.1);
+  transform: translateY(-1px);
 }
 
 .nav-item.active {
-  background: var(--text, #333);
-  color: #fff;
-  font-weight: 500;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  background: rgba(41, 36, 29, 0.93);
+  color: #fffaf1;
+  box-shadow: 0 10px 24px rgba(41, 36, 29, 0.22);
+}
+
+.nav-item.active .nav-icon {
+  color: var(--accent-soft);
+  opacity: 1;
 }
 
 /* 写文章按钮高亮 */
@@ -332,11 +406,15 @@ onMounted(() => {
    ================================================ */
 .souta-main {
   flex: 1;
-  padding-top: 72px;
+  position: relative;
+  z-index: 1;
+  padding-top: 78px;
 }
 
 .souta-footer {
-  padding: 24px 0;
+  position: relative;
+  z-index: 1;
+  padding: 28px 0;
   text-align: center;
   font-size: 13px;
   color: var(--text-lighter, #999);
@@ -351,33 +429,55 @@ onMounted(() => {
 /* 页面过渡动画 */
 .page-enter-active,
 .page-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.34s var(--ease-out), transform 0.34s var(--ease-out), filter 0.34s var(--ease-out);
 }
 
 .page-enter-from {
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(16px);
+  filter: blur(4px);
 }
 
 .page-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+  filter: blur(3px);
 }
 
 /* 响应式 */
 @media (max-width: 768px) {
+  .souta-nav {
+    align-items: flex-start;
+    overflow-x: auto;
+    justify-content: flex-start;
+    scrollbar-width: none;
+  }
+
+  .souta-nav::-webkit-scrollbar {
+    display: none;
+  }
+
   .souta-nav-inner {
-    gap: 2px;
-    padding: 4px 6px;
+    gap: 3px;
+    padding: 6px;
+    min-width: max-content;
   }
   
   .nav-item {
-    padding: 5px 10px;
-    font-size: 13px;
+    padding: 7px 11px;
+    font-size: 12px;
+  }
+
+  .nav-icon {
+    display: none;
   }
   
   .souta-main {
-    padding-top: 64px;
+    padding-top: 68px;
+  }
+
+  .ambient-stamp {
+    display: none;
   }
 }
 
@@ -391,6 +491,16 @@ onMounted(() => {
   
   .nav-item:hover {
     background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .candy,
+  .ambient-line,
+  .page-enter-active,
+  .page-leave-active {
+    animation: none !important;
+    transition: none !important;
   }
 }
 </style>

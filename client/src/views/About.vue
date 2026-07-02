@@ -137,7 +137,7 @@ const getIcon = (icon) => {
 <style scoped>
 .about-page {
   min-height: calc(100vh - 72px);
-  padding: 40px 0;
+  padding: 56px 0 86px;
 }
 
 .about-inner {
@@ -156,15 +156,24 @@ const getIcon = (icon) => {
   gap: 28px;
   align-items: center;
   margin-bottom: 0;
+  padding: 26px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 250, 241, 0.72);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: fadeInUp 0.68s var(--ease-out) both;
 }
 
 .about-avatar {
-  width: 90px;
-  height: 90px;
+  width: 98px;
+  height: 98px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  border: 3px solid var(--border);
+  border: 3px solid rgba(255, 250, 241, 0.92);
+  box-shadow: 0 14px 30px rgba(88, 66, 38, 0.16);
 }
 
 .about-avatar img {
@@ -174,10 +183,12 @@ const getIcon = (icon) => {
 }
 
 .about-name {
-  font-size: 1.8rem;
+  font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
   color: var(--text);
   margin-bottom: 4px;
+  font-family: var(--font-serif);
+  line-height: 1.1;
 }
 
 .about-subtitle {
@@ -193,40 +204,44 @@ const getIcon = (icon) => {
 }
 
 .social-icon {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
-  background: var(--c, var(--text));
-  color: #fff;
-  transition: all 0.2s;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255, 250, 241, 0.68);
+  color: var(--text);
+  transition: transform 0.22s var(--ease-out), box-shadow 0.22s var(--ease-out), color 0.2s, border-color 0.2s;
 }
 
 .social-icon:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  color: #fff;
+  transform: translateY(-3px) rotate(-2deg);
+  box-shadow: 0 14px 26px color-mix(in srgb, var(--c) 18%, transparent);
+  border-color: color-mix(in srgb, var(--c) 40%, transparent);
+  color: var(--c);
 }
 
 /* 段落 */
 .about-section {
   margin-bottom: 28px;
+  animation: fadeInUp 0.68s var(--ease-out) both;
 }
 
 .section-title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 14px;
   display: flex;
   align-items: center;
   gap: 8px;
+  font-family: var(--font-serif);
 }
 
 .about-bio {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text);
   line-height: 1.9;
   font-family: var(--font-serif);
@@ -239,17 +254,17 @@ const getIcon = (icon) => {
 }
 
 .skill-chip {
-  padding: 6px 16px;
+  padding: 7px 15px;
   background: var(--text);
-  color: #fff;
+  color: var(--paper);
   font-size: 13px;
-  border-radius: 20px;
-  transition: all 0.2s;
+  border-radius: 999px;
+  transition: transform 0.22s var(--ease-out), background 0.22s, color 0.22s;
 }
 
 .skill-chip:hover {
   background: var(--accent);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .skill-chip.interest {
@@ -304,17 +319,20 @@ const getIcon = (icon) => {
 /* 右侧 */
 .about-aside {
   position: sticky;
-  top: 88px;
+  top: 98px;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
 .aside-card {
-  background: var(--card);
+  background: rgba(255, 250, 241, 0.72);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .aside-card-title {
@@ -339,13 +357,13 @@ const getIcon = (icon) => {
   border-radius: 6px;
   font-size: 14px;
   color: var(--text);
-  transition: all 0.2s;
+  transition: transform 0.22s var(--ease-out), color 0.22s, background 0.22s;
 }
 
 .nav-link:hover {
-  background: var(--bg);
+  background: rgba(201, 133, 36, 0.1);
   color: var(--accent-dark);
-  padding-left: 14px;
+  transform: translateX(4px);
 }
 
 .contact-list {
@@ -360,11 +378,12 @@ const getIcon = (icon) => {
   gap: 10px;
   font-size: 13px;
   color: var(--text-light);
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.22s var(--ease-out);
 }
 
 .contact-item:hover {
   color: var(--text);
+  transform: translateX(3px);
 }
 
 @media (max-width: 900px) {

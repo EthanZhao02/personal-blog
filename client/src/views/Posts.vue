@@ -74,6 +74,7 @@ import { ref, computed, onMounted } from 'vue'
 import { getArticleList } from '../api/article'
 import { getTagList } from '../api/tag'
 import { getCategoryList } from '../api/category'
+import { fallbackArticles, fallbackCategories, fallbackTags } from '../config/site.config'
 
 const articles = ref([])
 const categories = ref([])
@@ -131,15 +132,30 @@ const selectCategory = (id) => {
   selectedCategoryId.value = id
 }
 
+const useFallbackArticles = () => {
+  articles.value = fallbackArticles
+}
+
+const useFallbackTags = () => {
+  allTags.value = fallbackTags
+}
+
+const useFallbackCategories = () => {
+  categories.value = fallbackCategories
+}
+
 const loadArticles = async () => {
   loading.value = true
   try {
     const res = await getArticleList(1, 200)
     if (res.code === 200) {
       articles.value = res.data?.records || []
+    } else {
+      useFallbackArticles()
     }
   } catch (e) {
-    console.error('加载文章失败', e)
+    useFallbackArticles()
+    if (import.meta.env.DEV) console.info('使用静态文章数据', e?.message || e)
   } finally {
     loading.value = false
   }
@@ -150,8 +166,13 @@ const loadTags = async () => {
     const res = await getTagList()
     if (res.code === 200) {
       allTags.value = res.data || []
+    } else {
+      useFallbackTags()
     }
-  } catch (e) { console.error('加载标签失败', e) }
+  } catch (e) {
+    useFallbackTags()
+    if (import.meta.env.DEV) console.info('使用静态标签数据', e?.message || e)
+  }
 }
 
 const loadCategories = async () => {
@@ -159,8 +180,13 @@ const loadCategories = async () => {
     const res = await getCategoryList()
     if (res.code === 200) {
       categories.value = res.data || []
+    } else {
+      useFallbackCategories()
     }
-  } catch (e) { console.error('加载分类失败', e) }
+  } catch (e) {
+    useFallbackCategories()
+    if (import.meta.env.DEV) console.info('使用静态分类数据', e?.message || e)
+  }
 }
 
 onMounted(() => {
@@ -171,11 +197,11 @@ onMounted(() => {
 <style scoped>
 .posts-page {
   min-height: calc(100vh - 72px);
-  padding: 40px 0;
+  padding: 56px 0 78px;
 }
 
 .posts-inner {
-  max-width: 800px;
+  max-width: 860px;
   margin: 0 auto;
   padding: 0 32px;
 }
@@ -185,19 +211,23 @@ onMounted(() => {
   display: flex;
   align-items: baseline;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  animation: fadeInUp 0.68s var(--ease-out) both;
 }
 
 .posts-title {
-  font-size: 1.8rem;
+  font-size: clamp(2rem, 4vw, 3.15rem);
   font-weight: 700;
   color: var(--text);
-  letter-spacing: 1px;
+  letter-spacing: 0;
+  font-family: var(--font-serif);
+  line-height: 1.1;
 }
 
 .posts-count {
   font-size: 13px;
   color: var(--text-lighter);
+  padding-bottom: 5px;
 }
 
 /* 筛选栏 */
@@ -205,9 +235,15 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  margin-bottom: 32px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 36px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 250, 241, 0.68);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: fadeInUp 0.68s var(--ease-out) 0.08s both;
 }
 
 .filter-group {
@@ -218,19 +254,20 @@ onMounted(() => {
 }
 
 .filter-chip {
-  padding: 5px 16px;
+  padding: 7px 15px;
   border: 1px solid var(--border);
-  border-radius: 20px;
-  background: transparent;
+  border-radius: 999px;
+  background: rgba(255, 250, 241, 0.68);
   color: var(--text-light);
   font-size: 13px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.22s var(--ease-out), color 0.22s, border-color 0.22s, background 0.22s;
 }
 
 .filter-chip:hover {
   border-color: var(--accent);
   color: var(--accent-dark);
+  transform: translateY(-1px);
 }
 
 .filter-chip.active {
@@ -240,10 +277,10 @@ onMounted(() => {
 }
 
 .tag-select {
-  padding: 6px 12px;
+  padding: 7px 12px;
   border: 1px solid var(--border);
-  border-radius: 20px;
-  background: var(--bg);
+  border-radius: 999px;
+  background: rgba(255, 250, 241, 0.72);
   color: var(--text);
   font-size: 13px;
   cursor: pointer;
@@ -256,17 +293,31 @@ onMounted(() => {
 
 /* 年份分组 */
 .year-group {
-  margin-bottom: 40px;
+  position: relative;
+  margin-bottom: 44px;
+  padding-left: 18px;
+  animation: fadeInUp 0.72s var(--ease-out) both;
+}
+
+.year-group::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 38px;
+  bottom: 8px;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(201, 133, 36, 0.5), transparent);
 }
 
 .year-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--text);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   padding-bottom: 8px;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
   position: relative;
+  font-family: var(--font-serif);
 }
 
 .year-title::after {
@@ -275,7 +326,7 @@ onMounted(() => {
   bottom: -2px;
   left: 0;
   width: 60px;
-  height: 2px;
+  height: 1px;
   background: var(--accent);
 }
 
@@ -283,27 +334,31 @@ onMounted(() => {
 .article-list {
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
 .article-item {
   display: flex;
   align-items: baseline;
   gap: 16px;
-  padding: 12px 0;
-  border-bottom: 1px dashed var(--border);
-  transition: all 0.2s;
+  padding: 14px 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: rgba(255, 250, 241, 0.42);
+  transition: transform 0.24s var(--ease-out), box-shadow 0.24s var(--ease-out), border-color 0.24s, background 0.24s;
 }
 
 .article-item:hover {
-  background: rgba(200, 169, 126, 0.04);
-  padding-left: 8px;
-  margin-left: -8px;
+  background: rgba(255, 250, 241, 0.9);
+  border-color: rgba(201, 133, 36, 0.22);
+  box-shadow: 0 14px 28px rgba(88, 66, 38, 0.08);
+  transform: translateX(8px);
 }
 
 .article-date {
   flex-shrink: 0;
   font-size: 13px;
-  color: var(--text-lighter);
+  color: var(--accent-dark);
   font-family: 'SF Mono', 'Consolas', monospace;
   min-width: 48px;
 }
@@ -314,7 +369,7 @@ onMounted(() => {
 }
 
 .article-title {
-  font-size: 15px;
+  font-size: 15.5px;
   font-weight: 500;
   color: var(--text);
   line-height: 1.5;
@@ -330,6 +385,7 @@ onMounted(() => {
 .empty {
   padding: 80px 0;
   text-align: center;
+  animation: fadeInUp 0.6s var(--ease-out) both;
 }
 
 .empty-icon {
@@ -382,8 +438,14 @@ onMounted(() => {
   
   .article-item {
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
     padding: 14px 0;
+    background: transparent;
+  }
+
+  .article-item:hover {
+    transform: none;
+    padding-left: 0;
   }
   
   .article-date {

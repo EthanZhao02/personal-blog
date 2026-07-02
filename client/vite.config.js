@@ -3,7 +3,12 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import history from 'connect-history-api-fallback'
 
+const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1]
+const pagesBase = process.env.BASE_PATH || (repoName ? `/${repoName}/` : '/')
+const base = process.env.GITHUB_PAGES === 'true' ? pagesBase : '/'
+
 export default defineConfig({
+  base,
   plugins: [
     vue(),
     {

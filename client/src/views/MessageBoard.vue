@@ -118,6 +118,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { getMessageList, addMessage, deleteMessage, replyMessage } from '../api/message'
 import { useUserStore } from '../stores/user'
+import { fallbackMessages } from '../config/site.config'
 
 const userStore = useUserStore()
 const isAdmin = computed(() => userStore.isAdmin)
@@ -132,6 +133,23 @@ const form = ref({
   email: '',
   content: ''
 })
+const localMessageKey = 'ethan_blog_messages'
+
+function getLocalMessages() {
+  try {
+    return JSON.parse(localStorage.getItem(localMessageKey) || '[]')
+  } catch {
+    return []
+  }
+}
+
+function setLocalMessages(list) {
+  localStorage.setItem(localMessageKey, JSON.stringify(list))
+}
+
+function useFallbackMessages() {
+  messages.value = [...getLocalMessages(), ...fallbackMessages]
+}
 
 function getInitial(name) {
   if (!name) return '游'
@@ -162,10 +180,13 @@ async function fetchMessages() {
   try {
     const res = await getMessageList()
     if (res.code === 200) {
-      messages.value = res.data || []
+      messages.value = res.data?.length ? res.data : [...getLocalMessages(), ...fallbackMessages]
+    } else {
+      useFallbackMessages()
     }
   } catch (e) {
-    console.error('留言加载失败', e)
+    useFallbackMessages()
+    if (import.meta.env.DEV) console.info('使用静态留言数据', e?.message || e)
   } finally {
     loading.value = false
   }
@@ -192,7 +213,18 @@ async function submitMessage() {
       alert(res.message || '提交失败')
     }
   } catch (e) {
-    alert('网络错误，请重试')
+    const localMessage = {
+      id: Date.now(),
+      nickname: form.value.nickname.trim() || '匿名用户',
+      email: form.value.email.trim(),
+      content: form.value.content.trim(),
+      createTime: new Date().toISOString(),
+    }
+    const next = [localMessage, ...getLocalMessages()]
+    setLocalMessages(next)
+    messages.value = [localMessage, ...messages.value]
+    form.value.content = ''
+    alert('当前是静态部署模式，留言已保存在本机浏览器。')
   } finally {
     submitting.value = false
   }
@@ -250,7 +282,7 @@ onMounted(() => {
 <style scoped>
 .message-page {
   min-height: calc(100vh - 72px);
-  padding: 40px 0 80px;
+  padding: 56px 0 86px;
 }
 
 .message-container {
@@ -261,27 +293,34 @@ onMounted(() => {
 
 .message-header {
   margin-bottom: 32px;
+  animation: fadeInUp 0.68s var(--ease-out) both;
 }
 
 .message-title {
-  font-size: 1.8rem;
+  font-size: clamp(2rem, 4vw, 3.15rem);
   font-weight: 700;
   color: var(--text);
   margin-bottom: 6px;
+  font-family: var(--font-serif);
+  line-height: 1.1;
 }
 
 .message-subtitle {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-light);
 }
 
 /* 留言表单 */
 .message-form {
-  background: var(--card);
+  background: rgba(255, 250, 241, 0.78);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 24px;
   margin-bottom: 40px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: fadeInUp 0.68s var(--ease-out) 0.08s both;
 }
 
 .form-row {
@@ -296,11 +335,11 @@ onMounted(() => {
   padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg);
+  background: rgba(255, 250, 241, 0.72);
   color: var(--text);
   font-size: 14px;
   font-family: inherit;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
 }
 
@@ -318,13 +357,13 @@ onMounted(() => {
   padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg);
+  background: rgba(255, 250, 241, 0.72);
   color: var(--text);
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
   min-height: 100px;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
 }
 
@@ -357,13 +396,14 @@ onMounted(() => {
   border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.22s var(--ease-out), background 0.2s, box-shadow 0.22s;
   font-family: inherit;
 }
 
 .submit-btn:hover:not(:disabled) {
   background: var(--accent-dark);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 24px rgba(153, 97, 22, 0.18);
 }
 
 .submit-btn:disabled {
@@ -418,7 +458,21 @@ onMounted(() => {
 .message-item {
   display: flex;
   gap: 14px;
-  animation: fadeUp 0.35s both;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 250, 241, 0.62);
+  box-shadow: 0 10px 24px rgba(88, 66, 38, 0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: fadeUp 0.45s var(--ease-out) both;
+  transition: transform 0.24s var(--ease-out), box-shadow 0.24s var(--ease-out), border-color 0.24s;
+}
+
+.message-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+  border-color: rgba(201, 133, 36, 0.28);
 }
 
 @keyframes fadeUp {
@@ -427,15 +481,16 @@ onMounted(() => {
 }
 
 .msg-avatar {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  background: var(--border);
+  background: var(--bg-soft);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 10px 22px rgba(88, 66, 38, 0.12);
 }
 
 .msg-avatar img {
@@ -477,7 +532,7 @@ onMounted(() => {
 .msg-ip {
   font-size: 11px;
   color: var(--text-lighter);
-  background: var(--bg);
+  background: rgba(47, 72, 88, 0.08);
   padding: 1px 6px;
   border-radius: 4px;
 }
@@ -501,11 +556,12 @@ onMounted(() => {
   border: none;
   cursor: pointer;
   padding: 0;
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.2s var(--ease-out);
 }
 
 .del-btn:hover {
   color: #f56c6c;
+  transform: translateY(-1px);
 }
 
 .reply-btn {
@@ -529,7 +585,7 @@ onMounted(() => {
 .msg-reply {
   margin-top: 8px;
   padding: 8px 12px;
-  background: rgba(200,169,126,0.08);
+  background: rgba(201, 133, 36, 0.08);
   border-radius: 8px;
   border-left: 3px solid var(--accent);
 }
@@ -556,7 +612,7 @@ onMounted(() => {
   border-radius: 6px;
   font-size: 13px;
   font-family: inherit;
-  background: var(--bg);
+  background: rgba(255, 250, 241, 0.72);
   color: var(--text);
 }
 .reply-input:focus { outline: none; border-color: var(--accent); }
@@ -580,7 +636,7 @@ onMounted(() => {
 }
 .child-message {
   padding: 8px 12px;
-  background: var(--card);
+  background: rgba(255, 250, 241, 0.72);
   border-radius: 6px;
   margin-bottom: 8px;
 }

@@ -190,6 +190,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useUserStore } from '../stores/user'
 import { getFriendLinks, getAllFriendLinks, applyFriendLink, approveFriendLink, updateFriendLink, deleteFriendLink } from '../api/friendLink'
 import { uploadImage } from '../api/upload'
+import { fallbackFriends } from '../config/site.config'
 
 const userStore = useUserStore()
 const isAdmin = computed(() => userStore.isAdmin)
@@ -209,6 +210,31 @@ const showEditModal = ref(false)
 const uploadingAvatar = ref(false)
 const editForm = ref({ id: null, name: '', url: '', description: '', email: '', avatar: '', category: 'tech', isActive: 1 })
 const applyForm = ref({ name: '', url: '', description: '', email: '', avatar: '', category: 'tech' })
+const localFriendKey = 'ethan_blog_friend_links'
+
+function getLocalFriends() {
+  try {
+    return JSON.parse(localStorage.getItem(localFriendKey) || '[]')
+  } catch {
+    return []
+  }
+}
+
+function setLocalFriends(list) {
+  localStorage.setItem(localFriendKey, JSON.stringify(list))
+}
+
+function normalizeFriends(list) {
+  return (list || []).map(f => ({
+    ...f,
+    category: f.category || 'tech',
+    isActive: f.isActive ?? 1,
+  }))
+}
+
+function useFallbackFriends() {
+  friends.value = normalizeFriends([...getLocalFriends(), ...fallbackFriends])
+}
 
 function getFriendsByCategory(cat) {
   return friends.value.filter(f => f.category === cat)
@@ -245,19 +271,14 @@ async function fetchFriends() {
   loading.value = true
   try {
     const res = await getFriendLinks()
-    console.log('[Friends] API 响应:', res)
     if (res.code === 200) {
-      // ✅ 如果后端没返回 category，默认补上 'tech'
-      friends.value = (res.data || []).map(f => ({
-        ...f,
-        category: f.category || 'tech'
-      }))
-      console.log('[Friends] 加载完成，共', friends.value.length, '条')
+      friends.value = normalizeFriends(res.data?.length ? res.data : [...getLocalFriends(), ...fallbackFriends])
     } else {
-      console.warn('[Friends] 接口返回非 200:', res.code, res.message)
+      useFallbackFriends()
     }
   } catch (e) {
-    console.error('友链加载失败', e)
+    useFallbackFriends()
+    if (import.meta.env.DEV) console.info('使用静态友链数据', e?.message || e)
   } finally {
     loading.value = false
   }
@@ -275,15 +296,31 @@ async function doApply() {
     } else {
       alert(res.message || '提交失败')
     }
-  } catch (e) { alert('网络错误') }
+  } catch (e) {
+    const localLink = {
+      ...applyForm.value,
+      id: Date.now(),
+      isActive: 1,
+      avatar: applyForm.value.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(applyForm.value.name)}`,
+    }
+    const next = [localLink, ...getLocalFriends()]
+    setLocalFriends(next)
+    useFallbackFriends()
+    applyForm.value = { name: '', url: '', description: '', email: '', avatar: '', category: 'tech' }
+    showApply.value = false
+    alert('当前是静态部署模式，友链申请已暂存在本机浏览器。')
+  }
 }
 
 async function fetchAllLinks() {
   if (!isAdmin.value) return
   try {
     const res = await getAllFriendLinks()
-    if (res.code === 200) allLinks.value = res.data || []
-  } catch (e) { console.error('加载全部友链失败', e) }
+    if (res.code === 200) allLinks.value = res.data?.length ? res.data : normalizeFriends([...getLocalFriends(), ...fallbackFriends])
+  } catch (e) {
+    allLinks.value = normalizeFriends([...getLocalFriends(), ...fallbackFriends])
+    if (import.meta.env.DEV) console.info('使用静态友链管理数据', e?.message || e)
+  }
 }
 
 async function doApprove(id, isActive) {
@@ -379,7 +416,7 @@ watch(showAdmin, (val) => {
 <style scoped>
 .friends-page {
   min-height: calc(100vh - 72px);
-  padding: 40px 0 80px;
+  padding: 56px 0 86px;
 }
 
 .friends-inner {
@@ -391,18 +428,20 @@ watch(showAdmin, (val) => {
 .friends-header {
   margin-bottom: 36px;
   text-align: center;
+  animation: fadeInUp 0.68s var(--ease-out) both;
 }
 
 .friends-title {
-  font-size: 1.8rem;
+  font-size: clamp(2rem, 4vw, 3.15rem);
   font-weight: 700;
   color: var(--text);
   margin-bottom: 6px;
-  font-family: 'Noto Serif SC', serif;
+  font-family: var(--font-serif);
+  line-height: 1.1;
 }
 
 .friends-desc {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-light);
 }
 
@@ -412,20 +451,24 @@ watch(showAdmin, (val) => {
 }
 
 .apply-postcard {
-  background: linear-gradient(135deg, #fdf6e3 0%, #faf8f5 100%);
+  background: rgba(255, 250, 241, 0.72);
   border: 1px dashed var(--accent);
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 20px 24px;
   display: flex;
   align-items: center;
   gap: 16px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: transform 0.26s var(--ease-out), box-shadow 0.26s var(--ease-out), border-color 0.26s;
 }
 
 .apply-postcard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(200, 169, 126, 0.2);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(201, 133, 36, 0.52);
 }
 
 .postcard-stamp {
@@ -433,7 +476,7 @@ watch(showAdmin, (val) => {
   width: 48px;
   height: 48px;
   background: var(--accent);
-  border-radius: 4px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -469,12 +512,13 @@ watch(showAdmin, (val) => {
 }
 
 .apply-panel {
-  background: var(--card);
+  background: rgba(255, 250, 241, 0.82);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 24px;
   margin-top: 12px;
-  animation: fadeIn 0.3s ease;
+  box-shadow: var(--shadow);
+  animation: fadeIn 0.3s var(--ease-out);
 }
 
 @keyframes fadeIn {
@@ -493,7 +537,7 @@ watch(showAdmin, (val) => {
   padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg);
+  background: rgba(255, 250, 241, 0.72);
   color: var(--text);
   font-size: 14px;
   font-family: inherit;
@@ -562,12 +606,13 @@ watch(showAdmin, (val) => {
   font-size: 13px;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s;
+  transition: transform 0.22s var(--ease-out), background 0.2s;
   flex-shrink: 0;
 }
 
 .upload-avatar-btn:hover {
   background: var(--accent-dark);
+  transform: translateY(-1px);
 }
 
 .upload-avatar-btn.uploading {
@@ -593,13 +638,15 @@ watch(showAdmin, (val) => {
   border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.22s var(--ease-out), background 0.2s, box-shadow 0.22s;
   font-family: inherit;
   margin-top: 8px;
 }
 
 .apply-btn:hover {
   background: var(--accent-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 24px rgba(153, 97, 22, 0.18);
 }
 
 .apply-note {
@@ -616,6 +663,7 @@ watch(showAdmin, (val) => {
 
 .friend-category {
   margin-bottom: 32px;
+  animation: fadeInUp 0.68s var(--ease-out) both;
 }
 
 .category-title {
@@ -626,6 +674,7 @@ watch(showAdmin, (val) => {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-family: var(--font-serif);
 }
 
 .cat-icon {
@@ -646,18 +695,21 @@ watch(showAdmin, (val) => {
   align-items: center;
   text-decoration: none;
   padding: 20px 16px;
-  background: var(--card);
+  background: rgba(255, 250, 241, 0.76);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  transition: all 0.25s ease;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.26s var(--ease-out), box-shadow 0.26s var(--ease-out), border-color 0.26s;
   cursor: pointer;
   text-align: center;
 }
 
 .friend-simple-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(200, 169, 126, 0.18);
-  border-color: var(--accent);
+  transform: translateY(-6px) rotate(-0.6deg);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(201, 133, 36, 0.36);
 }
 
 .simple-avatar {
@@ -665,8 +717,9 @@ watch(showAdmin, (val) => {
   height: 64px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid var(--accent);
-  background: var(--bg);
+  border: 2px solid rgba(255, 250, 241, 0.92);
+  background: var(--bg-soft);
+  box-shadow: 0 10px 22px rgba(88, 66, 38, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -710,7 +763,7 @@ watch(showAdmin, (val) => {
 }
 
 .admin-toggle {
-  background: var(--card);
+  background: rgba(255, 250, 241, 0.72);
   border: 1px dashed var(--accent);
   border-radius: 8px;
   padding: 12px 20px;
@@ -725,7 +778,7 @@ watch(showAdmin, (val) => {
 }
 
 .admin-panel {
-  background: var(--card);
+  background: rgba(255, 250, 241, 0.82);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 16px;
@@ -788,7 +841,7 @@ watch(showAdmin, (val) => {
   padding: 4px 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--bg);
+  background: rgba(255, 250, 241, 0.72);
   font-size: 12px;
   cursor: pointer;
   color: var(--text);
@@ -861,8 +914,8 @@ watch(showAdmin, (val) => {
 }
 
 .modal-content {
-  background: var(--card);
-  border-radius: 16px;
+  background: var(--paper);
+  border-radius: 8px;
   padding: 24px;
   width: 100%;
   max-width: 480px;
