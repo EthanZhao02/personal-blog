@@ -17,8 +17,8 @@ export const isStaticMode =
 
 const avatar = resolveAssetUrl('/photos/avatar-profile.jpg')
 const photos = [
-  resolveAssetUrl('/photos/photo1.png'),
   avatar,
+  resolveAssetUrl('/photos/photo1.png'),
   resolveAssetUrl('/photos/photo2.png'),
   resolveAssetUrl('/photos/photo3.png'),
 ]
@@ -122,9 +122,11 @@ GitHub Pages 不能运行 Java 后端，也不能托管 MySQL。为了避免上�
 
 每次推送到 master 分支后，GitHub Actions 会进入 client 目录，安装依赖，执行生产构建，然后把 dist 发布到 GitHub Pages。
 
-## 后续可以继续增强
+## 下一步更适合怎么做
 
-如果以后需要真实评论、登录、写文章和后台管理，可以把 Spring Boot 后端部署到 Render、Railway、Fly.io、云服务器或其他 Java 运行平台，再把 VITE_API_BASE_URL 指到后端地址。`,
+短期最适合做 GitHub 仓库驱动的 CMS/后台：后台页面编辑 Markdown 文章、首页配置、关于页、项目和友链，然后自动提交到仓库。仓库更新后 GitHub Actions 会重新部署，维护成本低，也不需要一直运行 Spring Boot + MySQL。
+
+如果以后要真实评论、登录、写文章和后台管理，再把 Spring Boot 后端部署到支持 Java 的平台，把数据库单独托管，并把 VITE_API_BASE_URL 指到后端地址。免费额度经常变化，部署前以平台官网为准。`,
     categoryId: 1,
     categoryName: '技术笔记',
     authorName: 'Ethan',

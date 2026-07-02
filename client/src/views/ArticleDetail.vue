@@ -164,13 +164,14 @@
         <div class="aside-card toc-card" v-if="toc.length > 0">
           <p class="aside-card-title">目录</p>
           <nav class="toc-nav">
-            <a
+            <button
               v-for="item in toc"
               :key="item.id"
-              :href="`#${item.id}`"
+              type="button"
               class="toc-item"
               :class="`toc-h${item.level}`"
-            >{{ item.text }}</a>
+              @click="scrollToHeading(item.id)"
+            >{{ item.text }}</button>
           </nav>
         </div>
 
@@ -249,6 +250,17 @@ const toc = computed(() => {
   }
   return headings
 })
+
+const scrollToHeading = async (id) => {
+  await nextTick()
+  let target = document.getElementById(id)
+  if (!target) {
+    renderHeadingIds()
+    await nextTick()
+    target = document.getElementById(id)
+  }
+  target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 
 // 附件
 const attachments = computed(() => {
@@ -1203,6 +1215,12 @@ watch(() => route.params.id, () => {
   gap: 4px;
 }
 .toc-item {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
   font-size: 13px;
   color: var(--text-light);
   padding: 4px 8px;

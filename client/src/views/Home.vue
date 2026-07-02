@@ -46,12 +46,6 @@
           <span class="stage-line line-one" aria-hidden="true"></span>
           <span class="stage-line line-two" aria-hidden="true"></span>
 
-          <pre class="code-note" aria-hidden="true"><code>const Ethan = {
-  passion: 'Code',
-  focus: 'Vue',
-  motto: 'Practice'
-}</code></pre>
-
           <div
             class="photo-wrapper"
             @mouseenter="stopCarousel"
@@ -411,28 +405,6 @@ onUnmounted(() => {
   bottom: 86px;
 }
 
-.code-note {
-  position: absolute;
-  right: -12px;
-  bottom: 64px;
-  z-index: 3;
-  margin: 0;
-  padding: 18px 20px;
-  border: 1px solid rgba(126, 238, 255, 0.22);
-  border-radius: 8px;
-  background:
-    linear-gradient(135deg, rgba(15, 24, 45, 0.92), rgba(8, 13, 25, 0.78));
-  color: var(--ink-blue);
-  font-family: 'Consolas', 'SF Mono', monospace;
-  font-size: 13px;
-  line-height: 1.75;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28), 0 0 30px rgba(56, 248, 255, 0.08);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  transform: rotate(1.8deg);
-  animation: noteFloat 5.5s ease-in-out infinite;
-}
-
 .photo-wrapper {
   width: 380px;
   height: 500px;
@@ -589,11 +561,6 @@ onUnmounted(() => {
   50% { translate: 0 -12px; }
 }
 
-@keyframes noteFloat {
-  0%, 100% { translate: 0 0; }
-  50% { translate: 0 9px; }
-}
-
 @keyframes slowSpin {
   to { transform: rotate(360deg); }
 }
@@ -634,7 +601,6 @@ onUnmounted(() => {
     transform: rotate(1.4deg);
   }
 
-  .code-note,
   .stage-line {
     display: none;
   }
@@ -653,7 +619,6 @@ onUnmounted(() => {
 @media (prefers-reduced-motion: reduce) {
   .hero-wave,
   .photo-wrapper,
-  .code-note,
   .stage-ring,
   .scroll-cue span {
     animation: none !important;

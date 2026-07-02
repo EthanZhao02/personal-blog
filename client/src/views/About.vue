@@ -5,10 +5,17 @@
       <!-- 左侧：个人介绍 -->
       <main class="about-main">
         <header class="about-header">
-          <div class="about-avatar">
-            <img :src="siteConfig.avatar" :alt="siteConfig.name" />
+          <div class="about-visual">
+            <span class="orbit orbit-one" aria-hidden="true"></span>
+            <span class="orbit orbit-two" aria-hidden="true"></span>
+            <span class="scan-line" aria-hidden="true"></span>
+            <div class="about-avatar">
+              <img :src="siteConfig.avatar" :alt="siteConfig.name" />
+            </div>
+            <span class="visual-label">DEVELOPER</span>
           </div>
           <div class="about-intro">
+            <p class="about-kicker">ABOUT ME</p>
             <h1 class="about-name">{{ siteConfig.name }}</h1>
             <p class="about-subtitle">{{ siteConfig.subtitle }}</p>
             <div class="about-socials">
@@ -23,6 +30,16 @@
                 :title="social.name"
                 v-html="getIcon(social.icon)"
               ></a>
+            </div>
+            <div class="about-stats" aria-label="个人博客统计">
+              <div
+                v-for="item in profileStats"
+                :key="item.label"
+                class="stat-card"
+              >
+                <strong>{{ item.value }}</strong>
+                <span>{{ item.label }}</span>
+              </div>
             </div>
           </div>
         </header>
@@ -117,6 +134,13 @@
 <script setup>
 import siteConfig from '../config/site.config.js'
 
+const profileStats = [
+  { value: `${siteConfig.about.skills?.length || 0}+`, label: '技术栈' },
+  { value: `${siteConfig.content.articles?.length || 0}`, label: '技术文章' },
+  { value: `${siteConfig.projects?.length || 0}`, label: '项目实践' },
+  { value: `${siteConfig.socials?.length || 0}`, label: '公开账号' },
+]
+
 const getIcon = (icon) => {
   const icons = {
     github: '<svg width="25" height="25" viewBox="0 -102 1024 1024" fill="currentColor"><path d="M511.6 76.3C264.3 76.2 64 276.4 64 523.5 64 718.9 189.3 885 363.8 946c23.5 5.9 19.9-10.8 19.9-22.2v-77.5c-135.7 15.9-141.2-73.9-150.3-88.9C215 726 171.5 718 184.5 703c30.9-15.9 62.4 4 98.9 57.9 26.4 39.1 77.9 32.5 104 26 5.7-23.5 17.9-44.5 34.7-60.8-140.6-25.2-199.2-111-199.2-213 0-49.5 16.3-95 48.3-131.7-20.4-60.5 1.9-112.3 4.9-120 58.1-5.2 118.5 41.6 123.2 45.3 33-8.9 70.7-13.6 112.9-13.6 42.4 0 80.2 4.9 113.5 13.9 11.3-8.6 67.3-48.8 121.3-43.9 2.9 7.7 24.7 58.3 5.5 118 32.4 36.8 48.9 82.7 48.9 132.3 0 102.2-59 188.1-200 212.9 23.5 23.2 38.1 55.4 38.1 91v112.5c0.8 9 0 17.9 15 17.9 177.1-59.7 304.6-227 304.6-424.1 0-247.2-200.4-447.3-447.5-447.3z"/></svg>',
@@ -156,34 +180,153 @@ const getIcon = (icon) => {
 /* 头部 */
 .about-header {
   display: flex;
-  gap: 28px;
+  gap: 36px;
   align-items: center;
   margin-bottom: 0;
-  padding: 26px;
+  padding: 34px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: rgba(8, 14, 27, 0.72);
+  background:
+    radial-gradient(circle at 24% 46%, rgba(56, 248, 255, 0.18), transparent 30%),
+    linear-gradient(135deg, rgba(9, 18, 36, 0.92), rgba(6, 10, 24, 0.72));
   box-shadow: var(--shadow);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  overflow: hidden;
+  position: relative;
   animation: fadeInUp 0.68s var(--ease-out) both;
 }
 
+.about-header::before,
+.about-header::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.about-header::before {
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 48%, rgba(56, 248, 255, 0.12) 50%, transparent 52%),
+    linear-gradient(0deg, transparent 0 48%, rgba(155, 92, 255, 0.1) 50%, transparent 52%);
+  background-size: 96px 96px;
+  opacity: 0.35;
+}
+
+.about-header::after {
+  width: 210px;
+  height: 1px;
+  right: 24px;
+  top: 34px;
+  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.7), transparent);
+  box-shadow: 0 0 18px rgba(56, 248, 255, 0.35);
+}
+
+.about-visual {
+  width: 230px;
+  height: 230px;
+  flex: 0 0 230px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  isolation: isolate;
+}
+
 .about-avatar {
-  width: 98px;
-  height: 98px;
+  width: 142px;
+  height: 142px;
   border-radius: 50%;
   overflow: hidden;
-  flex-shrink: 0;
   border: 2px solid rgba(56, 248, 255, 0.48);
-  box-shadow: 0 0 0 8px rgba(56, 248, 255, 0.08), 0 18px 42px rgba(56, 248, 255, 0.16);
+  box-shadow:
+    0 0 0 10px rgba(56, 248, 255, 0.08),
+    0 0 38px rgba(56, 248, 255, 0.28),
+    0 22px 62px rgba(0, 0, 0, 0.42);
   position: relative;
+  z-index: 2;
 }
 
 .about-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.orbit {
+  position: absolute;
+  border: 1px solid rgba(56, 248, 255, 0.36);
+  border-radius: 50%;
+  inset: 16px;
+  box-shadow: inset 0 0 24px rgba(56, 248, 255, 0.12), 0 0 26px rgba(155, 92, 255, 0.12);
+  animation: aboutOrbit 12s linear infinite;
+}
+
+.orbit-one::after,
+.orbit-two::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 18px rgba(56, 248, 255, 0.8);
+}
+
+.orbit-one::after {
+  right: 28px;
+  top: 18px;
+}
+
+.orbit-two {
+  inset: 40px 8px;
+  transform: rotate(-18deg);
+  border-color: rgba(155, 92, 255, 0.36);
+  animation-duration: 18s;
+  animation-direction: reverse;
+}
+
+.orbit-two::after {
+  left: 34px;
+  bottom: 12px;
+  background: var(--violet);
+  box-shadow: 0 0 18px rgba(155, 92, 255, 0.8);
+}
+
+.scan-line {
+  position: absolute;
+  left: 34px;
+  right: 34px;
+  bottom: 38px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.9), transparent);
+  box-shadow: 0 0 20px rgba(56, 248, 255, 0.45);
+  animation: scanPulse 2.8s ease-in-out infinite;
+}
+
+.visual-label {
+  position: absolute;
+  left: 4px;
+  top: 62px;
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+}
+
+.about-intro {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  flex: 1;
+}
+
+.about-kicker {
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  font-weight: 700;
 }
 
 .about-name {
@@ -225,6 +368,35 @@ const getIcon = (icon) => {
   box-shadow: 0 14px 26px color-mix(in srgb, var(--c) 18%, transparent);
   border-color: color-mix(in srgb, var(--c) 40%, transparent);
   color: var(--c);
+}
+
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.stat-card {
+  min-height: 74px;
+  padding: 13px 10px;
+  border: 1px solid rgba(126, 238, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(10, 20, 40, 0.64);
+  box-shadow: inset 0 0 22px rgba(56, 248, 255, 0.04);
+}
+
+.stat-card strong {
+  display: block;
+  color: var(--accent-soft);
+  font-size: 24px;
+  line-height: 1;
+  margin-bottom: 9px;
+}
+
+.stat-card span {
+  color: var(--text-lighter);
+  font-size: 12px;
 }
 
 /* 段落 */
@@ -404,12 +576,29 @@ const getIcon = (icon) => {
     align-items: center;
     text-align: center;
   }
+  .about-visual {
+    width: min(72vw, 230px);
+    height: min(72vw, 230px);
+    flex-basis: auto;
+  }
   .about-socials {
     justify-content: center;
+  }
+  .about-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .about-aside {
     position: static;
     order: 2;
   }
+}
+
+@keyframes aboutOrbit {
+  to { rotate: 360deg; }
+}
+
+@keyframes scanPulse {
+  0%, 100% { opacity: 0.28; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-8px); }
 }
 </style>
