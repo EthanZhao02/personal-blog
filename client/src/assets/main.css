@@ -591,3 +591,304 @@ textarea { resize: vertical; min-height: 100px; }
   .container { padding: 0 16px; }
   .md-content { font-size: 14px; }
 }
+
+/* Phase 1 redesign: global future-lab interface language */
+.posts-page,
+.projects-page,
+.friends-page,
+.message-page,
+.about-page,
+.article-page {
+  position: relative;
+  padding-top: clamp(56px, 7vw, 92px) !important;
+  padding-bottom: 96px !important;
+}
+
+.posts-inner,
+.projects-inner,
+.friends-inner,
+.message-container,
+.about-inner,
+.article-inner {
+  width: min(1240px, calc(100% - 40px)) !important;
+  max-width: 1240px !important;
+  margin: 0 auto !important;
+}
+
+.posts-header,
+.projects-header,
+.friends-header,
+.message-header {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: end !important;
+  gap: 20px !important;
+  min-height: 210px !important;
+  margin-bottom: 28px !important;
+  padding: clamp(26px, 4vw, 48px) !important;
+  border: 1px solid rgba(126, 238, 255, 0.28) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at 82% 20%, rgba(56, 248, 255, 0.16), transparent 28%),
+    linear-gradient(135deg, rgba(12, 24, 46, 0.78), rgba(5, 8, 18, 0.62)),
+    repeating-linear-gradient(90deg, rgba(126, 238, 255, 0.055) 0 1px, transparent 1px 80px),
+    repeating-linear-gradient(0deg, rgba(126, 238, 255, 0.04) 0 1px, transparent 1px 80px) !important;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.38), inset 0 0 80px rgba(56, 248, 255, 0.045) !important;
+}
+
+.posts-header::before,
+.projects-header::before,
+.friends-header::before,
+.message-header::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 18px !important;
+  border: 1px solid rgba(56, 248, 255, 0.12) !important;
+  border-radius: 8px !important;
+  pointer-events: none !important;
+}
+
+.posts-header::after,
+.projects-header::after,
+.friends-header::after,
+.message-header::after {
+  content: 'SYSTEM READY' !important;
+  position: absolute !important;
+  right: 28px !important;
+  top: 24px !important;
+  color: var(--ink-blue) !important;
+  font: 700 11px/1 'SF Mono', 'Consolas', monospace !important;
+  letter-spacing: 0.16em !important;
+  padding: 7px 10px !important;
+  border: 1px solid rgba(141, 248, 199, 0.34) !important;
+  border-radius: 999px !important;
+  background: rgba(141, 248, 199, 0.08) !important;
+}
+
+.posts-title,
+.projects-title,
+.friends-title,
+.message-title {
+  font-size: clamp(3rem, 7vw, 6.6rem) !important;
+  line-height: 0.92 !important;
+  margin: 0 !important;
+  letter-spacing: 0 !important;
+}
+
+.posts-count,
+.projects-desc,
+.friends-desc,
+.message-subtitle {
+  align-self: end !important;
+  max-width: 360px !important;
+  margin: 0 !important;
+  color: var(--text-light) !important;
+  font-size: 15px !important;
+  line-height: 1.8 !important;
+  text-align: right !important;
+}
+
+.filter-bar,
+.stats-bar,
+.message-form,
+.apply-postcard,
+.apply-panel,
+.aside-card,
+.article-main,
+.comment-form,
+.message-item,
+.friend-simple-card,
+.project-card {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+
+.filter-bar,
+.stats-bar {
+  padding: 18px !important;
+  border: 1px solid rgba(126, 238, 255, 0.2) !important;
+}
+
+.posts-container,
+.projects-container,
+.friends-categories,
+.message-list {
+  margin-top: 30px !important;
+}
+
+.year-group,
+.project-group,
+.friend-category {
+  position: relative !important;
+  margin-bottom: 34px !important;
+  padding-left: 28px !important;
+}
+
+.year-group::before,
+.project-group::before,
+.friend-category::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 6px !important;
+  bottom: 0 !important;
+  width: 1px !important;
+  background: linear-gradient(180deg, var(--accent), rgba(56, 248, 255, 0.08)) !important;
+  box-shadow: 0 0 18px rgba(56, 248, 255, 0.35) !important;
+}
+
+.year-title,
+.group-title,
+.category-title {
+  width: fit-content !important;
+  margin-bottom: 16px !important;
+  padding: 7px 12px !important;
+  border: 1px solid rgba(126, 238, 255, 0.22) !important;
+  border-radius: 999px !important;
+  color: var(--accent-soft) !important;
+  background: rgba(8, 14, 27, 0.64) !important;
+  font: 700 13px/1 'SF Mono', 'Consolas', monospace !important;
+  letter-spacing: 0.08em !important;
+}
+
+.article-list {
+  display: grid !important;
+  gap: 12px !important;
+}
+
+.article-item,
+.recent-item,
+.admin-link-row,
+.admin-item {
+  position: relative !important;
+  border: 1px solid rgba(126, 238, 255, 0.16) !important;
+  border-radius: 8px !important;
+  background: rgba(8, 14, 27, 0.48) !important;
+  transition: transform 0.24s var(--ease-out), border-color 0.24s, box-shadow 0.24s !important;
+}
+
+.article-item:hover,
+.recent-item:hover,
+.admin-link-row:hover,
+.admin-item:hover {
+  transform: translateX(6px) !important;
+  border-color: rgba(56, 248, 255, 0.5) !important;
+  box-shadow: 0 0 28px rgba(56, 248, 255, 0.11) !important;
+}
+
+.project-list,
+.friends-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)) !important;
+  gap: 18px !important;
+}
+
+.project-card,
+.friend-simple-card,
+.message-item {
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px)) !important;
+}
+
+.project-card:hover,
+.friend-simple-card:hover,
+.message-item:hover {
+  transform: translateY(-6px) !important;
+  border-color: rgba(56, 248, 255, 0.48) !important;
+  box-shadow: var(--shadow-hover) !important;
+}
+
+.message-container {
+  display: grid !important;
+  grid-template-columns: minmax(320px, 0.78fr) minmax(420px, 1.22fr) !important;
+  gap: 24px !important;
+  align-items: start !important;
+}
+
+.message-header,
+.message-form {
+  grid-column: 1 !important;
+}
+
+.message-header {
+  grid-column: 1 / -1 !important;
+}
+
+.message-list {
+  grid-column: 2 !important;
+  grid-row: 2 / span 2 !important;
+  margin-top: 0 !important;
+}
+
+.article-inner {
+  grid-template-columns: minmax(0, 1fr) 320px !important;
+  gap: 28px !important;
+}
+
+.article-main {
+  padding: clamp(24px, 4vw, 46px) !important;
+}
+
+.article-header {
+  position: relative !important;
+  margin-bottom: 28px !important;
+  padding-bottom: 22px !important;
+  border-bottom: 1px solid rgba(126, 238, 255, 0.18) !important;
+}
+
+.article-title {
+  font-size: clamp(2.2rem, 5vw, 4.6rem) !important;
+  line-height: 1.05 !important;
+}
+
+.toc-item {
+  border-radius: 6px !important;
+}
+
+.about-inner {
+  grid-template-columns: minmax(0, 1fr) 320px !important;
+}
+
+.about-header {
+  min-height: 330px !important;
+}
+
+@media (max-width: 900px) {
+  .posts-inner,
+  .projects-inner,
+  .friends-inner,
+  .message-container,
+  .about-inner,
+  .article-inner {
+    width: min(100% - 28px, 760px) !important;
+  }
+
+  .posts-header,
+  .projects-header,
+  .friends-header,
+  .message-header {
+    grid-template-columns: 1fr !important;
+    min-height: 190px !important;
+  }
+
+  .posts-count,
+  .projects-desc,
+  .friends-desc,
+  .message-subtitle {
+    text-align: left !important;
+  }
+
+  .message-container,
+  .article-inner,
+  .about-inner {
+    grid-template-columns: 1fr !important;
+  }
+
+  .message-header,
+  .message-form,
+  .message-list {
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+}

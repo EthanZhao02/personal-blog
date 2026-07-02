@@ -47,9 +47,15 @@
               class="article-item"
             >
               <time class="article-date">{{ formatDate(article.createTime) }}</time>
-              <router-link :to="`/article/${article.id}`" class="article-link">
-                <h3 class="article-title">{{ article.title }}</h3>
-              </router-link>
+              <div class="article-content">
+                <router-link :to="`/article/${article.id}`" class="article-link">
+                  <h3 class="article-title">{{ article.title }}</h3>
+                </router-link>
+                <p class="article-summary" v-if="article.summary">{{ article.summary }}</p>
+                <div class="article-tags" v-if="article.tags?.length">
+                  <span v-for="tag in article.tags.slice(0, 4)" :key="tag.id || tag.name">#{{ tag.name }}</span>
+                </div>
+              </div>
             </article>
           </div>
         </section>
@@ -352,9 +358,9 @@ onMounted(() => {
 
 .article-item {
   display: flex;
-  align-items: baseline;
-  gap: 16px;
-  padding: 14px 16px;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 20px;
   border: 1px solid transparent;
   border-radius: 8px;
   background: rgba(8, 14, 27, 0.44);
@@ -381,9 +387,14 @@ onMounted(() => {
   text-decoration: none;
 }
 
+.article-content {
+  min-width: 0;
+  flex: 1;
+}
+
 .article-title {
-  font-size: 15.5px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--text);
   line-height: 1.5;
   margin: 0;
@@ -392,6 +403,29 @@ onMounted(() => {
 
 .article-item:hover .article-title {
   color: var(--accent-soft);
+}
+
+.article-summary {
+  margin-top: 8px;
+  color: var(--text-light);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.article-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.article-tags span {
+  color: var(--accent);
+  font: 700 11px/1 'SF Mono', 'Consolas', monospace;
+  padding: 6px 8px;
+  border: 1px solid rgba(126, 238, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(56, 248, 255, 0.07);
 }
 
 /* 空状态 */

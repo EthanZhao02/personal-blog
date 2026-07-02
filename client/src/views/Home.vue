@@ -1,29 +1,32 @@
 <template>
   <div class="home-page">
-    <div class="home-layout">
-      <div class="home-left">
-        <div class="hero-kicker reveal-up">ETHAN FUTURE LAB / PERSONAL BLOG</div>
-        <div class="hero-greeting reveal-up">
-          <span>Hi, there </span>
-          <span class="hero-wave" aria-hidden="true">/</span>
+    <div class="home-dashboard">
+      <section class="hero-console reveal-up">
+        <div class="console-status">
+          <span>ETHAN FUTURE LAB</span>
+          <strong>ONLINE</strong>
         </div>
 
-        <div class="hero-name reveal-up" style="animation-delay: 120ms">
-          <span>I'm </span>
-          <span class="hero-name-underline">{{ siteConfig.name }}</span>
-          <span> !</span>
+        <h1 class="hero-title">
+          <span>{{ siteConfig.name }}</span>
+          <span>Personal Lab</span>
+        </h1>
+
+        <p class="hero-subtitle">{{ siteConfig.subtitle }}</p>
+
+        <div class="hero-command">
+          <router-link to="/posts" class="hero-action primary">进入文章系统</router-link>
+          <router-link to="/projects" class="hero-action">查看项目矩阵</router-link>
         </div>
 
-        <div class="hero-subtitle reveal-up" style="animation-delay: 240ms">
-          {{ siteConfig.subtitle }}
+        <div class="hero-metrics" aria-label="站点数据">
+          <div v-for="item in heroStats" :key="item.label" class="metric-card">
+            <strong>{{ item.value }}</strong>
+            <span>{{ item.label }}</span>
+          </div>
         </div>
 
-        <div class="hero-actions reveal-up" style="animation-delay: 300ms">
-          <router-link to="/posts" class="hero-action primary">进入文章</router-link>
-          <router-link to="/projects" class="hero-action">查看项目</router-link>
-        </div>
-
-        <div class="hero-socials reveal-up" style="animation-delay: 360ms">
+        <div class="hero-socials" aria-label="公开账号">
           <a
             v-for="social in siteConfig.socials"
             :key="social.name"
@@ -33,18 +36,19 @@
             class="social-btn"
             :style="{ '--social-color': social.color }"
             :aria-label="social.name"
+            :title="social.name"
           >
             <span v-html="getSocialIcon(social.icon)"></span>
           </a>
         </div>
-      </div>
+      </section>
 
-      <div class="home-right reveal-up" style="animation-delay: 180ms">
-        <div class="photo-stage">
-          <span class="stage-ring ring-one" aria-hidden="true"></span>
-          <span class="stage-ring ring-two" aria-hidden="true"></span>
-          <span class="stage-line line-one" aria-hidden="true"></span>
-          <span class="stage-line line-two" aria-hidden="true"></span>
+      <section class="media-command reveal-up" style="animation-delay: 120ms">
+        <div class="media-shell">
+          <div class="media-topbar">
+            <span>VISUAL FEED</span>
+            <span>{{ String(currentPhoto + 1).padStart(2, '0') }} / {{ String(siteConfig.photos.length).padStart(2, '0') }}</span>
+          </div>
 
           <div
             class="photo-wrapper"
@@ -52,12 +56,17 @@
             @mouseleave="startCarousel"
             @click="handlePhotoClick"
           >
+            <div
+              class="photo-backdrop"
+              :style="{ backgroundImage: activePhoto ? `url(${activePhoto})` : 'none' }"
+              aria-hidden="true"
+            ></div>
             <div ref="photoInnerRef" class="photo-inner">
               <img
                 v-for="(photo, i) in siteConfig.photos"
                 :key="i"
                 :src="photo"
-                :alt="`photo ${i + 1}`"
+                :alt="`Ethan Future Lab visual ${i + 1}`"
                 class="photo-img"
                 :class="{ active: i === currentPhoto }"
               />
@@ -75,7 +84,13 @@
             ></button>
           </div>
         </div>
-      </div>
+
+        <div class="signal-panel">
+          <span>STATIC DEPLOY</span>
+          <strong>GitHub Pages</strong>
+          <small>CMS and backend will be connected in the next phase.</small>
+        </div>
+      </section>
     </div>
 
     <router-link to="/posts" class="scroll-cue" aria-label="查看文章">
@@ -86,14 +101,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import siteConfig from '../config/site.config.js'
 
 const siteConfigData = siteConfig
 const currentPhoto = ref(0)
 const photoInnerRef = ref(null)
 let carouselTimer = null
-let waveTimer = null
+
+const heroStats = computed(() => [
+  { value: siteConfig.content.articles?.length || 0, label: '文章' },
+  { value: siteConfig.projects?.length || 0, label: '项目' },
+  { value: siteConfig.socials?.length || 0, label: '账号' },
+  { value: siteConfig.about.skills?.length || 0, label: '技术栈' },
+])
+
+const activePhoto = computed(() => siteConfigData.photos[currentPhoto.value] || siteConfigData.photos[0] || '')
 
 // 触发自然缩放动画
 const triggerPopBounce = () => {
@@ -156,19 +179,10 @@ const getSocialIcon = (icon) => {
 
 onMounted(() => {
   startCarousel()
-  waveTimer = setInterval(() => {
-    const hand = document.querySelector('.hero-wave')
-    if (hand) {
-      hand.classList.remove('wave-pop')
-      void hand.offsetWidth
-      hand.classList.add('wave-pop')
-    }
-  }, 2400)
 })
 
 onUnmounted(() => {
   stopCarousel()
-  if (waveTimer) clearInterval(waveTimer)
 })
 </script>
 
@@ -622,6 +636,371 @@ onUnmounted(() => {
   .stage-ring,
   .scroll-cue span {
     animation: none !important;
+  }
+}
+
+/* Phase 1 redesign: immersive lab console */
+.home-page {
+  min-height: calc(100vh - 84px);
+  display: block;
+  padding: 82px clamp(18px, 4vw, 56px) 96px;
+}
+
+.home-dashboard {
+  width: min(1320px, 100%);
+  min-height: min(760px, calc(100vh - 170px));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(360px, 0.86fr) minmax(520px, 1.14fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: stretch;
+}
+
+.hero-console,
+.media-command {
+  position: relative;
+  min-width: 0;
+}
+
+.hero-console {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(28px, 4vw, 54px);
+  border: 1px solid rgba(126, 238, 255, 0.28);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(12, 24, 46, 0.78), rgba(5, 8, 18, 0.42)),
+    repeating-linear-gradient(90deg, rgba(126, 238, 255, 0.055) 0 1px, transparent 1px 72px),
+    repeating-linear-gradient(0deg, rgba(126, 238, 255, 0.045) 0 1px, transparent 1px 72px);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.44), inset 0 0 60px rgba(56, 248, 255, 0.045);
+  overflow: hidden;
+}
+
+.hero-console::before,
+.hero-console::after,
+.media-shell::before,
+.media-shell::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.hero-console::before {
+  inset: 18px;
+  border: 1px solid rgba(56, 248, 255, 0.12);
+  border-radius: 8px;
+}
+
+.hero-console::after {
+  width: 210px;
+  height: 1px;
+  right: 30px;
+  top: 42px;
+  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.9), transparent);
+  box-shadow: 0 0 20px rgba(56, 248, 255, 0.4);
+  animation: scanPulse 3.4s ease-in-out infinite;
+}
+
+.console-status {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+  color: var(--text-light);
+  font: 700 12px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.12em;
+}
+
+.console-status strong {
+  padding: 6px 9px;
+  border: 1px solid rgba(141, 248, 199, 0.4);
+  border-radius: 999px;
+  color: var(--ink-blue);
+  background: rgba(141, 248, 199, 0.08);
+}
+
+.hero-title {
+  display: grid;
+  gap: 6px;
+  color: var(--text);
+  font-size: clamp(3.6rem, 8vw, 8.2rem);
+  line-height: 0.9;
+  letter-spacing: 0;
+}
+
+.hero-title span:first-child {
+  width: fit-content;
+  background: linear-gradient(90deg, #ffffff, var(--accent), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+.hero-title span:last-child {
+  font-size: clamp(1.7rem, 3vw, 3.1rem);
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.hero-subtitle {
+  width: min(520px, 100%);
+  margin: 28px 0 0;
+  padding: 0;
+  border: 0;
+  color: var(--text-light);
+  font-size: clamp(1.02rem, 1.6vw, 1.34rem);
+  line-height: 1.85;
+  letter-spacing: 0;
+}
+
+.hero-command {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.hero-action {
+  height: 46px;
+  min-width: 140px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 34px;
+}
+
+.metric-card {
+  min-height: 82px;
+  padding: 16px 12px;
+  border: 1px solid rgba(126, 238, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(4, 10, 22, 0.52);
+}
+
+.metric-card strong {
+  display: block;
+  color: var(--accent-soft);
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.metric-card span {
+  color: var(--text-lighter);
+  font-size: 12px;
+}
+
+.hero-socials {
+  margin-top: 28px;
+}
+
+.media-command {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 16px;
+}
+
+.media-shell {
+  position: relative;
+  min-height: 680px;
+  padding: 18px;
+  border: 1px solid rgba(126, 238, 255, 0.32);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 52% 44%, rgba(56, 248, 255, 0.18), transparent 28%),
+    linear-gradient(135deg, rgba(9, 18, 36, 0.86), rgba(5, 8, 18, 0.66));
+  box-shadow: 0 32px 100px rgba(0, 0, 0, 0.5), inset 0 0 80px rgba(56, 248, 255, 0.06);
+  overflow: hidden;
+}
+
+.media-shell::before {
+  inset: 28px;
+  border: 1px solid rgba(56, 248, 255, 0.16);
+  border-radius: 8px;
+  z-index: 2;
+}
+
+.media-shell::after {
+  width: 92%;
+  height: 92%;
+  left: 4%;
+  top: 4%;
+  border: 1px solid rgba(56, 248, 255, 0.18);
+  border-radius: 50%;
+  transform: rotate(-16deg);
+  animation: slowSpin 32s linear infinite;
+}
+
+.media-topbar {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--accent-soft);
+  font: 700 12px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.12em;
+  padding: 8px 10px 14px;
+}
+
+.photo-wrapper {
+  width: 100%;
+  height: calc(100% - 72px);
+  min-height: 560px;
+  border-radius: 8px;
+  transform: none;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(56, 248, 255, 0.1), transparent 44%),
+    #050912;
+  border-color: rgba(126, 238, 255, 0.2);
+  box-shadow: none;
+  animation: mediaFloat 7s ease-in-out infinite;
+}
+
+.photo-backdrop {
+  position: absolute;
+  inset: -10%;
+  z-index: 0;
+  background-position: center;
+  background-size: cover;
+  opacity: 0.52;
+  filter: blur(28px) saturate(1.25) brightness(0.72);
+  transform: scale(1.06);
+  transition: background-image 0.35s ease, opacity 0.35s ease;
+}
+
+.photo-wrapper:hover {
+  transform: translateY(-4px);
+}
+
+.photo-wrapper::before {
+  inset: 0;
+  z-index: 3;
+  border: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, rgba(56, 248, 255, 0.14), transparent 16%, transparent 84%, rgba(56, 248, 255, 0.14)),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.25), transparent 24%, transparent 76%, rgba(0, 0, 0, 0.22));
+}
+
+.photo-wrapper::after {
+  inset: 0;
+  height: auto;
+  border-radius: inherit;
+  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0 1px, transparent 1px 6px);
+  filter: none;
+  opacity: 0.14;
+  z-index: 4;
+}
+
+.photo-img {
+  inset: 0 auto 0 50%;
+  width: min(72%, 520px);
+  padding: 0;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: saturate(1.08) contrast(1.04);
+  transform: translateX(-50%) scale(1.035);
+  background: transparent;
+}
+
+.photo-img.active {
+  transform: translateX(-50%) scale(1);
+}
+
+.photo-dots {
+  bottom: 26px;
+}
+
+.photo-dot {
+  height: 6px;
+  width: 18px;
+  border-radius: 999px;
+}
+
+.photo-dot.active {
+  width: 42px;
+}
+
+.signal-panel {
+  min-height: 108px;
+  padding: 18px 20px;
+  border: 1px solid rgba(126, 238, 255, 0.22);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(12, 24, 46, 0.72), rgba(5, 8, 18, 0.64));
+}
+
+.signal-panel span,
+.signal-panel small {
+  display: block;
+  color: var(--text-lighter);
+  font: 700 11px/1.5 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.12em;
+}
+
+.signal-panel strong {
+  display: block;
+  margin: 7px 0 8px;
+  color: var(--accent-soft);
+  font-size: 24px;
+}
+
+@keyframes mediaFloat {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -8px; }
+}
+
+@keyframes scanPulse {
+  0%, 100% { opacity: 0.25; transform: translateX(-18px); }
+  50% { opacity: 1; transform: translateX(18px); }
+}
+
+@media (max-width: 980px) {
+  .home-page {
+    padding: 72px 18px 88px;
+  }
+
+  .home-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .media-shell {
+    min-height: 560px;
+  }
+
+  .photo-wrapper {
+    min-height: 440px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-console {
+    padding: 28px 18px;
+  }
+
+  .hero-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .media-shell {
+    min-height: 490px;
+    padding: 12px;
+  }
+
+  .photo-wrapper {
+    min-height: 380px;
+  }
+
+  .photo-img {
+    width: min(82%, 320px);
   }
 }
 </style>

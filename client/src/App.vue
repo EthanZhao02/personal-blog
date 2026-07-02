@@ -30,6 +30,11 @@
     <!-- 顶部固定导航 -->
     <header class="souta-nav" @click.stop @touchstart.stop>
       <nav class="souta-nav-inner" @click.stop @touchstart.stop>
+        <router-link to="/" class="nav-brand" aria-label="Ethan Future Lab">
+          <strong>Ethan</strong>
+          <span>Future Lab</span>
+        </router-link>
+
         <router-link
           v-for="link in navLinks"
           :key="link.path"
@@ -299,17 +304,18 @@ onMounted(() => {
   z-index: 100;
   display: flex;
   justify-content: center;
-  padding: 14px 16px;
+  padding: 14px clamp(14px, 4vw, 44px);
 }
 
 .souta-nav-inner {
   display: flex;
   align-items: center;
   gap: 6px;
-  max-width: min(100%, 820px);
-  padding: 8px 10px;
+  width: min(1280px, 100%);
+  max-width: min(100%, 1280px);
+  padding: 8px;
   border: 1px solid rgba(126, 238, 255, 0.24);
-  border-radius: 999px;
+  border-radius: 12px;
   background:
     linear-gradient(135deg, rgba(15, 24, 45, 0.88), rgba(8, 12, 24, 0.74));
   backdrop-filter: blur(18px) saturate(1.25);
@@ -317,6 +323,35 @@ onMounted(() => {
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28), 0 0 34px rgba(56, 248, 255, 0.08);
   position: relative;
   overflow: hidden;
+}
+
+.nav-brand {
+  position: relative;
+  z-index: 1;
+  min-width: 170px;
+  margin-right: auto;
+  padding: 7px 14px 7px 12px;
+  display: inline-grid;
+  gap: 2px;
+  border-right: 1px solid rgba(126, 238, 255, 0.18);
+  color: var(--text);
+  line-height: 1.05;
+}
+
+.nav-brand strong {
+  font-size: 22px;
+  letter-spacing: 0;
+  background: linear-gradient(90deg, #ffffff, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nav-brand span {
+  color: var(--text-lighter);
+  font: 700 10px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .souta-nav-inner::before {
@@ -331,6 +366,7 @@ onMounted(() => {
 
 .nav-item {
   position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -455,10 +491,13 @@ onMounted(() => {
 /* 响应式 */
 @media (max-width: 768px) {
   .souta-nav {
+    padding: 10px 10px 8px;
     align-items: flex-start;
     overflow-x: auto;
     justify-content: flex-start;
     scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 26px), transparent);
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 26px), transparent);
   }
 
   .souta-nav::-webkit-scrollbar {
@@ -467,12 +506,29 @@ onMounted(() => {
 
   .souta-nav-inner {
     gap: 3px;
-    padding: 6px;
+    width: max-content;
+    max-width: none;
+    padding: 5px;
     min-width: max-content;
+    border-radius: 10px;
+  }
+
+  .nav-brand {
+    min-width: 104px;
+    margin-right: 2px;
+    padding: 6px 9px;
+  }
+
+  .nav-brand strong {
+    font-size: 18px;
+  }
+
+  .nav-brand span {
+    font-size: 8px;
   }
   
   .nav-item {
-    padding: 7px 11px;
+    padding: 7px 9px;
     font-size: 12px;
   }
 
@@ -492,13 +548,13 @@ onMounted(() => {
 /* 深色模式适配 */
 @media (prefers-color-scheme: dark) {
   .souta-nav-inner {
-    background: rgba(30, 30, 30, 0.85);
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, rgba(15, 24, 45, 0.88), rgba(8, 12, 24, 0.74));
+    border-color: rgba(126, 238, 255, 0.24);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28), 0 0 34px rgba(56, 248, 255, 0.08);
   }
   
   .nav-item:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(56, 248, 255, 0.1);
   }
 }
 
