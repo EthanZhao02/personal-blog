@@ -17,10 +17,10 @@ export const isStaticMode =
 
 const avatar = resolveAssetUrl('/photos/avatar-profile.jpg')
 const photos = [
-  avatar,
-  resolveAssetUrl('/photos/photo1.png'),
-  resolveAssetUrl('/photos/photo2.png'),
-  resolveAssetUrl('/photos/photo3.png'),
+  resolveAssetUrl('/photos/hero-tech-01.png'),
+  resolveAssetUrl('/photos/hero-tech-02.png'),
+  resolveAssetUrl('/photos/hero-tech-03.png'),
+  resolveAssetUrl('/photos/hero-tech-04.png'),
 ]
 
 const socials = [
