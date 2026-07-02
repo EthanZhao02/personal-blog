@@ -58,14 +58,14 @@
 
         <section class="about-section" v-if="siteConfig.about.location">
           <h2 class="section-title">坐标</h2>
-          <p class="location-text">📍 {{ siteConfig.about.location }}</p>
+          <p class="location-text">{{ siteConfig.about.location }}</p>
         </section>
 
         <hr class="divider" />
 
         <!-- 赞助 -->
         <section class="about-section" v-if="siteConfig.wechatPay || siteConfig.alipay">
-          <h2 class="section-title">☕ 赞助</h2>
+          <h2 class="section-title">赞助</h2>
           <p class="donate-intro">{{ siteConfig.donateIntro }}</p>
           <div class="donate-qr">
             <div class="qr-item" v-if="siteConfig.wechatPay">
@@ -85,10 +85,10 @@
         <div class="aside-card">
           <p class="aside-card-title">快速导航</p>
           <nav class="quick-nav">
-            <router-link to="/" class="nav-link">🏠 首页</router-link>
-            <router-link to="/posts" class="nav-link">📝 文章</router-link>
-            <router-link to="/projects" class="nav-link">🛠️ 项目</router-link>
-            <router-link to="/friends" class="nav-link">🤝 朋友</router-link>
+            <router-link to="/" class="nav-link">首页</router-link>
+            <router-link to="/posts" class="nav-link">文章</router-link>
+            <router-link to="/projects" class="nav-link">项目</router-link>
+            <router-link to="/friends" class="nav-link">朋友</router-link>
           </nav>
         </div>
 
@@ -391,6 +391,9 @@ const getIcon = (icon) => {
     grid-template-columns: 1fr;
     padding: 0 20px;
   }
+  .about-main {
+    order: 1;
+  }
   .about-header {
     flex-direction: column;
     align-items: center;
@@ -401,7 +404,7 @@ const getIcon = (icon) => {
   }
   .about-aside {
     position: static;
-    order: -1;
+    order: 2;
   }
 }
 </style>

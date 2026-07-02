@@ -11,8 +11,13 @@ export const resolveAssetUrl = (path = '') => {
   return `${base}/${path.replace(/^\//, '')}`
 }
 
-const avatar = resolveAssetUrl('/photos/avatar.png')
+export const isStaticMode =
+  import.meta.env.VITE_STATIC_MODE === 'true' ||
+  (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io'))
+
+const avatar = resolveAssetUrl('/photos/avatar-profile.jpg')
 const photos = [
+  avatar,
   resolveAssetUrl('/photos/photo1.png'),
   resolveAssetUrl('/photos/photo2.png'),
   resolveAssetUrl('/photos/photo3.png'),
@@ -125,7 +130,7 @@ const projects = [
     id: 1,
     name: '个人博客系统',
     description: 'Vue3 + Spring Boot 个人博客，支持 Markdown 文章、评论、留言和友链模块。',
-    icon: '📝',
+    icon: '◇',
     tag: 'Vue',
     techStack: 'Vue3, Vite, Spring Boot, MySQL, GitHub Pages',
     category: 'web',
@@ -141,7 +146,7 @@ const projects = [
     id: 2,
     name: '开发工具集',
     description: '日常开发中积累的脚本、模板和排错经验，后续会逐步整理成可复用工具。',
-    icon: '🛠️',
+    icon: '⌘',
     tag: 'Tools',
     techStack: 'JavaScript, PowerShell, Markdown',
     category: 'tool',
@@ -223,7 +228,7 @@ export const siteConfig = {
     interests: ['编程', '游戏', '新技术'],
     location: '地球',
   },
-  donateIntro: '如果我的博客对你有帮助，欢迎请我喝杯咖啡 ☕',
+  donateIntro: '如果我的博客对你有帮助，欢迎随手支持一下。',
   wechatPay: '',
   alipay: '',
   content: {

@@ -2,7 +2,7 @@
   <div class="notfound-page">
     <div class="notfound-inner">
       <div class="notfound-art">
-        <div class="art-emoji">🔍</div>
+        <div class="art-emoji">?</div>
         <div class="art-shadow"></div>
       </div>
       <div class="notfound-content">
@@ -12,7 +12,7 @@
           你想要找的页面可能已被删除，或者地址有误。
         </p>
         <div class="notfound-actions">
-          <router-link to="/" class="btn-home">🏠 回到首页</router-link>
+          <router-link to="/" class="btn-home">回到首页</router-link>
           <button class="btn-back" @click="$router.back()">← 返回上一页</button>
         </div>
       </div>

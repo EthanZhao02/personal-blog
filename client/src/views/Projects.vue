@@ -4,7 +4,7 @@
       <!-- 页面头部 -->
       <header class="projects-header">
         <h1 class="projects-title">项目</h1>
-        <p class="projects-desc">折腾过的有意思的东西 ✨</p>
+        <p class="projects-desc">折腾过的有意思的东西</p>
       </header>
 
       <!-- 统计栏 -->
@@ -88,7 +88,7 @@
               <div class="project-stats">
                 <div class="stats-row">
                   <span class="stat" v-if="proj.stats">
-                    <span class="stat-icon">⭐</span>
+                    <span class="stat-icon">◆</span>
                     <span class="stat-text">{{ proj.stats }}</span>
                   </span>
                   <span class="stat" v-if="proj.tag">
@@ -145,7 +145,7 @@
       <!-- 管理员面板 -->
       <div v-if="isAdmin" class="admin-section">
         <div class="admin-toggle" @click="showAdmin = !showAdmin">
-          🛠️ 管理员：项目管理
+          管理员：项目管理
           <span class="toggle-arrow" :class="{ open: showAdmin }">▼</span>
         </div>
 
@@ -158,7 +158,7 @@
           <div class="admin-list">
             <div v-for="proj in allProjects" :key="proj.id" class="admin-item">
               <div class="item-info">
-                <span class="item-icon">{{ proj.icon || '🛠️' }}</span>
+                <span class="item-icon">{{ proj.icon || '⌘' }}</span>
                 <span class="item-name">{{ proj.name }}</span>
                 <span class="item-tag" v-if="proj.tag">{{ proj.tag }}</span>
                 <span class="item-category" v-if="proj.category">{{ getCategoryName(proj.category) }}</span>
@@ -167,18 +167,18 @@
                 </span>
               </div>
               <div class="item-actions">
-                <button class="action-btn edit-btn" @click="startEdit(proj)">✏️ 编辑</button>
+                <button class="action-btn edit-btn" @click="startEdit(proj)">编辑</button>
                 <button class="action-btn toggle-btn" @click="toggleActive(proj)">
-                  {{ proj.isActive ? '⏸ 下线' : '▶ 上线' }}
+                  {{ proj.isActive ? '下线' : '上线' }}
                 </button>
-                <button class="action-btn delete-btn" @click="confirmDelete(proj)">🗑 删除</button>
+                <button class="action-btn delete-btn" @click="confirmDelete(proj)">删除</button>
               </div>
             </div>
           </div>
 
           <!-- 添加/编辑表单 -->
           <div class="crud-form">
-            <h4 class="form-title">{{ editingId ? '✏️ 编辑项目' : '➕ 添加项目' }}</h4>
+            <h4 class="form-title">{{ editingId ? '编辑项目' : '添加项目' }}</h4>
             <div class="form-row">
               <input v-model="form.name" placeholder="项目名称 *" class="form-input" />
               <input v-model="form.url" placeholder="项目链接 *" class="form-input" />
@@ -189,7 +189,7 @@
             </div>
             <textarea v-model="form.description" placeholder="项目描述" class="form-textarea" rows="2" />
             <div class="form-row-3">
-              <input v-model="form.icon" placeholder="图标（emoji）" class="form-input" />
+              <input v-model="form.icon" placeholder="图标或短标识" class="form-input" />
               <input v-model="form.tag" placeholder="主语言如 Java" class="form-input" />
               <input v-model="form.techStack" placeholder="技术栈（逗号分隔）" class="form-input" />
             </div>
@@ -199,7 +199,7 @@
                 <option v-for="cat in categories" :key="cat.key" :value="cat.key">{{ cat.name }}</option>
               </select>
               <input v-model="form.badge" placeholder="角标如 NEW" class="form-input" />
-              <input v-model="form.stats" placeholder="统计如 ⭐ 1.2k" class="form-input" />
+              <input v-model="form.stats" placeholder="统计如 1.2k" class="form-input" />
             </div>
             <div class="form-row">
               <input v-model="form.status" placeholder="状态（已上线/开发中/维护中）" class="form-input" />
@@ -233,7 +233,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { getProjects, getAllProjects, addProject, updateProject, deleteProject } from '../api/project.js'
 import { useUserStore } from '../stores/user.js'
-import { fallbackProjects } from '../config/site.config.js'
+import { fallbackProjects, isStaticMode } from '../config/site.config.js'
 
 const userStore = useUserStore()
 const isAdmin = computed(() => userStore.isAdmin)
@@ -255,11 +255,11 @@ const formError = ref('')
 
 // 分类配置
 const categories = [
-  { key: 'web', name: 'Web 应用', icon: '🌐' },
-  { key: 'tool', name: '效率工具', icon: '🔋' },
-  { key: 'education', name: '教育类', icon: '🏫' },
-  { key: 'mobile', name: '移动端', icon: '📱' },
-  { key: 'other', name: '其他', icon: '⭐' }
+  { key: 'web', name: 'Web 应用', icon: '◇' },
+  { key: 'tool', name: '效率工具', icon: '⌘' },
+  { key: 'education', name: '教育类', icon: '▦' },
+  { key: 'mobile', name: '移动端', icon: '▣' },
+  { key: 'other', name: '其他', icon: '◆' }
 ]
 
 // 表单
@@ -269,7 +269,7 @@ const form = ref({
   githubUrl: '',
   imageUrl: '',
   description: '',
-  icon: '🛠️',
+  icon: '⌘',
   tag: '',
   techStack: '',
   badge: '',
@@ -337,6 +337,11 @@ const activeFallbackProjects = () => fallbackProjects.filter(p => p.isActive !==
 // 加载数据
 const loadProjects = async () => {
   loading.value = true
+  if (isStaticMode) {
+    projects.value = activeFallbackProjects()
+    loading.value = false
+    return
+  }
   try {
     const res = await getProjects()
     projects.value = res.data?.length ? res.data : activeFallbackProjects()
@@ -349,6 +354,10 @@ const loadProjects = async () => {
 }
 
 const loadAll = async () => {
+  if (isStaticMode) {
+    allProjects.value = fallbackProjects
+    return
+  }
   try {
     const res = await getAllProjects()
     allProjects.value = res.data?.length ? res.data : fallbackProjects
@@ -367,7 +376,7 @@ const startEdit = (proj) => {
     githubUrl: proj.githubUrl || '',
     imageUrl: proj.imageUrl || '',
     description: proj.description || '',
-    icon: proj.icon || '🛠️',
+    icon: proj.icon || '⌘',
     tag: proj.tag || '',
     techStack: proj.techStack || '',
     badge: proj.badge || '',
@@ -388,7 +397,7 @@ const cancelEdit = () => {
 const resetForm = () => {
   form.value = {
     name: '', url: '', githubUrl: '', imageUrl: '', description: '',
-    icon: '🛠️', tag: '', techStack: '', badge: '', category: 'other',
+    icon: '⌘', tag: '', techStack: '', badge: '', category: 'other',
     stats: '', status: '已上线', isOpenSource: false, isActive: true, articleUrl: ''
   }
   formError.value = ''

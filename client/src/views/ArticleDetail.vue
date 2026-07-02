@@ -73,7 +73,7 @@
 
         <!-- 评论区 -->
         <section class="comments-section">
-          <h3 class="comments-title">💬 评论 <span class="comments-count">({{ totalComments }})</span></h3>
+          <h3 class="comments-title">评论 <span class="comments-count">({{ totalComments }})</span></h3>
 
           <!-- 发表评论 -->
           <div class="comment-form">
@@ -219,7 +219,7 @@ import { getArticleDetail } from '../api/article'
 import { getCommentList, addComment, deleteComment as apiDeleteComment } from '../api/comment'
 import { getArticleList } from '../api/article'
 import { useUserStore } from '../stores/user'
-import siteConfig, { fallbackArticles, fallbackComments, resolveAssetUrl } from '../config/site.config.js'
+import siteConfig, { fallbackArticles, fallbackComments, isStaticMode, resolveAssetUrl } from '../config/site.config.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -287,6 +287,24 @@ const canSubmit = computed(() => {
 })
 
 const getFallbackArticle = () => fallbackArticles.find(a => String(a.id) === String(route.params.id))
+const getLocalCommentKey = () => `ethan_blog_comments_${route.params.id}`
+
+const getLocalComments = () => {
+  try {
+    return JSON.parse(localStorage.getItem(getLocalCommentKey()) || '[]')
+  } catch {
+    return []
+  }
+}
+
+const setLocalComments = (list) => {
+  localStorage.setItem(getLocalCommentKey(), JSON.stringify(list))
+}
+
+const useStaticComments = () => {
+  comments.value = [...getLocalComments(), ...(fallbackComments[route.params.id] || [])]
+  totalComments.value = countAll(comments.value)
+}
 
 const resolveContentUrl = (url) => {
   if (!url) return '#'
@@ -336,6 +354,12 @@ const downloadFile = async (attachment) => {
 }
 
 const loadArticle = async () => {
+  if (isStaticMode) {
+    article.value = getFallbackArticle()
+    await nextTick()
+    renderHeadingIds()
+    return
+  }
   try {
     const res = await getArticleDetail(route.params.id)
     if (res.code === 200) {
@@ -356,6 +380,10 @@ const loadArticle = async () => {
 }
 
 const loadComments = async () => {
+  if (isStaticMode) {
+    useStaticComments()
+    return
+  }
   try {
     const res = await getCommentList(route.params.id)
     if (res.code === 200) {
@@ -395,6 +423,26 @@ const submitComment = async () => {
   }
   
   submitting.value = true
+  if (isStaticMode) {
+    const localComment = {
+      id: Date.now(),
+      nickname: commentNickname.value.trim(),
+      userAvatar: '',
+      content: commentContent.value.trim(),
+      createTime: new Date().toISOString(),
+      children: [],
+    }
+    const next = [localComment, ...getLocalComments()]
+    setLocalComments(next)
+    replyingTo.value = null
+    replyingToId.value = null
+    pendingParentId.value = null
+    commentContent.value = ''
+    useStaticComments()
+    submitting.value = false
+    alert('当前是静态部署模式，评论已保存在本机浏览器。')
+    return
+  }
   try {
     // 修复：先保存 parentId，再发请求，最后再清空
     const parentId = replyingToId.value
@@ -490,6 +538,12 @@ const formatFileSize = (bytes) => {
 }
 
 const loadRecent = async () => {
+  if (isStaticMode) {
+    recentArticles.value = fallbackArticles
+      .filter(a => a.id !== Number(route.params.id))
+      .slice(0, 5)
+    return
+  }
   try {
     const res = await getArticleList(1, 5)
     const list = res.data?.records?.length ? res.data.records : fallbackArticles

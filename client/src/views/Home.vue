@@ -4,7 +4,7 @@
       <div class="home-left">
         <div class="hero-greeting reveal-up">
           <span>Hi, there </span>
-          <span class="hero-wave" aria-hidden="true">👋</span>
+          <span class="hero-wave" aria-hidden="true">/</span>
         </div>
 
         <div class="hero-name reveal-up" style="animation-delay: 120ms">

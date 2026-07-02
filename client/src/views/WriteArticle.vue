@@ -24,10 +24,10 @@
             </span>
             <div class="item-actions">
               <button class="item-btn" :title="a.isPublished ? t('unpublish') : t('publish')" @click.stop="togglePublish(a)">
-                {{ a.isPublished ? '📢' : '📝' }}
+                {{ a.isPublished ? t('unpublish') : t('publish') }}
               </button>
               <button class="item-btn item-btn-danger" :title="t('delete')" @click.stop="handleDelete(a.id)">
-                🗑
+                {{ t('delete') }}
               </button>
             </div>
           </div>

@@ -6,7 +6,7 @@
       <span class="ambient-stamp">保持热爱<br />奔赴山海</span>
     </div>
 
-    <!-- ✨ 特效容器 -->
+    <!-- 特效容器 -->
     <div class="candy-container">
       <span
         v-for="candy in candies"
@@ -107,7 +107,7 @@ const isActive = (path) => {
   return route.path.startsWith(path)
 }
 
-// ✨ 萤火虫/金粉特效配置
+// 萤火虫/金粉特效配置
 // 使用微小符号和星星，配合暖金色系
 const DUST_EMOJIS = ['✦', '·', '•', '∗']
 
@@ -252,7 +252,7 @@ onMounted(() => {
   50% { opacity: 0.75; transform: translateY(12px) rotate(var(--r, -7deg)); }
 }
 
-/* ✨ 特效容器 */
+/* 特效容器 */
 .candy-container {
   position: fixed;
   top: 0;
@@ -264,7 +264,7 @@ onMounted(() => {
   overflow: hidden;
 }
 
-/* ✨ 微粒基础样式 */
+/* 微粒基础样式 */
 .candy {
   position: absolute;
   pointer-events: none;

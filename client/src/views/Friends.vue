@@ -3,7 +3,7 @@
     <div class="friends-inner">
       <header class="friends-header">
         <h1 class="friends-title">朋友们</h1>
-        <p class="friends-desc">有趣的灵魂终会相遇 🤝</p>
+        <p class="friends-desc">有趣的灵魂终会相遇</p>
       </header>
 
       <!-- 友链分类展示 -->
@@ -64,7 +64,7 @@
           <div class="avatar-input-row">
             <input v-model="applyForm.avatar" placeholder="头像URL（选填）" class="apply-input" />
             <label class="upload-avatar-btn" :class="{ uploading: uploadingAvatar }">
-              {{ uploadingAvatar ? '上传中…' : '📷 上传' }}
+              {{ uploadingAvatar ? '上传中…' : '上传' }}
               <input type="file" accept="image/*" @change="onAvatarUpload($event, 'apply')" :disabled="uploadingAvatar" />
             </label>
           </div>
@@ -88,7 +88,7 @@
       <!-- 管理员操作区 -->
       <div v-if="isAdmin" class="admin-section">
         <div class="admin-toggle" @click="showAdmin = !showAdmin">
-          <span>⚙️ 友链管理{{ showAdmin ? ' ▲' : ' ▼' }}</span>
+          <span>友链管理{{ showAdmin ? ' ▲' : ' ▼' }}</span>
         </div>
         <div v-if="showAdmin" class="admin-panel">
           <div v-for="link in allLinks" :key="link.id" class="admin-link-row">
@@ -131,7 +131,7 @@
             <div class="avatar-input-row">
               <input v-model="editForm.avatar" class="apply-input" />
               <label class="upload-avatar-btn small" :class="{ uploading: uploadingAvatar }">
-                {{ uploadingAvatar ? '…' : '📷' }}
+                {{ uploadingAvatar ? '…' : '上传' }}
                 <input type="file" accept="image/*" @change="onAvatarUpload($event, 'edit')" :disabled="uploadingAvatar" />
               </label>
             </div>
@@ -190,15 +190,15 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useUserStore } from '../stores/user'
 import { getFriendLinks, getAllFriendLinks, applyFriendLink, approveFriendLink, updateFriendLink, deleteFriendLink } from '../api/friendLink'
 import { uploadImage } from '../api/upload'
-import { fallbackFriends } from '../config/site.config'
+import { fallbackFriends, isStaticMode } from '../config/site.config'
 
 const userStore = useUserStore()
 const isAdmin = computed(() => userStore.isAdmin)
 
 const categories = [
-  { key: 'tech', name: '技术伙伴', icon: '💻' },
-  { key: 'life', name: '生活日志', icon: '🌿' },
-  { key: 'other', name: '其他', icon: '⭐' }
+  { key: 'tech', name: '技术伙伴', icon: '◇' },
+  { key: 'life', name: '生活日志', icon: '∿' },
+  { key: 'other', name: '其他', icon: '◆' }
 ]
 
 const friends = ref([])
@@ -248,6 +248,11 @@ function getCategoryName(cat) {
 const onAvatarUpload = async (e, target) => {
   const file = e.target.files?.[0]
   if (!file) return
+  if (isStaticMode) {
+    alert('静态部署模式暂不支持上传图片，请先粘贴头像 URL。')
+    e.target.value = ''
+    return
+  }
   if (file.size > 2 * 1024 * 1024) { alert('图片不能超过 2MB'); return }
   uploadingAvatar.value = true
   try {
@@ -269,6 +274,11 @@ const onAvatarUpload = async (e, target) => {
 
 async function fetchFriends() {
   loading.value = true
+  if (isStaticMode) {
+    useFallbackFriends()
+    loading.value = false
+    return
+  }
   try {
     const res = await getFriendLinks()
     if (res.code === 200) {
@@ -287,6 +297,21 @@ async function fetchFriends() {
 async function doApply() {
   if (!applyForm.value.name.trim()) { alert('请填写网站名称'); return }
   if (!applyForm.value.url.trim()) { alert('请填写网站地址'); return }
+  if (isStaticMode) {
+    const localLink = {
+      ...applyForm.value,
+      id: Date.now(),
+      isActive: 1,
+      avatar: applyForm.value.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(applyForm.value.name)}`,
+    }
+    const next = [localLink, ...getLocalFriends()]
+    setLocalFriends(next)
+    useFallbackFriends()
+    applyForm.value = { name: '', url: '', description: '', email: '', avatar: '', category: 'tech' }
+    showApply.value = false
+    alert('当前是静态部署模式，友链申请已暂存在本机浏览器。')
+    return
+  }
   try {
     const res = await applyFriendLink(applyForm.value)
     if (res.code === 200) {
@@ -314,6 +339,10 @@ async function doApply() {
 
 async function fetchAllLinks() {
   if (!isAdmin.value) return
+  if (isStaticMode) {
+    allLinks.value = normalizeFriends([...getLocalFriends(), ...fallbackFriends])
+    return
+  }
   try {
     const res = await getAllFriendLinks()
     if (res.code === 200) allLinks.value = res.data?.length ? res.data : normalizeFriends([...getLocalFriends(), ...fallbackFriends])

@@ -4,7 +4,7 @@
       <!-- 标题区 -->
       <header class="message-header">
         <h1 class="message-title">留言板</h1>
-        <p class="message-subtitle">想说点什么？留下你的足迹 ✍️</p>
+        <p class="message-subtitle">想说点什么？留下你的足迹</p>
       </header>
 
       <!-- 发布留言 -->
@@ -118,7 +118,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { getMessageList, addMessage, deleteMessage, replyMessage } from '../api/message'
 import { useUserStore } from '../stores/user'
-import { fallbackMessages } from '../config/site.config'
+import { fallbackMessages, isStaticMode } from '../config/site.config'
 
 const userStore = useUserStore()
 const isAdmin = computed(() => userStore.isAdmin)
@@ -177,6 +177,11 @@ function maskIp(ip) {
 
 async function fetchMessages() {
   loading.value = true
+  if (isStaticMode) {
+    useFallbackMessages()
+    loading.value = false
+    return
+  }
   try {
     const res = await getMessageList()
     if (res.code === 200) {
@@ -199,6 +204,22 @@ async function submitMessage() {
     return
   }
   submitting.value = true
+  if (isStaticMode) {
+    const localMessage = {
+      id: Date.now(),
+      nickname: form.value.nickname.trim() || '匿名用户',
+      email: form.value.email.trim(),
+      content: form.value.content.trim(),
+      createTime: new Date().toISOString(),
+    }
+    const next = [localMessage, ...getLocalMessages()]
+    setLocalMessages(next)
+    messages.value = [localMessage, ...messages.value]
+    form.value.content = ''
+    submitting.value = false
+    alert('当前是静态部署模式，留言已保存在本机浏览器。')
+    return
+  }
   try {
     const res = await addMessage({
       nickname: form.value.nickname,

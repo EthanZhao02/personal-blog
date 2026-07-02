@@ -74,7 +74,7 @@ import { ref, computed, onMounted } from 'vue'
 import { getArticleList } from '../api/article'
 import { getTagList } from '../api/tag'
 import { getCategoryList } from '../api/category'
-import { fallbackArticles, fallbackCategories, fallbackTags } from '../config/site.config'
+import { fallbackArticles, fallbackCategories, fallbackTags, isStaticMode } from '../config/site.config'
 
 const articles = ref([])
 const categories = ref([])
@@ -146,6 +146,11 @@ const useFallbackCategories = () => {
 
 const loadArticles = async () => {
   loading.value = true
+  if (isStaticMode) {
+    useFallbackArticles()
+    loading.value = false
+    return
+  }
   try {
     const res = await getArticleList(1, 200)
     if (res.code === 200) {
@@ -162,6 +167,10 @@ const loadArticles = async () => {
 }
 
 const loadTags = async () => {
+  if (isStaticMode) {
+    useFallbackTags()
+    return
+  }
   try {
     const res = await getTagList()
     if (res.code === 200) {
@@ -176,6 +185,10 @@ const loadTags = async () => {
 }
 
 const loadCategories = async () => {
+  if (isStaticMode) {
+    useFallbackCategories()
+    return
+  }
   try {
     const res = await getCategoryList()
     if (res.code === 200) {
