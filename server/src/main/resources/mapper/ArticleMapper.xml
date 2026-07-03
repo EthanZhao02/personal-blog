@@ -18,16 +18,16 @@
             a.is_published AS isPublished,
             a.create_time AS createTime,
             a.update_time AS updateTime
-        FROM article a
-        LEFT JOIN category c ON a.category_id = c.id
-        LEFT JOIN user u ON a.user_id = u.id
+        FROM test.blog_article a
+        LEFT JOIN test.blog_category c ON a.category_id = c.id
+        LEFT JOIN test.blog_user u ON a.user_id = u.id
         WHERE a.is_published = 1
         <if test="categoryId != null">
             AND a.category_id = #{categoryId}
         </if>
         <if test="tagId != null">
             AND EXISTS (
-                SELECT 1 FROM article_tag at 
+                SELECT 1 FROM test.blog_article_tag at 
                 WHERE at.article_id = a.id AND at.tag_id = #{tagId}
             )
         </if>
@@ -55,9 +55,9 @@
             a.create_time AS createTime,
             a.update_time AS updateTime,
             a.attachments
-        FROM article a
-        LEFT JOIN category c ON a.category_id = c.id
-        LEFT JOIN user u ON a.user_id = u.id
+        FROM test.blog_article a
+        LEFT JOIN test.blog_category c ON a.category_id = c.id
+        LEFT JOIN test.blog_user u ON a.user_id = u.id
         WHERE a.id = #{id}
     </select>
 
