@@ -461,18 +461,30 @@ onMounted(() => {
 
 .filter-select {
   padding: 8px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(56, 248, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(12, 20, 35, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 13px;
   cursor: pointer;
   min-width: 140px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2338f8ff' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
 }
 
 .filter-select:focus {
   outline: none;
-  border-color: rgba(56, 248, 255, 0.4);
+  border-color: rgba(56, 248, 255, 0.5);
+  box-shadow: 0 0 10px rgba(56, 248, 255, 0.1);
+}
+
+.filter-select option {
+  background: rgba(12, 20, 35, 0.95);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 8px;
 }
 
 /* 时间轴 */
