@@ -23,7 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*")
+                .allowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*", "https://*.github.io", "https://*.onrender.com", "https://ethanzhao02.github.io")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)
@@ -72,7 +72,14 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String uploadPath = System.getenv("FILE_UPLOAD_PATH");
+        if (uploadPath == null || uploadPath.isEmpty()) {
+            uploadPath = "uploads/";
+        }
+        if (!uploadPath.endsWith("/") && !uploadPath.endsWith("/")) {
+            uploadPath = uploadPath + "/";
+        }
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:C:/Users/byy90/.qclaw/workspace/personal-blog/server/uploads/");
+                .addResourceLocations("file:" + uploadPath);
     }
 }
