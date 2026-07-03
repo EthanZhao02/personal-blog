@@ -46,6 +46,16 @@
           <span>{{ link.name }}</span>
         </router-link>
 
+        <router-link
+          v-if="!userStore.isLoggedIn"
+          to="/login"
+          class="nav-item nav-login"
+          :class="{ active: isActive('/login') }"
+        >
+          <span class="nav-icon" aria-hidden="true">↳</span>
+          <span>{{ authNavLabel }}</span>
+        </router-link>
+
         <!-- 已登录显示写文章入口 -->
         <router-link
           v-if="userStore.isLoggedIn"
@@ -80,10 +90,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router'
 import { useUserStore } from './stores/user'
+import { isStaticMode } from './config/site.config'
 
 const route = useRoute()
 const router = useRouter()
@@ -106,6 +117,8 @@ const navLinks = [
   { name: '留言板', path: '/message', icon: '✎' },
   { name: '关于', path: '/about', icon: '○' },
 ]
+
+const authNavLabel = computed(() => isStaticMode ? '账号说明' : '登录')
 
 const isActive = (path) => {
   if (path === '/') return route.path === '/'
