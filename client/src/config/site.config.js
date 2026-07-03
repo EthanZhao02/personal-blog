@@ -44,11 +44,20 @@ const socials = [
     icon: 'leetcode',
   },
   {
+    name: '语雀',
+    handle: 'Ethan的知识库',
+    url: 'https://www.yuque.com/ethan-nohpo/ak5789',
+    color: '#00b96b',
+    icon: 'yuque',
+  },
+  {
     name: '微信公众号',
-    handle: 'gh_acb63caf6891',
-    url: '#wechat-official',
+    handle: '扫码关注',
+    url: '#wechat-qr',
     color: '#22c55e',
     icon: 'wechat',
+    isQRCode: true,
+    qrCodeUrl: '/photos/wechat-qr.jpg',
   },
   {
     name: 'QQ',

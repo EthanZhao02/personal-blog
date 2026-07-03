@@ -97,26 +97,46 @@
             <span class="section-line"></span>
           </div>
           <div class="contact-grid">
-            <a
-              v-for="social in siteConfig.socials"
-              :key="social.name"
-              :href="social.url"
-              :target="social.url?.startsWith('#') ? undefined : '_blank'"
-              :rel="social.url?.startsWith('#') ? undefined : 'noopener noreferrer'"
-              class="contact-node"
-              :style="{ '--node-color': social.color || '#38f8ff' }"
-            >
-              <span class="contact-icon" v-html="getSocialIcon(social.icon)"></span>
-              <span class="contact-copy">
-                <span class="contact-name">{{ social.name }}</span>
-                <span v-if="social.handle" class="contact-detail">{{ social.handle }}</span>
-              </span>
-              <span class="contact-arrow">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M7 17l9.2-9.2M17 17V7H7"/>
-                </svg>
-              </span>
-            </a>
+            <template v-for="social in siteConfig.socials" :key="social.name">
+              <!-- 普通链接 -->
+              <a
+                v-if="!social.isQRCode"
+                :href="social.url"
+                :target="social.url?.startsWith('#') ? undefined : '_blank'"
+                :rel="social.url?.startsWith('#') ? undefined : 'noopener noreferrer'"
+                class="contact-node"
+                :style="{ '--node-color': social.color || '#38f8ff' }"
+              >
+                <span class="contact-icon" v-html="getSocialIcon(social.icon)"></span>
+                <span class="contact-copy">
+                  <span class="contact-name">{{ social.name }}</span>
+                  <span v-if="social.handle" class="contact-detail">{{ social.handle }}</span>
+                </span>
+                <span class="contact-arrow">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M7 17l9.2-9.2M17 17V7H7"/>
+                  </svg>
+                </span>
+              </a>
+              <!-- 二维码弹窗 -->
+              <div
+                v-else
+                class="contact-node qr-trigger"
+                :style="{ '--node-color': social.color || '#38f8ff' }"
+                @click="showQRCode(social)"
+              >
+                <span class="contact-icon" v-html="getSocialIcon(social.icon)"></span>
+                <span class="contact-copy">
+                  <span class="contact-name">{{ social.name }}</span>
+                  <span v-if="social.handle" class="contact-detail">{{ social.handle }}</span>
+                </span>
+                <span class="contact-arrow">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M7 17l9.2-9.2M17 17V7H7"/>
+                  </svg>
+                </span>
+              </div>
+            </template>
           </div>
         </div>
 
@@ -126,6 +146,16 @@
             <span class="footer-bracket">[</span>
             <span class="footer-content">{{ siteConfig.about?.footer || '保持热爱，奔赴山海' }}</span>
             <span class="footer-bracket">]</span>
+          </div>
+        </div>
+
+        <!-- 二维码弹窗 -->
+        <div v-if="showQR" class="qr-modal" @click="closeQRCode">
+          <div class="qr-content" @click.stop>
+            <button class="qr-close" @click="closeQRCode">×</button>
+            <h4 class="qr-title">{{ currentQR?.name }}</h4>
+            <img v-if="currentQR?.qrCodeUrl" :src="currentQR.qrCodeUrl" :alt="currentQR?.name" class="qr-image" />
+            <p class="qr-tip">扫描二维码关注我</p>
           </div>
         </div>
 
@@ -140,8 +170,21 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import siteConfig from '../config/site.config'
+
+const showQR = ref(false)
+const currentQR = ref(null)
+
+const showQRCode = (social) => {
+  currentQR.value = social
+  showQR.value = true
+}
+
+const closeQRCode = () => {
+  showQR.value = false
+  currentQR.value = null
+}
 
 const skills = computed(() => {
   const raw = siteConfig.about?.skills || []
@@ -178,6 +221,7 @@ const getSocialIcon = (icon) => {
     gitlab: '<span style="font-size:14px;font-weight:700">GL</span>',
     gitee: '<span style="font-size:14px;font-weight:700">GE</span>',
     csdn: '<span style="font-size:14px;font-weight:700">CN</span>',
+    yuque: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.5 15.5h-2v-7h2v7zm5 0h-2v-4h-2v-3h4v7z"/></svg>',
   }
   return icons[icon] || '<span style="font-size:14px">--</span>'
 }
@@ -590,5 +634,69 @@ const getSocialIcon = (icon) => {
   .contact-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* 二维码弹窗 */
+.qr-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.qr-content {
+  background: linear-gradient(135deg, rgba(17, 27, 49, 0.95), rgba(8, 14, 27, 0.95));
+  border: 1px solid rgba(56, 248, 255, 0.3);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  position: relative;
+  max-width: 320px;
+  width: 100%;
+  box-shadow: 0 0 40px rgba(56, 248, 255, 0.2);
+}
+
+.qr-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.qr-close:hover {
+  color: #fff;
+}
+
+.qr-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 20px;
+}
+
+.qr-image {
+  width: 200px;
+  height: 200px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.qr-tip {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.qr-trigger {
+  cursor: pointer;
 }
 </style>
