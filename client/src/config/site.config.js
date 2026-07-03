@@ -11,9 +11,7 @@ export const resolveAssetUrl = (path = '') => {
   return `${base}/${path.replace(/^\//, '')}`
 }
 
-export const isStaticMode =
-  import.meta.env.VITE_STATIC_MODE === 'true' ||
-  (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io'))
+export const isStaticMode = import.meta.env.VITE_STATIC_MODE === 'true'
 
 const avatar = resolveAssetUrl('/photos/avatar-profile.jpg')
 const photos = [
