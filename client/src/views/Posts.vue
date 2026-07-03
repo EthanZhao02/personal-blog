@@ -1,74 +1,129 @@
 <template>
   <div class="posts-page">
-    <div class="posts-inner">
+    <!-- 背景装饰 -->
+    <div class="page-bg" aria-hidden="true">
+      <div class="bg-line"></div>
+      <div class="bg-line"></div>
+    </div>
+
+    <div class="posts-container">
       <!-- 页面头部 -->
-      <header class="posts-header">
-        <h1 class="posts-title">归档</h1>
-        <p class="posts-count">共 {{ totalCount }} 篇文章</p>
+      <header class="page-header">
+        <div class="header-content">
+          <div class="header-badge">ARCHIVE</div>
+          <h1 class="page-title">文章归档</h1>
+          <p class="page-desc">探索技术、记录思考、分享经验</p>
+        </div>
+        <div class="header-stats">
+          <div class="stat-box">
+            <span class="stat-num">{{ totalCount }}</span>
+            <span class="stat-label">篇文章</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-box">
+            <span class="stat-num">{{ categories.length }}</span>
+            <span class="stat-label">个分类</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-box">
+            <span class="stat-num">{{ allTags.length }}</span>
+            <span class="stat-label">个标签</span>
+          </div>
+        </div>
       </header>
 
       <!-- 筛选栏 -->
-      <div class="filter-bar" v-if="categories.length || allTags.length">
-        <div class="filter-group" v-if="categories.length">
-          <button
-            class="filter-chip"
-            :class="{ active: !selectedCategoryId }"
-            @click="selectCategory(null)"
-          >全部</button>
-          <button
-            v-for="cat in categories"
-            :key="cat.id"
-            class="filter-chip"
-            :class="{ active: selectedCategoryId === cat.id }"
-            @click="selectCategory(cat.id)"
-          >{{ cat.name }}</button>
+      <div class="filter-panel">
+        <div class="filter-section">
+          <span class="filter-label">分类</span>
+          <div class="filter-chips">
+            <button
+              class="chip"
+              :class="{ active: !selectedCategoryId }"
+              @click="selectCategory(null)"
+            >全部</button>
+            <button
+              v-for="cat in categories"
+              :key="cat.id"
+              class="chip"
+              :class="{ active: selectedCategoryId === cat.id }"
+              @click="selectCategory(cat.id)"
+            >{{ cat.name }}</button>
+          </div>
         </div>
-        <div class="filter-group" v-if="allTags.length">
-          <select v-model="selectedTagName" class="tag-select">
-            <option value="">按标签筛选</option>
+        <div class="filter-section" v-if="allTags.length">
+          <span class="filter-label">标签</span>
+          <select v-model="selectedTagName" class="filter-select">
+            <option value="">全部标签</option>
             <option v-for="tag in allTags" :key="tag.id" :value="tag.name">{{ tag.name }}</option>
           </select>
         </div>
       </div>
 
-      <!-- 按年份分组的文章列表 -->
-      <main class="posts-container">
-        <section
-          v-for="year in sortedYears"
-          :key="year"
-          class="year-group"
-        >
-          <h2 class="year-title">{{ year }} 年</h2>
-          
-          <div class="article-list">
-            <article
-              v-for="article in getArticlesByYear(year)"
-              :key="article.id"
-              class="article-item"
-            >
-              <time class="article-date">{{ formatDate(article.createTime) }}</time>
-              <div class="article-content">
-                <router-link :to="`/article/${article.id}`" class="article-link">
-                  <h3 class="article-title">{{ article.title }}</h3>
-                </router-link>
-                <p class="article-summary" v-if="article.summary">{{ article.summary }}</p>
-                <div class="article-tags" v-if="article.tags?.length">
-                  <span v-for="tag in article.tags.slice(0, 4)" :key="tag.id || tag.name">#{{ tag.name }}</span>
-                </div>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <!-- 空状态 -->
-        <div class="empty" v-if="filteredArticles.length === 0 && !loading">
-          <p class="empty-icon">--</p>
-          <p class="empty-text">还没有文章</p>
+      <!-- 时间轴文章列表 -->
+      <main class="timeline-wrapper">
+        <div v-if="loading" class="loading-state">
+          <div class="loading-spinner"></div>
+          <span>加载中...</span>
         </div>
 
-        <!-- 加载中 -->
-        <div class="loading-wrap" v-if="loading">
-          <span class="loading-dot">·</span><span class="loading-dot">·</span><span class="loading-dot">·</span>
+        <div v-else-if="filteredArticles.length === 0" class="empty-state">
+          <div class="empty-icon">◈</div>
+          <p>暂无文章</p>
+        </div>
+
+        <div v-else class="timeline">
+          <div
+            v-for="year in sortedYears"
+            :key="year"
+            class="timeline-year"
+          >
+            <div class="year-marker">
+              <span class="year-num">{{ year }}</span>
+              <span class="year-line"></span>
+            </div>
+            
+            <div class="articles-grid">
+              <article
+                v-for="article in getArticlesByYear(year)"
+                :key="article.id"
+                class="article-card"
+              >
+                <div class="card-glow" aria-hidden="true"></div>
+                <router-link :to="`/article/${article.id}`" class="card-link">
+                  <div class="card-header">
+                    <time class="article-date">
+                      <span class="date-day">{{ formatDay(article.createTime) }}</span>
+                      <span class="date-month">{{ formatMonth(article.createTime) }}</span>
+                    </time>
+                    <div class="article-category" v-if="getCategoryName(article.categoryId)">
+                      {{ getCategoryName(article.categoryId) }}
+                    </div>
+                  </div>
+                  
+                  <h3 class="article-title">{{ article.title }}</h3>
+                  
+                  <p class="article-summary" v-if="article.summary">
+                    {{ article.summary }}
+                  </p>
+                  
+                  <div class="article-footer" v-if="article.tags?.length">
+                    <div class="article-tags">
+                      <span v-for="tag in article.tags.slice(0, 3)" :key="tag.id || tag.name" class="tag">
+                        {{ tag.name }}
+                      </span>
+                    </div>
+                    <span class="read-more">
+                      阅读
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                    </span>
+                  </div>
+                </router-link>
+              </article>
+            </div>
+          </div>
         </div>
       </main>
     </div>
@@ -125,13 +180,23 @@ const getArticlesByYear = (year) => {
   })
 }
 
-// 格式化日期（MM-DD）
-const formatDate = (s) => {
+// 获取分类名称
+const getCategoryName = (categoryId) => {
+  if (!categoryId) return ''
+  const cat = categories.value.find(c => c.id === categoryId)
+  return cat ? cat.name : ''
+}
+
+// 格式化日期
+const formatDay = (s) => {
   if (!s) return ''
-  const d = new Date(s)
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${m}-${day}`
+  return String(new Date(s).getDate()).padStart(2, '0')
+}
+
+const formatMonth = (s) => {
+  if (!s) return ''
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+  return months[new Date(s).getMonth()]
 }
 
 const selectCategory = (id) => {
@@ -215,294 +280,471 @@ onMounted(() => {
 
 <style scoped>
 .posts-page {
-  min-height: calc(100vh - 72px);
-  padding: 56px 0 78px;
+  position: relative;
+  min-height: 100vh;
+  padding: 80px 24px 100px;
 }
 
-.posts-inner {
-  max-width: 860px;
+/* 背景 */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-line {
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(56, 248, 255, 0.1), transparent);
+}
+
+.bg-line:nth-child(1) { left: 20%; }
+.bg-line:nth-child(2) { right: 20%; }
+
+/* 容器 */
+.posts-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 32px;
 }
 
 /* 页面头部 */
-.posts-header {
+.page-header {
   display: flex;
-  align-items: baseline;
-  gap: 12px;
-  margin-bottom: 28px;
-  animation: fadeInUp 0.68s var(--ease-out) both;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(56, 248, 255, 0.1);
 }
 
-.posts-title {
-  font-size: clamp(2rem, 4vw, 3.15rem);
+.header-content {
+  flex: 1;
+}
+
+.header-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: #38f8ff;
+  padding: 6px 12px;
+  border: 1px solid rgba(56, 248, 255, 0.3);
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.page-title {
+  font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
-  color: var(--text);
-  letter-spacing: 0;
-  font-family: var(--font-serif);
-  line-height: 1.1;
+  color: #fff;
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, #fff 0%, #38f8ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.posts-count {
-  font-size: 13px;
-  color: var(--text-lighter);
-  padding-bottom: 5px;
+.page-desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
 }
 
-/* 筛选栏 */
-.filter-bar {
+.header-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.stat-box {
+  text-align: center;
+}
+
+.stat-num {
+  display: block;
+  font-size: 32px;
+  font-weight: 700;
+  color: #38f8ff;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.1em;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(56, 248, 255, 0.2);
+}
+
+/* 筛选面板 */
+.filter-panel {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 36px;
-  padding: 14px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: rgba(8, 14, 27, 0.72);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  animation: fadeInUp 0.68s var(--ease-out) 0.08s both;
+  gap: 32px;
+  padding: 24px;
+  background: rgba(12, 20, 35, 0.6);
+  border: 1px solid rgba(56, 248, 255, 0.1);
+  border-radius: 12px;
+  margin-bottom: 40px;
+  backdrop-filter: blur(10px);
 }
 
-.filter-group {
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.1em;
+}
+
+.filter-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  align-items: center;
 }
 
-.filter-chip {
-  padding: 7px 15px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: rgba(8, 14, 27, 0.62);
-  color: var(--text-light);
+.chip {
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 13px;
   cursor: pointer;
-  transition: transform 0.22s var(--ease-out), color 0.22s, border-color 0.22s, background 0.22s;
+  transition: all 0.2s ease;
 }
 
-.filter-chip:hover {
-  border-color: var(--accent);
-  color: var(--accent-dark);
-  transform: translateY(-1px);
+.chip:hover {
+  border-color: rgba(56, 248, 255, 0.3);
+  color: #fff;
 }
 
-.filter-chip.active {
-  background: linear-gradient(135deg, var(--accent), var(--violet));
-  border-color: var(--accent);
-  color: #06101f;
+.chip.active {
+  background: linear-gradient(135deg, rgba(56, 248, 255, 0.2), rgba(155, 92, 255, 0.2));
+  border-color: rgba(56, 248, 255, 0.4);
+  color: #fff;
 }
 
-.tag-select {
-  padding: 7px 12px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: rgba(8, 14, 27, 0.62);
-  color: var(--text);
+.filter-select {
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 13px;
   cursor: pointer;
+  min-width: 140px;
+}
+
+.filter-select:focus {
   outline: none;
+  border-color: rgba(56, 248, 255, 0.4);
 }
 
-.tag-select:focus {
-  border-color: var(--accent);
-}
-
-/* 年份分组 */
-.year-group {
+/* 时间轴 */
+.timeline-wrapper {
   position: relative;
-  margin-bottom: 44px;
-  padding-left: 18px;
-  animation: fadeInUp 0.72s var(--ease-out) both;
 }
 
-.year-group::before {
+.timeline {
+  position: relative;
+}
+
+.timeline::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 38px;
-  bottom: 8px;
-  width: 1px;
-  background: linear-gradient(180deg, rgba(56, 248, 255, 0.6), rgba(155, 92, 255, 0.24), transparent);
+  left: 60px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, 
+    rgba(56, 248, 255, 0.3),
+    rgba(155, 92, 255, 0.3),
+    transparent
+  );
 }
 
-.year-title {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 18px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
+.timeline-year {
   position: relative;
-  font-family: var(--font-serif);
+  margin-bottom: 48px;
 }
 
-.year-title::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 60px;
+.timeline-year:last-child {
+  margin-bottom: 0;
+}
+
+.year-marker {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding-left: 24px;
+}
+
+.year-num {
+  font-size: 48px;
+  font-weight: 700;
+  color: rgba(56, 248, 255, 0.15);
+  line-height: 1;
+  font-family: 'SF Mono', monospace;
+}
+
+.year-line {
+  flex: 1;
   height: 1px;
-  background: var(--accent);
+  background: linear-gradient(to right, rgba(56, 248, 255, 0.2), transparent);
 }
 
-/* 文章列表 */
-.article-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* 文章网格 */
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  padding-left: 100px;
 }
 
-.article-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 18px;
+.article-card {
+  position: relative;
+  background: rgba(12, 20, 35, 0.6);
+  border: 1px solid rgba(56, 248, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.article-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(56, 248, 255, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.card-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(56, 248, 255, 0.1), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.article-card:hover .card-glow {
+  opacity: 1;
+}
+
+.card-link {
+  display: block;
   padding: 20px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  background: rgba(8, 14, 27, 0.44);
-  transition: transform 0.24s var(--ease-out), box-shadow 0.24s var(--ease-out), border-color 0.24s, background 0.24s;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  z-index: 1;
 }
 
-.article-item:hover {
-  background: rgba(16, 28, 50, 0.78);
-  border-color: rgba(56, 248, 255, 0.28);
-  box-shadow: 0 14px 36px rgba(56, 248, 255, 0.1);
-  transform: translateX(8px);
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
 }
 
 .article-date {
-  flex-shrink: 0;
-  font-size: 13px;
-  color: var(--accent);
-  font-family: 'SF Mono', 'Consolas', monospace;
-  min-width: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(56, 248, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(56, 248, 255, 0.2);
 }
 
-.article-link {
-  flex: 1;
-  text-decoration: none;
+.date-day {
+  font-size: 20px;
+  font-weight: 700;
+  color: #38f8ff;
+  line-height: 1;
 }
 
-.article-content {
-  min-width: 0;
-  flex: 1;
+.date-month {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(56, 248, 255, 0.6);
+  letter-spacing: 0.1em;
+}
+
+.article-category {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
 }
 
 .article-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 12px 0;
   line-height: 1.5;
-  margin: 0;
-  transition: color 0.2s;
-}
-
-.article-item:hover .article-title {
-  color: var(--accent-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .article-summary {
-  margin-top: 8px;
-  color: var(--text-light);
-  font-size: 14px;
-  line-height: 1.7;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.article-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .article-tags {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  margin-top: 12px;
+  flex-wrap: wrap;
 }
 
-.article-tags span {
-  color: var(--accent);
-  font: 700 11px/1 'SF Mono', 'Consolas', monospace;
-  padding: 6px 8px;
-  border: 1px solid rgba(126, 238, 255, 0.18);
-  border-radius: 999px;
-  background: rgba(56, 248, 255, 0.07);
+.tag {
+  font-size: 11px;
+  color: rgba(56, 248, 255, 0.7);
+  padding: 4px 8px;
+  background: rgba(56, 248, 255, 0.1);
+  border-radius: 4px;
+}
+
+.read-more {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #38f8ff;
+  transition: gap 0.2s;
+}
+
+.article-card:hover .read-more {
+  gap: 10px;
+}
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 80px 0;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(56, 248, 255, 0.2);
+  border-top-color: #38f8ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* 空状态 */
-.empty {
-  padding: 80px 0;
+.empty-state {
   text-align: center;
-  animation: fadeInUp 0.6s var(--ease-out) both;
+  padding: 80px 0;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .empty-icon {
-  font-size: 1.6rem;
-  margin-bottom: 12px;
-  letter-spacing: 0.2em;
-  color: var(--accent);
-}
-
-.empty-text {
-  color: var(--text-lighter);
-  font-size: 14px;
-}
-
-/* 加载 */
-.loading-wrap {
-  text-align: center;
-  padding: 60px 0;
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-}
-
-.loading-dot {
-  font-size: 28px;
-  color: var(--text-lighter);
-  animation: blink 1.2s infinite;
-}
-
-.loading-dot:nth-child(2) { animation-delay: 0.2s; }
-.loading-dot:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes blink {
-  0%, 80%, 100% { opacity: 0.2; }
-  40% { opacity: 1; }
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.3;
 }
 
 /* 响应式 */
-@media (max-width: 600px) {
-  .posts-inner {
-    padding: 0 20px;
-  }
-  
-  .posts-title {
-    font-size: 1.5rem;
-  }
-  
-  .filter-bar {
+@media (max-width: 900px) {
+  .page-header {
     flex-direction: column;
-    gap: 12px;
+    align-items: flex-start;
+    gap: 24px;
   }
   
-  .article-item {
-    flex-direction: column;
-    gap: 5px;
-    padding: 14px 0;
-    background: transparent;
+  .header-stats {
+    width: 100%;
+    justify-content: flex-start;
   }
-
-  .article-item:hover {
-    transform: none;
+  
+  .timeline::before {
+    left: 20px;
+  }
+  
+  .year-marker {
     padding-left: 0;
   }
   
-  .article-date {
-    font-size: 12px;
+  .year-num {
+    font-size: 32px;
   }
   
-  .article-title {
-    font-size: 14px;
+  .articles-grid {
+    padding-left: 50px;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .posts-page {
+    padding: 72px 16px 80px;
+  }
+  
+  .filter-panel {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .timeline::before {
+    display: none;
+  }
+  
+  .articles-grid {
+    padding-left: 0;
+  }
+  
+  .year-marker {
+    padding-left: 0;
   }
 }
 </style>

@@ -1,112 +1,107 @@
 <template>
   <div class="message-page">
+    <div class="page-bg" aria-hidden="true">
+      <div class="bg-scanlines"></div>
+    </div>
+
     <div class="message-container">
-      <!-- 标题区 -->
-      <header class="message-header">
-        <h1 class="message-title">留言板</h1>
-        <p class="message-subtitle">想说点什么？留下你的足迹</p>
+      <!-- 页面头部 -->
+      <header class="page-header">
+        <div class="header-badge">COMMUNICATION</div>
+        <h1 class="page-title">留言板</h1>
+        <p class="page-desc">在此留下你的想法或建议</p>
       </header>
 
-      <!-- 发布留言 -->
-      <div class="message-form">
-        <div class="form-row">
-          <input
-            v-model="form.nickname"
-            class="form-input"
-            placeholder="你的昵称（选填，默认匿名）"
-            maxlength="50"
-          />
-          <input
-            v-model="form.email"
-            class="form-input"
-            type="email"
-            placeholder="邮箱（选填，收到回复会通知）"
-            maxlength="100"
-          />
-        </div>
-        <div class="form-textarea-wrap">
-          <textarea
-            v-model="form.content"
-            class="form-textarea"
-            placeholder="写下你的留言..."
-            maxlength="500"
-            rows="4"
-            @keydown.ctrl.enter="submitMessage"
-          ></textarea>
-          <div class="textarea-footer">
-            <span class="char-count" :class="{ warn: form.content.length > 450 }">
-              {{ form.content.length }}/500
+      <!-- 通信终端 -->
+      <div class="terminal-panel">
+        <!-- 终端头部 -->
+        <div class="terminal-header">
+          <div class="header-left">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot yellow"></span>
+            <span class="terminal-dot green"></span>
+            <span class="terminal-title">message_channel</span>
+          </div>
+          <div class="header-right">
+            <span class="terminal-status">
+              <span class="status-pulse"></span>
+              {{ loading ? 'RECEIVING' : 'READY' }}
             </span>
-            <button class="submit-btn" @click="submitMessage" :disabled="submitting || !form.content.trim()">
-              {{ submitting ? '提交中...' : '发表评论' }}
-            </button>
           </div>
         </div>
-        <p class="form-tip">Ctrl+Enter 快捷提交 · 留言仅博主可见</p>
-      </div>
 
-      <!-- 留言列表 -->
-      <div class="message-list">
-        <div v-if="loading" class="loading">
-          <span class="loading-dot"></span>
-          <span class="loading-dot"></span>
-          <span class="loading-dot"></span>
-        </div>
+        <!-- 消息列表 -->
+        <div class="terminal-body" ref="messageListRef">
+          <div v-if="loading" class="terminal-loading">
+            <span class="loading-text">$ 正在接收消息...</span>
+          </div>
 
-        <div v-else-if="!messages.length" class="empty-message">
-          <p>还没有留言，来做第一个留言的人吧~</p>
-        </div>
+          <div v-else-if="messages.length === 0" class="terminal-empty">
+            <span class="empty-prompt">$ 暂无消息记录</span>
+            <span class="empty-hint">成为第一个留言的人</span>
+          </div>
 
-        <div v-else>
-          <div
-            v-for="(msg, idx) in messages"
-            :key="msg.id"
-            class="message-item"
-            :style="{ animationDelay: `${idx * 60}ms` }"
-          >
-            <div class="msg-avatar">
-              <img
-                v-if="msg.avatar"
-                :src="msg.avatar"
-                :alt="msg.nickname"
-              />
-              <span v-else class="avatar-default">
-                {{ getInitial(msg.nickname) }}
-              </span>
-            </div>
-            <div class="msg-body">
-              <div class="msg-meta">
-                <span class="msg-name">{{ msg.nickname || '匿名用户' }}</span>
-                <span class="msg-time">{{ formatTime(msg.createTime) }}</span>
-                <span v-if="msg.ipAddress && isAdmin" class="msg-ip">IP: {{ maskIp(msg.ipAddress) }}</span>
-                <span v-if="msg.email && isAdmin" class="msg-email">✉ {{ msg.email }}</span>
+          <div v-else class="message-stream">
+            <div
+              v-for="msg in messages"
+              :key="msg.id"
+              class="message-bubble"
+              :class="{ 'message-mine': msg.isMine }"
+            >
+              <div class="bubble-header">
+                <span class="bubble-name">{{ msg.nickname || '匿名用户' }}</span>
+                <span class="bubble-time">{{ formatTime(msg.createTime) }}</span>
               </div>
-              <div class="msg-content">{{ msg.content }}</div>
-              <!-- 博主回复（旧版兼容） -->
-              <div v-if="msg.reply" class="msg-reply">
-                <span class="reply-badge">博主回复</span>
-                <span class="reply-text">{{ msg.reply }}</span>
-              </div>
-              <!-- 子留言（连续回复） -->
-              <div v-if="msg.children && msg.children.length" class="msg-children">
-                <div v-for="child in msg.children" :key="child.id" class="child-message">
-                  <div class="child-meta">
-                    <span class="child-name">{{ child.nickname || '博主' }}</span>
-                    <span class="child-time">{{ formatTime(child.createTime) }}</span>
-                  </div>
-                  <div class="child-content">{{ child.content }}</div>
-                </div>
-              </div>
-              <div class="msg-actions" v-if="isAdmin">
-                <button class="reply-btn" @click="replyingId = replyingId === msg.id ? null : msg.id; replyContent = ''">回复</button>
-                <button class="del-btn" @click="deleteMsg(msg.id)">删除</button>
-              </div>
-              <!-- 回复输入 -->
-              <div v-if="replyingId === msg.id" class="reply-input-row">
-                <input v-model="replyContent" class="reply-input" placeholder="输入回复内容..." />
-                <button class="reply-send" @click="doReply(msg.id)">发送</button>
+              <div class="bubble-content">{{ msg.content }}</div>
+              <div class="bubble-footer" v-if="msg.location || msg.browser">
+                <span v-if="msg.location" class="bubble-meta">📍 {{ msg.location }}</span>
+                <span v-if="msg.browser" class="bubble-meta">{{ msg.browser }}</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="terminal-input-area">
+          <div class="input-header">
+            <span class="input-prompt">></span>
+            <span class="input-label">输入消息</span>
+          </div>
+          <div class="input-form">
+            <input
+              v-model="nickname"
+              type="text"
+              class="form-input"
+              placeholder="昵称（选填）"
+              maxlength="30"
+            />
+            <input
+              v-model="contact"
+              type="text"
+              class="form-input"
+              placeholder="联系方式（选填）"
+              maxlength="50"
+            />
+            <textarea
+              v-model="content"
+              class="form-textarea"
+              placeholder="留下你的想法..."
+              rows="3"
+              maxlength="500"
+              @keydown.enter.ctrl="handleSubmit"
+            ></textarea>
+            <button
+              class="send-btn"
+              :disabled="!content.trim() || sending"
+              @click="handleSubmit"
+            >
+              <span v-if="!sending">发送消息</span>
+              <span v-else>发送中...</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -115,579 +110,428 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { getMessageList, addMessage, deleteMessage, replyMessage } from '../api/message'
-import { useUserStore } from '../stores/user'
-import { fallbackMessages, isStaticMode } from '../config/site.config'
-
-const userStore = useUserStore()
-const isAdmin = computed(() => userStore.isAdmin)
+import { ref, onMounted, nextTick } from 'vue'
+import { getMessageList, addMessage } from '../api/message'
+import { isStaticMode } from '../config/site.config'
 
 const messages = ref([])
 const loading = ref(true)
-const submitting = ref(false)
-const replyingId = ref(null)
-const replyContent = ref('')
-const form = ref({
-  nickname: '',
-  email: '',
-  content: ''
-})
-const localMessageKey = 'ethan_blog_messages'
+const sending = ref(false)
+const nickname = ref('')
+const contact = ref('')
+const content = ref('')
+const messageListRef = ref(null)
 
-function getLocalMessages() {
-  try {
-    return JSON.parse(localStorage.getItem(localMessageKey) || '[]')
-  } catch {
-    return []
-  }
-}
-
-function setLocalMessages(list) {
-  localStorage.setItem(localMessageKey, JSON.stringify(list))
-}
-
-function useFallbackMessages() {
-  messages.value = [...getLocalMessages(), ...fallbackMessages]
-}
-
-function getInitial(name) {
-  if (!name) return '游'
-  return name.slice(0, 1).toUpperCase()
-}
-
-function formatTime(time) {
-  if (!time) return ''
-  const d = new Date(time)
-  const now = new Date()
-  const diff = (now - d) / 1000
-  if (diff < 60) return '刚刚'
-  if (diff < 3600) return Math.floor(diff / 60) + '分钟前'
-  if (diff < 86400) return Math.floor(diff / 3600) + '小时前'
-  if (diff < 2592000) return Math.floor(diff / 86400) + '天前'
-  return `${d.getMonth() + 1}月${d.getDate()}日`
-}
-
-function maskIp(ip) {
-  if (!ip) return ''
-  const parts = ip.split('.')
-  if (parts.length === 4) return parts[0] + '.' + parts[1] + '.*.*'
-  return ip
-}
-
-async function fetchMessages() {
+const loadMessages = async () => {
   loading.value = true
   if (isStaticMode) {
-    useFallbackMessages()
+    messages.value = []
     loading.value = false
     return
   }
   try {
-    const res = await getMessageList()
+    const res = await getMessageList(1, 50)
     if (res.code === 200) {
-      messages.value = res.data?.length ? res.data : [...getLocalMessages(), ...fallbackMessages]
-    } else {
-      useFallbackMessages()
+      messages.value = res.data?.records || res.data || []
     }
   } catch (e) {
-    useFallbackMessages()
-    if (import.meta.env.DEV) console.info('使用静态留言数据', e?.message || e)
+    messages.value = []
+    if (import.meta.env.DEV) console.info('留言加载失败', e?.message || e)
   } finally {
     loading.value = false
   }
 }
 
-async function submitMessage() {
-  if (!form.value.content.trim()) return
-  if (form.value.content.length > 500) {
-    alert('留言不能超过500字')
-    return
-  }
-  submitting.value = true
-  if (isStaticMode) {
-    const localMessage = {
-      id: Date.now(),
-      nickname: form.value.nickname.trim() || '匿名用户',
-      email: form.value.email.trim(),
-      content: form.value.content.trim(),
-      createTime: new Date().toISOString(),
-    }
-    const next = [localMessage, ...getLocalMessages()]
-    setLocalMessages(next)
-    messages.value = [localMessage, ...messages.value]
-    form.value.content = ''
-    submitting.value = false
-    alert('当前是静态部署模式，留言已保存在本机浏览器。')
-    return
-  }
+const handleSubmit = async () => {
+  if (!content.value.trim() || sending.value) return
+  sending.value = true
   try {
     const res = await addMessage({
-      nickname: form.value.nickname,
-      email: form.value.email,
-      content: form.value.content.trim()
+      nickname: nickname.value || '匿名用户',
+      content: content.value.trim(),
+      contact: contact.value || undefined
     })
     if (res.code === 200) {
-      form.value.content = ''
-      // 已有昵称则保留
-      await fetchMessages()
-    } else {
-      alert(res.message || '提交失败')
+      messages.value.push(res.data || {
+        nickname: nickname.value,
+        content: content.value.trim(),
+        createTime: new Date().toISOString()
+      })
+      content.value = ''
+      await nextTick()
+      scrollToBottom()
     }
   } catch (e) {
-    const localMessage = {
-      id: Date.now(),
-      nickname: form.value.nickname.trim() || '匿名用户',
-      email: form.value.email.trim(),
-      content: form.value.content.trim(),
-      createTime: new Date().toISOString(),
-    }
-    const next = [localMessage, ...getLocalMessages()]
-    setLocalMessages(next)
-    messages.value = [localMessage, ...messages.value]
-    form.value.content = ''
-    alert('当前是静态部署模式，留言已保存在本机浏览器。')
+    if (import.meta.env.DEV) console.error('发送失败', e)
   } finally {
-    submitting.value = false
+    sending.value = false
   }
 }
 
-async function deleteMsg(id) {
-  if (!confirm('确定删除这条留言？')) return
-
-  // 检查登录状态
-  if (!userStore.isLoggedIn) {
-    alert('请先登录')
-    return
-  }
-
-  try {
-    const res = await deleteMessage(id)
-    if (res.code === 200 || res.code === 0) {
-      messages.value = messages.value.filter(m => m.id !== id)
-      alert('删除成功')
-    } else {
-      alert('删除失败: ' + (res.message || '未知错误'))
-    }
-  } catch (e) {
-    console.error('删除留言失败:', e)
-    const msg = e?.response?.data?.message || e?.message || '删除失败'
-    if (e?.response?.status === 401) {
-      alert('登录已过期，请重新登录')
-    } else {
-      alert(msg)
-    }
+const scrollToBottom = () => {
+  if (messageListRef.value) {
+    messageListRef.value.scrollTop = messageListRef.value.scrollHeight
   }
 }
 
-async function doReply(id) {
-  if (!replyContent.value.trim()) return
-  try {
-    const res = await replyMessage(id, replyContent.value.trim())
-    if (res.code === 200) {
-      replyingId.value = null
-      replyContent.value = ''
-      await fetchMessages()
-    } else {
-      alert(res.message || '回复失败')
-    }
-  } catch (e) {
-    alert('回复失败')
-  }
+const formatTime = (s) => {
+  if (!s) return ''
+  const d = new Date(s)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
-onMounted(() => {
-  fetchMessages()
-})
+onMounted(loadMessages)
 </script>
 
 <style scoped>
 .message-page {
-  min-height: calc(100vh - 72px);
-  padding: 56px 0 86px;
+  position: relative;
+  min-height: 100vh;
+  padding: 80px 24px 100px;
+}
+
+.page-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(56, 248, 255, 0.015) 3px,
+    rgba(56, 248, 255, 0.015) 6px
+  );
 }
 
 .message-container {
-  max-width: 760px;
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 0 32px;
 }
 
-.message-header {
-  margin-bottom: 32px;
-  animation: fadeInUp 0.68s var(--ease-out) both;
-}
-
-.message-title {
-  font-size: clamp(2rem, 4vw, 3.15rem);
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 6px;
-  font-family: var(--font-serif);
-  line-height: 1.1;
-}
-
-.message-subtitle {
-  font-size: 15px;
-  color: var(--text-light);
-}
-
-/* 留言表单 */
-.message-form {
-  background: rgba(8, 14, 27, 0.72);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
+/* 页面头部 */
+.page-header {
   margin-bottom: 40px;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  animation: fadeInUp 0.68s var(--ease-out) 0.08s both;
 }
 
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.header-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: #38f8ff;
+  padding: 6px 12px;
+  border: 1px solid rgba(56, 248, 255, 0.3);
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.page-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, #fff 0%, #38f8ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* 通信终端面板 */
+.terminal-panel {
+  background: rgba(8, 12, 22, 0.9);
+  border: 1px solid rgba(56, 248, 255, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+}
+
+/* 终端头部 */
+.terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(56, 248, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-dot.red { background: #ff5f57; }
+.terminal-dot.yellow { background: #ffbd2e; }
+.terminal-dot.green { background: #28ca42; }
+
+.terminal-title {
+  margin-left: 12px;
+  font-family: 'SF Mono', monospace;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.terminal-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #4ade80;
+  letter-spacing: 0.1em;
+}
+
+.status-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* 终端消息区 */
+.terminal-body {
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.terminal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.terminal-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.terminal-body::-webkit-scrollbar-thumb {
+  background: rgba(56, 248, 255, 0.3);
+  border-radius: 3px;
+}
+
+/* 加载/空状态 */
+.terminal-loading,
+.terminal-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 0;
+  font-family: 'SF Mono', monospace;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.loading-text,
+.empty-prompt {
+  font-size: 14px;
+}
+
+.empty-hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* 消息气泡 */
+.message-bubble {
+  max-width: 80%;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  align-self: flex-start;
+}
+
+.message-bubble.message-mine {
+  align-self: flex-end;
+  background: rgba(56, 248, 255, 0.1);
+  border-color: rgba(56, 248, 255, 0.2);
+}
+
+.bubble-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
   gap: 12px;
-  margin-bottom: 12px;
+}
+
+.bubble-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #38f8ff;
+}
+
+.bubble-time {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: 'SF Mono', monospace;
+}
+
+.bubble-content {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.bubble-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.bubble-meta {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* 输入区域 */
+.terminal-input-area {
+  padding: 20px;
+  border-top: 1px solid rgba(56, 248, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.input-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.input-prompt {
+  font-family: 'SF Mono', monospace;
+  font-size: 14px;
+  color: #38f8ff;
+}
+
+.input-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.1em;
+}
+
+.input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .form-input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
+  padding: 12px 16px;
+  border: 1px solid rgba(56, 248, 255, 0.15);
   border-radius: 8px;
-  background: rgba(8, 14, 27, 0.62);
-  color: var(--text);
-  font-size: 14px;
-  font-family: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff;
+  font-size: 13px;
+  transition: border-color 0.2s;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: rgba(56, 248, 255, 0.4);
 }
 
-.form-textarea-wrap {
-  position: relative;
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
 }
 
 .form-textarea {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--border);
+  padding: 12px 16px;
+  border: 1px solid rgba(56, 248, 255, 0.15);
   border-radius: 8px;
-  background: rgba(8, 14, 27, 0.62);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff;
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
-  min-height: 100px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  box-sizing: border-box;
+  min-height: 80px;
+  transition: border-color 0.2s;
 }
 
 .form-textarea:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: rgba(56, 248, 255, 0.4);
 }
 
-.textarea-footer {
+.form-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.send-btn {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 8px;
-}
-
-.char-count {
-  font-size: 12px;
-  color: var(--text-lighter);
-}
-
-.char-count.warn {
-  color: #e6a23c;
-}
-
-.submit-btn {
-  padding: 8px 20px;
-  background: linear-gradient(135deg, var(--accent), var(--violet));
-  color: #06101f;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  background: linear-gradient(135deg, rgba(56, 248, 255, 0.2), rgba(155, 92, 255, 0.2));
+  border: 1px solid rgba(56, 248, 255, 0.4);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 0.22s var(--ease-out), background 0.2s, box-shadow 0.22s;
-  font-family: inherit;
+  transition: all 0.2s ease;
+  align-self: flex-end;
 }
 
-.submit-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--accent), var(--ink-blue));
+.send-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(56, 248, 255, 0.16);
+  box-shadow: 0 8px 20px rgba(56, 248, 255, 0.2);
 }
 
-.submit-btn:disabled {
+.send-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.form-tip {
-  font-size: 12px;
-  color: var(--text-lighter);
-  margin-top: 8px;
-  text-align: right;
-}
-
-/* 留言列表 */
-.message-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.loading {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  padding: 40px 0;
-}
-
-.loading-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--accent);
-  border-radius: 50%;
-  animation: bounce 1.2s infinite;
-}
-
-.loading-dot:nth-child(2) { animation-delay: 0.2s; }
-.loading-dot:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes bounce {
-  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-  40% { transform: scale(1); opacity: 1; }
-}
-
-.empty-message {
-  text-align: center;
-  padding: 40px 0;
-  color: var(--text-lighter);
-  font-size: 14px;
-}
-
-.message-item {
-  display: flex;
-  gap: 14px;
-  padding: 18px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: rgba(8, 14, 27, 0.64);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  animation: fadeUp 0.45s var(--ease-out) both;
-  transition: transform 0.24s var(--ease-out), box-shadow 0.24s var(--ease-out), border-color 0.24s;
-}
-
-.message-item:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow);
-  border-color: rgba(56, 248, 255, 0.28);
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.msg-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: var(--bg-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(56, 248, 255, 0.24);
-  box-shadow: 0 10px 28px rgba(56, 248, 255, 0.1);
-}
-
-.msg-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-default {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--accent);
-  font-family: 'Noto Serif SC', serif;
-}
-
-.msg-body {
-  flex: 1;
-  min-width: 0;
-}
-
-.msg-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.msg-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.msg-time {
-  font-size: 12px;
-  color: var(--text-lighter);
-}
-
-.msg-ip {
-  font-size: 11px;
-  color: var(--text-lighter);
-  background: rgba(56, 248, 255, 0.08);
-  padding: 1px 6px;
-  border-radius: 4px;
-}
-
-.msg-content {
-  font-size: 14px;
-  color: var(--text);
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.msg-actions {
-  margin-top: 6px;
-}
-
-.del-btn {
-  font-size: 12px;
-  color: #c0c0c0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  transition: color 0.2s, transform 0.2s var(--ease-out);
-}
-
-.del-btn:hover {
-  color: #f56c6c;
-  transform: translateY(-1px);
-}
-
-.reply-btn {
-  font-size: 12px;
-  color: #c0c0c0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  margin-right: 10px;
-  transition: color 0.2s;
-}
-.reply-btn:hover { color: var(--accent); }
-
-.msg-email {
-  font-size: 11px;
-  color: var(--text-lighter);
-  margin-left: 6px;
-}
-
-.msg-reply {
-  margin-top: 8px;
-  padding: 8px 12px;
-  background: rgba(56, 248, 255, 0.08);
-  border-radius: 8px;
-  border-left: 3px solid var(--accent);
-}
-.reply-badge {
-  font-size: 11px;
-  color: var(--accent);
-  font-weight: 600;
-  margin-right: 6px;
-}
-.reply-text {
-  font-size: 13px;
-  color: var(--text);
-}
-
-.reply-input-row {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-}
-.reply-input {
-  flex: 1;
-  padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 13px;
-  font-family: inherit;
-  background: rgba(8, 14, 27, 0.62);
-  color: var(--text);
-}
-.reply-input:focus { outline: none; border-color: var(--accent); }
-.reply-send {
-  padding: 6px 16px;
-  background: linear-gradient(135deg, var(--accent), var(--violet));
-  color: #06101f;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  cursor: pointer;
-  font-family: inherit;
-}
-.reply-send:hover { background: linear-gradient(135deg, var(--accent), var(--ink-blue)); }
-
-/* 子留言样式 */
-.msg-children {
-  margin-top: 12px;
-  padding-left: 12px;
-  border-left: 2px solid var(--border);
-}
-.child-message {
-  padding: 8px 12px;
-  background: rgba(8, 14, 27, 0.62);
-  border-radius: 6px;
-  margin-bottom: 8px;
-}
-.child-message:last-child {
-  margin-bottom: 0;
-}
-.child-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-.child-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent);
-}
-.child-time {
-  font-size: 12px;
-  color: var(--text-lighter);
-}
-.child-content {
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.5;
-}
-
-@media (max-width: 600px) {
-  .message-container { padding: 0 20px; }
-  .form-row { grid-template-columns: 1fr; }
+/* 响应式 */
+@media (max-width: 768px) {
+  .message-page {
+    padding: 72px 16px 80px;
+  }
+  
+  .message-bubble {
+    max-width: 95%;
+  }
+  
+  .bubble-footer {
+    flex-direction: column;
+    gap: 4px;
+  }
 }
 </style>
