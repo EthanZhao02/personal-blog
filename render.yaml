@@ -5,7 +5,7 @@ services:
     dockerfilePath: ./server/Dockerfile
     dockerContext: .
     plan: free
-    healthCheckPath: /error
+    healthCheckPath: /article/list
     envVars:
       - key: SPRING_DATASOURCE_URL
         sync: false
