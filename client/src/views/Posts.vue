@@ -101,17 +101,21 @@
                     </div>
                   </div>
                   
-                  <h3 class="article-title">{{ article.title }}</h3>
-                  
-                  <p class="article-summary" v-if="article.summary">
-                    {{ article.summary }}
-                  </p>
-                  
-                  <div class="article-footer" v-if="article.tags?.length">
-                    <div class="article-tags">
+                  <div class="card-body">
+                    <h3 class="article-title">{{ article.title }}</h3>
+                    <p class="article-summary" v-if="article.summary">
+                      {{ article.summary }}
+                    </p>
+                  </div>
+                  <div class="article-footer">
+                    <div class="article-tags" v-if="article.tags?.length">
                       <span v-for="tag in article.tags.slice(0, 3)" :key="tag.id || tag.name" class="tag">
                         {{ tag.name }}
                       </span>
+                    </div>
+                    <div class="article-tags empty" v-else>
+                      <span class="tag-placeholder">◈</span>
+                    </div>
                     </div>
                     <span class="read-more">
                       阅读
@@ -413,29 +417,47 @@ onMounted(() => {
 .filter-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .chip {
-  padding: 8px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.7);
+  padding: 8px 18px;
+  border: 1px solid rgba(56, 248, 255, 0.15);
+  border-radius: 20px;
+  background: rgba(12, 20, 35, 0.6);
+  color: rgba(255, 255, 255, 0.6);
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(56, 248, 255, 0.1), rgba(155, 92, 255, 0.1));
+  opacity: 0;
+  transition: opacity 0.25s;
 }
 
 .chip:hover {
-  border-color: rgba(56, 248, 255, 0.3);
-  color: #fff;
+  border-color: rgba(56, 248, 255, 0.4);
+  color: #38f8ff;
+  box-shadow: 0 0 15px rgba(56, 248, 255, 0.15);
+}
+
+.chip:hover::before {
+  opacity: 1;
 }
 
 .chip.active {
-  background: linear-gradient(135deg, rgba(56, 248, 255, 0.2), rgba(155, 92, 255, 0.2));
-  border-color: rgba(56, 248, 255, 0.4);
+  background: linear-gradient(135deg, rgba(56, 248, 255, 0.15), rgba(155, 92, 255, 0.15));
+  border-color: rgba(56, 248, 255, 0.5);
   color: #fff;
+  box-shadow: 0 0 20px rgba(56, 248, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .filter-select {
@@ -496,10 +518,12 @@ onMounted(() => {
 
 .year-num {
   font-size: 48px;
-  font-weight: 700;
-  color: rgba(56, 248, 255, 0.15);
+  font-weight: 800;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(56, 248, 255, 0.25);
   line-height: 1;
   font-family: 'SF Mono', monospace;
+  letter-spacing: -2px;
 }
 
 .year-line {
@@ -512,8 +536,9 @@ onMounted(() => {
 .articles-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
+  gap: 24px;
   padding-left: 100px;
+  align-items: stretch;
 }
 
 .article-card {
@@ -523,6 +548,8 @@ onMounted(() => {
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .article-card:hover {
@@ -544,8 +571,10 @@ onMounted(() => {
 }
 
 .card-link {
-  display: block;
+  display: flex;
+  flex-direction: column;
   padding: 20px;
+  height: 100%;
   text-decoration: none;
   color: inherit;
   position: relative;
@@ -556,6 +585,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  flex-shrink: 0;
   margin-bottom: 16px;
 }
 
@@ -593,11 +623,18 @@ onMounted(() => {
   border-radius: 4px;
 }
 
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .article-title {
   font-size: 16px;
   font-weight: 600;
   color: #fff;
-  margin: 0 0 12px 0;
+  margin: 0 0 10px 0;
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -606,28 +643,40 @@ onMounted(() => {
 }
 
 .article-summary {
-  font-size: 13px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.5);
-  line-height: 1.6;
-  margin: 0 0 16px 0;
+  line-height: 1.5;
+  margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  flex: 1;
 }
 
 .article-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
   padding-top: 16px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: auto;
 }
 
 .article-tags {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.article-tags.empty {
+  opacity: 0.5;
+}
+
+.tag-placeholder {
+  font-size: 10px;
+  color: rgba(56, 248, 255, 0.3);
 }
 
 .tag {
