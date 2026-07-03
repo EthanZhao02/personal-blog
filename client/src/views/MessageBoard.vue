@@ -25,85 +25,97 @@
           <div class="header-right">
             <span class="terminal-status">
               <span class="status-pulse"></span>
-              {{ loading ? 'RECEIVING' : 'READY' }}
+              {{ isStaticMode ? 'GISCUS' : (loading ? 'RECEIVING' : 'READY') }}
             </span>
           </div>
         </div>
 
-        <!-- 消息列表 -->
-        <div class="terminal-body" ref="messageListRef">
-          <div v-if="loading" class="terminal-loading">
-            <span class="loading-text">$ 正在接收消息...</span>
+        <!-- Giscus 静态模式 -->
+        <div v-if="isStaticMode" class="giscus-section">
+          <div class="giscus-intro">
+            <p>留言板基于 <a href="https://giscus.app" target="_blank" rel="noopener">Giscus</a>，使用 GitHub 账号登录即可留言。</p>
+            <p class="giscus-hint">你的留言会保存到本仓库的 Discussions 区，博主会收到通知。</p>
           </div>
+          <GiscusComments term="留言板" mapping="specific" />
+        </div>
 
-          <div v-else-if="messages.length === 0" class="terminal-empty">
-            <span class="empty-prompt">$ 暂无消息记录</span>
-            <span class="empty-hint">成为第一个留言的人</span>
-          </div>
+        <!-- 后端动态模式 -->
+        <template v-else>
+          <!-- 消息列表 -->
+          <div class="terminal-body" ref="messageListRef">
+            <div v-if="loading" class="terminal-loading">
+              <span class="loading-text">$ 正在接收消息...</span>
+            </div>
 
-          <div v-else class="message-stream">
-            <div
-              v-for="msg in messages"
-              :key="msg.id"
-              class="message-bubble"
-              :class="{ 'message-mine': msg.isMine }"
-            >
-              <div class="bubble-header">
-                <span class="bubble-name">{{ msg.nickname || '匿名用户' }}</span>
-                <span class="bubble-time">{{ formatTime(msg.createTime) }}</span>
-              </div>
-              <div class="bubble-content">{{ msg.content }}</div>
-              <div class="bubble-footer" v-if="msg.location || msg.browser">
-                <span v-if="msg.location" class="bubble-meta">📍 {{ msg.location }}</span>
-                <span v-if="msg.browser" class="bubble-meta">{{ msg.browser }}</span>
+            <div v-else-if="messages.length === 0" class="terminal-empty">
+              <span class="empty-prompt">$ 暂无消息记录</span>
+              <span class="empty-hint">成为第一个留言的人</span>
+            </div>
+
+            <div v-else class="message-stream">
+              <div
+                v-for="msg in messages"
+                :key="msg.id"
+                class="message-bubble"
+                :class="{ 'message-mine': msg.isMine }"
+              >
+                <div class="bubble-header">
+                  <span class="bubble-name">{{ msg.nickname || '匿名用户' }}</span>
+                  <span class="bubble-time">{{ formatTime(msg.createTime) }}</span>
+                </div>
+                <div class="bubble-content">{{ msg.content }}</div>
+                <div class="bubble-footer" v-if="msg.location || msg.browser">
+                  <span v-if="msg.location" class="bubble-meta">{{ msg.location }}</span>
+                  <span v-if="msg.browser" class="bubble-meta">{{ msg.browser }}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- 输入区域 -->
-        <div class="terminal-input-area">
-          <div class="input-header">
-            <span class="input-prompt">></span>
-            <span class="input-label">输入消息</span>
+          <!-- 输入区域 -->
+          <div class="terminal-input-area">
+            <div class="input-header">
+              <span class="input-prompt">></span>
+              <span class="input-label">输入消息</span>
+            </div>
+            <div class="input-form">
+              <input
+                v-model="nickname"
+                type="text"
+                class="form-input"
+                placeholder="昵称（选填）"
+                maxlength="30"
+              />
+              <input
+                v-model="contact"
+                type="text"
+                class="form-input"
+                placeholder="联系方式（选填）"
+                maxlength="50"
+              />
+              <textarea
+                v-model="content"
+                class="form-textarea"
+                placeholder="留下你的想法..."
+                rows="3"
+                maxlength="500"
+                @keydown.enter.ctrl="handleSubmit"
+              ></textarea>
+              <button
+                class="send-btn"
+                :disabled="!content.trim() || sending"
+                @click="handleSubmit"
+              >
+                <span v-if="!sending">发送消息</span>
+                <span v-else>发送中...</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"/>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+              </button>
+            </div>
           </div>
-          <div class="input-form">
-            <input
-              v-model="nickname"
-              type="text"
-              class="form-input"
-              placeholder="昵称（选填）"
-              maxlength="30"
-            />
-            <input
-              v-model="contact"
-              type="text"
-              class="form-input"
-              placeholder="联系方式（选填）"
-              maxlength="50"
-            />
-            <textarea
-              v-model="content"
-              class="form-textarea"
-              placeholder="留下你的想法..."
-              rows="3"
-              maxlength="500"
-              @keydown.enter.ctrl="handleSubmit"
-            ></textarea>
-            <button
-              class="send-btn"
-              :disabled="!content.trim() || sending"
-              @click="handleSubmit"
-            >
-              <span v-if="!sending">发送消息</span>
-              <span v-else>发送中...</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="22" y1="2" x2="11" y2="13"/>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-              </svg>
-            </button>
-          </div>
-        </div>
+        </template>
       </div>
     </div>
   </div>
@@ -113,6 +125,7 @@
 import { ref, onMounted, nextTick } from 'vue'
 import { getMessageList, addMessage } from '../api/message'
 import { isStaticMode } from '../config/site.config'
+import GiscusComments from '../components/GiscusComments.vue'
 
 const messages = ref([])
 const loading = ref(true)
@@ -517,6 +530,45 @@ onMounted(loadMessages)
 .send-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Giscus 静态模式 */
+.giscus-section {
+  padding: 24px;
+}
+
+.giscus-intro {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(56, 248, 255, 0.05);
+  border: 1px solid rgba(56, 248, 255, 0.15);
+  border-radius: 8px;
+}
+
+.giscus-intro p {
+  margin: 0 0 6px 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+}
+
+.giscus-intro p:last-child {
+  margin-bottom: 0;
+}
+
+.giscus-intro a {
+  color: #38f8ff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.giscus-intro a:hover {
+  text-decoration: underline;
+}
+
+.giscus-hint {
+  font-size: 12px !important;
+  color: rgba(255, 255, 255, 0.4) !important;
 }
 
 /* 响应式 */

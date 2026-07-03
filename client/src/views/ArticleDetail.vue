@@ -73,87 +73,96 @@
 
         <!-- 评论区 -->
         <section class="comments-section">
-          <h3 class="comments-title">评论 <span class="comments-count">({{ totalComments }})</span></h3>
+          <h3 class="comments-title">评论</h3>
 
-          <!-- 发表评论 -->
-          <div class="comment-form">
-            <h4 class="form-title">发布评论</h4>
-            <div class="form-row">
-              <input v-model="commentNickname" type="text" placeholder="昵称 *" class="form-input" maxlength="50" />
-              <input v-model="commentEmail" type="email" placeholder="邮箱 *" class="form-input" maxlength="100" />
-            </div>
-            <input v-model="commentWebsite" type="url" placeholder="网站地址（选填）" class="form-input full-row" maxlength="200" />
-            <textarea v-model="commentContent" placeholder="说点什么...（需填写昵称和邮箱）" class="comment-textarea" rows="5"></textarea>
-            <div class="reply-notice" v-if="replyingTo">
-              回复 @{{ replyingTo }}
-              <button class="cancel-reply" @click="cancelReply">取消</button>
-            </div>
-            <div class="form-footer">
-              <button class="btn-submit" @click="submitComment" :disabled="!canSubmit || submitting">
-                {{ submitting ? '发送中...' : '发布评论' }}
-              </button>
-            </div>
+          <!-- Giscus 静态模式 -->
+          <div v-if="isStaticMode" class="giscus-container">
+            <p class="giscus-hint">使用 GitHub 账号登录即可评论，留言会保存到仓库 Discussions 区。</p>
+            <GiscusComments :term="`文章: ${article.title}`" mapping="specific" />
           </div>
 
-          <!-- 评论列表 -->
-          <div class="comment-list" v-if="comments.length > 0">
-            <div
-              v-for="comment in comments"
-              :key="comment.id"
-              class="comment-item"
-            >
-              <div class="comment-avatar">
-                <img v-if="comment.userAvatar" :src="comment.userAvatar" :alt="comment.nickname || comment.username" @error="handleAvatarError" />
-                <span v-else class="avatar-letter">{{ getInitial(comment.nickname || comment.username) }}</span>
+          <!-- 后端动态模式 -->
+          <template v-else>
+            <!-- 发表评论 -->
+            <div class="comment-form">
+              <h4 class="form-title">发布评论</h4>
+              <div class="form-row">
+                <input v-model="commentNickname" type="text" placeholder="昵称 *" class="form-input" maxlength="50" />
+                <input v-model="commentEmail" type="email" placeholder="邮箱 *" class="form-input" maxlength="100" />
               </div>
-              <div class="comment-body">
-                <div class="comment-meta">
-                  <a v-if="comment.website" :href="comment.website" target="_blank" rel="noopener" class="comment-author linked">{{ comment.nickname || comment.username || '匿名用户' }}</a>
-                  <span v-else class="comment-author">{{ comment.nickname || comment.username || '匿名用户' }}</span>
-                  <span class="comment-badge" v-if="comment.isAdmin">博主</span>
-                  <span class="comment-time">{{ formatDate(comment.createTime) }}</span>
-                  <span v-if="comment.email && isLoggedIn" class="comment-email">{{ comment.email }}</span>
+              <input v-model="commentWebsite" type="url" placeholder="网站地址（选填）" class="form-input full-row" maxlength="200" />
+              <textarea v-model="commentContent" placeholder="说点什么...（需填写昵称和邮箱）" class="comment-textarea" rows="5"></textarea>
+              <div class="reply-notice" v-if="replyingTo">
+                回复 @{{ replyingTo }}
+                <button class="cancel-reply" @click="cancelReply">取消</button>
+              </div>
+              <div class="form-footer">
+                <button class="btn-submit" @click="submitComment" :disabled="!canSubmit || submitting">
+                  {{ submitting ? '发送中...' : '发布评论' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- 评论列表 -->
+            <div class="comment-list" v-if="comments.length > 0">
+              <div
+                v-for="comment in comments"
+                :key="comment.id"
+                class="comment-item"
+              >
+                <div class="comment-avatar">
+                  <img v-if="comment.userAvatar" :src="comment.userAvatar" :alt="comment.nickname || comment.username" @error="handleAvatarError" />
+                  <span v-else class="avatar-letter">{{ getInitial(comment.nickname || comment.username) }}</span>
                 </div>
-                <div class="comment-text">{{ comment.content }}</div>
-                <div class="comment-actions">
-                  <button class="action-btn" @click="replyTo(comment)">回复</button>
-                  <button v-if="canDeleteComment(comment)" class="action-btn del-btn" @click="deleteComment(comment.id)">删除</button>
-                </div>
-                
-                <!-- 子评论 -->
-                <div class="sub-comments" v-if="comment.children?.length">
-                  <div
-                    v-for="sub in comment.children"
-                    :key="sub.id"
-                    class="sub-comment-item"
-                  >
-                    <div class="sub-comment-avatar">
-                      <img v-if="sub.userAvatar" :src="sub.userAvatar" :alt="sub.nickname || sub.username" @error="handleAvatarError" />
-                      <span v-else class="avatar-letter">{{ getInitial(sub.nickname || sub.username) }}</span>
-                    </div>
-                    <div class="sub-comment-body">
-                      <div class="sub-comment-meta">
-                        <a v-if="sub.website" :href="sub.website" target="_blank" rel="noopener" class="sub-author linked">{{ sub.nickname || sub.username || '匿名用户' }}</a>
-                        <span v-else class="sub-author">{{ sub.nickname || sub.username || '匿名用户' }}</span>
-                        <span class="comment-badge" v-if="sub.isAdmin">博主</span>
-                        <span class="sub-time">{{ formatDate(sub.createTime) }}</span>
-                        <span v-if="sub.email && isLoggedIn" class="comment-email">{{ sub.email }}</span>
+                <div class="comment-body">
+                  <div class="comment-meta">
+                    <a v-if="comment.website" :href="comment.website" target="_blank" rel="noopener" class="comment-author linked">{{ comment.nickname || comment.username || '匿名用户' }}</a>
+                    <span v-else class="comment-author">{{ comment.nickname || comment.username || '匿名用户' }}</span>
+                    <span class="comment-badge" v-if="comment.isAdmin">博主</span>
+                    <span class="comment-time">{{ formatDate(comment.createTime) }}</span>
+                    <span v-if="comment.email && isLoggedIn" class="comment-email">{{ comment.email }}</span>
+                  </div>
+                  <div class="comment-text">{{ comment.content }}</div>
+                  <div class="comment-actions">
+                    <button class="action-btn" @click="replyTo(comment)">回复</button>
+                    <button v-if="canDeleteComment(comment)" class="action-btn del-btn" @click="deleteComment(comment.id)">删除</button>
+                  </div>
+
+                  <!-- 子评论 -->
+                  <div class="sub-comments" v-if="comment.children?.length">
+                    <div
+                      v-for="sub in comment.children"
+                      :key="sub.id"
+                      class="sub-comment-item"
+                    >
+                      <div class="sub-comment-avatar">
+                        <img v-if="sub.userAvatar" :src="sub.userAvatar" :alt="sub.nickname || sub.username" @error="handleAvatarError" />
+                        <span v-else class="avatar-letter">{{ getInitial(sub.nickname || sub.username) }}</span>
                       </div>
-                      <div class="sub-text">{{ sub.content }}</div>
-                      <div class="comment-actions">
-                        <button class="action-btn" @click="replyTo(sub)">回复</button>
-                        <button v-if="canDeleteComment(sub)" class="action-btn del-btn" @click="deleteComment(sub.id)">删除</button>
+                      <div class="sub-comment-body">
+                        <div class="sub-comment-meta">
+                          <a v-if="sub.website" :href="sub.website" target="_blank" rel="noopener" class="sub-author linked">{{ sub.nickname || sub.username || '匿名用户' }}</a>
+                          <span v-else class="sub-author">{{ sub.nickname || sub.username || '匿名用户' }}</span>
+                          <span class="comment-badge" v-if="sub.isAdmin">博主</span>
+                          <span class="sub-time">{{ formatDate(sub.createTime) }}</span>
+                          <span v-if="sub.email && isLoggedIn" class="comment-email">{{ sub.email }}</span>
+                        </div>
+                        <div class="sub-text">{{ sub.content }}</div>
+                        <div class="comment-actions">
+                          <button class="action-btn" @click="replyTo(sub)">回复</button>
+                          <button v-if="canDeleteComment(sub)" class="action-btn del-btn" @click="deleteComment(sub.id)">删除</button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="no-comments" v-else>
-            <p>还没有评论，来抢沙发吧~</p>
-          </div>
+            <div class="no-comments" v-else>
+              <p>还没有评论，来抢沙发吧~</p>
+            </div>
+          </template>
         </section>
       </main>
 
@@ -221,6 +230,7 @@ import { getCommentList, addComment, deleteComment as apiDeleteComment } from '.
 import { getArticleList } from '../api/article'
 import { useUserStore } from '../stores/user'
 import siteConfig, { fallbackArticles, fallbackComments, isStaticMode, resolveAssetUrl } from '../config/site.config.js'
+import GiscusComments from '../components/GiscusComments.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -887,6 +897,26 @@ watch(() => route.params.id, () => {
   font-size: 14px;
   color: var(--text-lighter);
   font-weight: 400;
+}
+
+/* Giscus 评论区 */
+.giscus-container {
+  padding: 16px 0;
+}
+
+.giscus-hint {
+  font-size: 13px;
+  color: var(--text-lighter);
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: rgba(56, 248, 255, 0.05);
+  border: 1px solid rgba(56, 248, 255, 0.15);
+  border-radius: 8px;
+}
+
+.giscus-hint a {
+  color: #38f8ff;
+  text-decoration: none;
 }
 
 /* 评论表单 - 与留言板一致 */
