@@ -116,7 +116,6 @@
                     <div class="article-tags empty" v-else>
                       <span class="tag-placeholder">◈</span>
                     </div>
-                    </div>
                     <span class="read-more">
                       阅读
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

@@ -1,8 +1,7 @@
 <template>
   <div class="about-page">
     <div class="page-bg" aria-hidden="true">
-      <div class="bg-orb orb-1"></div>
-      <div class="bg-orb orb-2"></div>
+      <div class="bg-grid"></div>
     </div>
 
     <div class="about-container">
@@ -46,7 +45,7 @@
         </div>
 
         <!-- 描述区 -->
-        <div class="profile-body" v-if="siteConfig.about?.description">
+        <div class="profile-body" v-if="siteConfig.about?.bio">
           <p class="profile-desc">{{ siteConfig.about?.bio }}</p>
         </div>
 
@@ -102,13 +101,16 @@
               v-for="social in siteConfig.socials"
               :key="social.name"
               :href="social.url"
-              target="_blank"
-              rel="noopener noreferrer"
+              :target="social.url?.startsWith('#') ? undefined : '_blank'"
+              :rel="social.url?.startsWith('#') ? undefined : 'noopener noreferrer'"
               class="contact-node"
               :style="{ '--node-color': social.color || '#38f8ff' }"
             >
               <span class="contact-icon" v-html="getSocialIcon(social.icon)"></span>
-              <span class="contact-name">{{ social.name }}</span>
+              <span class="contact-copy">
+                <span class="contact-name">{{ social.name }}</span>
+                <span v-if="social.handle" class="contact-detail">{{ social.handle }}</span>
+              </span>
               <span class="contact-arrow">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M7 17l9.2-9.2M17 17V7H7"/>
@@ -169,6 +171,10 @@ const getSocialIcon = (icon) => {
     telegram: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>',
     email: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>',
     twitter: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
+    juejin: '<span style="font-size:14px;font-weight:800">掘</span>',
+    leetcode: '<span style="font-size:12px;font-weight:800">LC</span>',
+    wechat: '<span style="font-size:14px;font-weight:800">微</span>',
+    qq: '<span style="font-size:12px;font-weight:800">QQ</span>',
     gitlab: '<span style="font-size:14px;font-weight:700">GL</span>',
     gitee: '<span style="font-size:14px;font-weight:700">GE</span>',
     csdn: '<span style="font-size:14px;font-weight:700">CN</span>',
@@ -191,26 +197,14 @@ const getSocialIcon = (icon) => {
   z-index: 0;
 }
 
-.bg-orb {
+.bg-grid {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-}
-
-.orb-1 {
-  width: 400px;
-  height: 400px;
-  top: 10%;
-  left: -100px;
-  background: rgba(56, 248, 255, 0.08);
-}
-
-.orb-2 {
-  width: 300px;
-  height: 300px;
-  bottom: 10%;
-  right: -50px;
-  background: rgba(155, 92, 255, 0.08);
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.035) 1px, transparent 1px);
+  background-size: 58px 58px;
+  mask-image: linear-gradient(to bottom, #000, transparent 82%);
 }
 
 .about-container {
@@ -511,11 +505,24 @@ const getSocialIcon = (icon) => {
   color: var(--node-color, #38f8ff);
 }
 
-.contact-name {
+.contact-copy {
   flex: 1;
+  min-width: 0;
+}
+
+.contact-name {
+  display: block;
   font-size: 13px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.8);
+}
+
+.contact-detail {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 11px;
+  overflow-wrap: anywhere;
 }
 
 .contact-arrow {

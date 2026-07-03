@@ -6,7 +6,7 @@
  */
 export const resolveAssetUrl = (path = '') => {
   if (!path) return ''
-  if (/^(https?:|mailto:|tel:|#)/.test(path)) return path
+  if (/^[a-z][a-z\d+.-]*:|#/i.test(path)) return path
   const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
   return `${base}/${path.replace(/^\//, '')}`
 }
@@ -26,174 +26,187 @@ const photos = [
 const socials = [
   {
     name: 'GitHub',
+    handle: 'EthanZhao02',
     url: 'https://github.com/EthanZhao02',
-    color: '#38f8ff',
+    color: '#38bdf8',
     icon: 'github',
   },
   {
-    name: 'B站',
-    url: 'https://space.bilibili.com/1671173639?spm_id_from=333.1007.0.0',
-    color: '#00a1d6',
-    icon: 'bilibili',
+    name: '稀土掘金',
+    handle: '2355568709733891',
+    url: 'https://juejin.cn/user/2355568709733891',
+    color: '#1e80ff',
+    icon: 'juejin',
   },
   {
-    name: '小红书',
-    url: 'https://www.xiaohongshu.com/user/profile/66effb0c000000001d032156',
-    color: '#ff2e4d',
-    icon: 'xiaohongshu',
+    name: '力扣',
+    handle: 'ethan-517',
+    url: 'https://leetcode.cn/u/ethan-517/',
+    color: '#ffa116',
+    icon: 'leetcode',
   },
   {
-    name: '微博',
-    url: 'https://weibo.com/u/6857384033',
-    color: '#ff8200',
-    icon: 'weibo',
+    name: '微信公众号',
+    handle: 'gh_acb63caf6891',
+    url: '#wechat-official',
+    color: '#22c55e',
+    icon: 'wechat',
   },
   {
-    name: '知乎',
-    url: 'https://www.zhihu.com/people/84-27-88-27-17',
-    color: '#1772f6',
-    icon: 'zhihu',
-  },
-  {
-    name: '抖音',
-    url: 'https://www.douyin.com/user/self?from_tab_name=main&showSubTab=video&showTab=post',
-    color: '#38f8ff',
-    icon: 'douyin',
+    name: 'QQ',
+    handle: '2317733506',
+    url: 'tencent://message/?uin=2317733506',
+    color: '#22d3ee',
+    icon: 'qq',
   },
   {
     name: '邮箱',
+    handle: 'ethan912yydegree@gmail.com',
     url: 'mailto:ethan912yydegree@gmail.com',
     color: '#8df8c7',
     icon: 'email',
   },
   {
+    name: 'B站',
+    handle: '1671173639',
+    url: 'https://space.bilibili.com/1671173639?spm_id_from=333.1007.0.0',
+    color: '#00a1d6',
+    icon: 'bilibili',
+  },
+  {
     name: 'CSDN',
+    handle: 'm0_60650009',
     url: 'https://blog.csdn.net/m0_60650009?type=blog',
     color: '#ff5a33',
     icon: 'csdn',
   },
   {
-    name: 'GitLab',
-    url: 'https://gitlab.com/dashboard/projects',
-    color: '#fc6d26',
-    icon: 'gitlab',
-  },
-  {
-    name: 'Gitee',
-    url: 'http://gitee.com/Ethan_36',
-    color: '#c71d23',
-    icon: 'gitee',
-  },
-  {
-    name: 'X',
-    url: 'https://x.com/Chason4436911',
-    color: '#ffffff',
-    icon: 'twitter',
+    name: '知乎',
+    handle: '84-27-88-27-17',
+    url: 'https://www.zhihu.com/people/84-27-88-27-17',
+    color: '#1772f6',
+    icon: 'zhihu',
   },
 ]
 
 const categories = [
-  { id: 1, name: '技术笔记', sort: 1 },
-  { id: 2, name: '项目复盘', sort: 2 },
-  { id: 3, name: '生活记录', sort: 3 },
+  { id: 1, name: 'Tech 技术', sort: 1 },
+  { id: 2, name: 'Project 项目', sort: 2 },
+  { id: 3, name: 'AI 人工智能', sort: 3 },
+  { id: 4, name: 'Learning 学习', sort: 4 },
+  { id: 5, name: 'Essay 随笔', sort: 5 },
 ]
 
 const tags = [
   { id: 1, name: 'Vue3' },
   { id: 2, name: 'Spring Boot' },
-  { id: 3, name: 'GitHub Pages' },
-  { id: 4, name: '个人博客' },
+  { id: 3, name: 'MySQL' },
+  { id: 4, name: 'GitHub Pages' },
+  { id: 5, name: 'AI' },
+  { id: 6, name: 'Portfolio' },
+  { id: 7, name: '考研复试' },
+  { id: 8, name: '知识管理' },
 ]
 
 const articles = [
   {
     id: 1,
-    title: '把个人博客部署到 GitHub Pages',
-    summary: '记录这个站点从本地项目到 GitHub Pages 静态发布的关键步骤。',
-    content: `# 把个人博客部署到 GitHub Pages
+    title: 'Ethan Future Lab：把个人博客升级成作品集档案',
+    summary: '这次改版把首页从普通文章入口升级为面向复试、求职和长期成长记录的 Future Lab。',
+    content: `# Ethan Future Lab：把个人博客升级成作品集档案
 
-这个博客原本是 Vue3 + Spring Boot + MySQL 的全栈项目。本次上线先把访客会看到的页面做成静态可访问版本，再通过 GitHub Actions 自动构建并部署。
+这个站点不只承担生活记录，更重要的是成为一个长期可访问的个人数字空间：展示项目、技术文章、学习路线、研究兴趣和成长时间线。
 
-## 为什么要做静态兜底
+## 为什么要这样改
 
-GitHub Pages 不能运行 Java 后端，也不能托管 MySQL。为了避免上线后文章、项目、友链和留言页空白，前端会在接口不可用时读取本地配置里的公开内容。
+复试老师或面试官进入网站时，最需要快速看到三个问题：我是谁、我做过什么、我正在往哪个方向积累。首页因此采用作品集优先的信息架构，把文章列表放到后面，把项目和学习轨迹提前。
 
-## 当前部署流程
+## 当前定位
 
-每次推送到 master 分支后，GitHub Actions 会进入 client 目录，安装依赖，执行生产构建，然后把 dist 发布到 GitHub Pages。
+- AI / Web Developer / Knowledge System Builder
+- 关注智能学习工具、知识管理、Web 全栈实践
+- 用项目和笔记记录持续成长
 
-## 下一步更适合怎么做
+## 后续计划
 
-短期最适合做 GitHub 仓库驱动的 CMS/后台：后台页面编辑 Markdown 文章、首页配置、关于页、项目和友链，然后自动提交到仓库。仓库更新后 GitHub Actions 会重新部署，维护成本低，也不需要一直运行 Spring Boot + MySQL。
-
-如果以后要真实评论、登录、写文章和后台管理，再把 Spring Boot 后端部署到支持 Java 的平台，把数据库单独托管，并把 VITE_API_BASE_URL 指到后端地址。免费额度经常变化，部署前以平台官网为准。`,
-    categoryId: 1,
-    categoryName: '技术笔记',
+继续补充真实项目复盘、专业课学习笔记、英文表达训练、算法题记录和研究兴趣整理，让这个站点既有个人表达，也能作为正式展示入口。`,
+    categoryId: 2,
+    categoryName: 'Project 项目',
     authorName: 'Ethan',
     tags: [
-      { id: 1, name: 'Vue3' },
-      { id: 3, name: 'GitHub Pages' },
-      { id: 4, name: '个人博客' },
+      { id: 4, name: 'GitHub Pages' },
+      { id: 6, name: 'Portfolio' },
+      { id: 7, name: '考研复试' },
     ],
-    viewCount: 128,
-    createTime: '2026-07-02T09:30:00',
+    viewCount: 168,
+    createTime: '2026-07-03T10:20:00',
   },
   {
     id: 2,
-    title: '个人博客项目结构说明',
-    summary: '前端、后端和数据库脚本各自承担的角色，以及上线时的取舍。',
-    content: `# 个人博客项目结构说明
+    title: 'Vue3 + Spring Boot 个人博客项目结构说明',
+    summary: '梳理前端、后端、数据库和静态部署模式的职责边界，以及登录功能真正可用的前提。',
+    content: `# Vue3 + Spring Boot 个人博客项目结构说明
 
 项目主要分为三个部分：client、server 和 database。
 
 ## client
 
-前端使用 Vue3、Vue Router、Pinia 和 Vite。首页、归档、项目、友链、留言板和关于页都在这里实现。
+前端使用 Vue3、Vue Router、Pinia 和 Vite。首页、文章、项目、友链、留言板、关于页和写文章页面都在这里实现。
 
 ## server
 
-后端使用 Spring Boot，负责文章、评论、留言、友链、用户登录和上传等接口。它适合部署在支持 Java 的服务器上。
+后端使用 Spring Boot，负责文章、评论、留言、友链、用户登录、上传等接口。登录功能依赖后端在线运行，并且数据库中要存在用户数据。
 
 ## database
 
-database/init.sql 是初始化 MySQL 数据的脚本。线上如果要启用后台管理和动态内容，需要先准备数据库。`,
-    categoryId: 2,
-    categoryName: '项目复盘',
+database/init.sql 是初始化 MySQL 数据的脚本，包含默认管理员账号 admin / 123456。线上如果只部署 GitHub Pages，站内账号登录不会生效；如果要启用账号登录，需要单独部署后端和 MySQL，并设置 VITE_API_BASE_URL。`,
+    categoryId: 1,
+    categoryName: 'Tech 技术',
     authorName: 'Ethan',
     tags: [
+      { id: 1, name: 'Vue3' },
       { id: 2, name: 'Spring Boot' },
-      { id: 4, name: '个人博客' },
+      { id: 3, name: 'MySQL' },
     ],
-    viewCount: 86,
-    createTime: '2026-06-28T20:15:00',
+    viewCount: 132,
+    createTime: '2026-07-02T20:15:00',
   },
   {
     id: 3,
-    title: '关于这个站点',
-    summary: '这里会放一些学习、实践和项目记录。',
-    content: `# 关于这个站点
+    title: '学习档案：数学、英语、计算机与 AI 的长期路线',
+    summary: '把复试准备、专业基础和 AI/Web 项目积累拆成可持续更新的学习轨道。',
+    content: `# 学习档案：数学、英语、计算机与 AI 的长期路线
 
-这里会记录我在编程、项目实践和技术学习中的一些笔记。站点会先保持轻量、好读、能稳定访问，再逐步补充真实文章和项目沉淀。
+这个栏目会记录我对数学、英语、计算机基础、算法训练和 AI 实践的阶段性总结。
 
-保持热爱，奔赴山海。`,
-    categoryId: 3,
-    categoryName: '生活记录',
+## 记录方式
+
+- 数学：概念、题型、错题和复盘
+- 英语：阅读、听说表达和专业英文
+- 计算机：数据结构、操作系统、网络、数据库
+- AI/Web：模型工具、知识管理、工程实践
+
+目标不是堆砌碎片，而是形成能被回看、复用和展示的知识档案。`,
+    categoryId: 4,
+    categoryName: 'Learning 学习',
     authorName: 'Ethan',
     tags: [
-      { id: 4, name: '个人博客' },
+      { id: 5, name: 'AI' },
+      { id: 7, name: '考研复试' },
+      { id: 8, name: '知识管理' },
     ],
-    viewCount: 42,
-    createTime: '2026-06-18T18:00:00',
+    viewCount: 96,
+    createTime: '2026-06-28T18:00:00',
   },
 ]
 
 const projects = [
   {
     id: 1,
-    name: '个人博客系统',
-    description: 'Vue3 + Spring Boot 个人博客，支持 Markdown 文章、评论、留言和友链模块。',
+    name: 'Ethan Future Lab',
+    description: '面向复试与求职展示的个人作品集博客，整合项目、文章、学习路线、研究兴趣和联系入口。',
     icon: '◇',
-    tag: 'Vue',
+    tag: 'Portfolio',
     techStack: 'Vue3, Vite, Spring Boot, MySQL, GitHub Pages',
     category: 'web',
     status: '已上线',
@@ -201,23 +214,85 @@ const projects = [
     isActive: 1,
     url: 'https://ethanzhao02.github.io/personal-blog/',
     githubUrl: 'https://github.com/EthanZhao02/personal-blog',
-    stats: 'Personal Blog',
-    createTime: '2026-07-02T09:00:00',
+    stats: 'Portfolio Blog',
+    features: ['未来科技风首页', '静态内容兜底', 'Giscus 留言', 'JWT 登录后端'],
+    createTime: '2026-07-03T10:00:00',
   },
   {
     id: 2,
-    name: '开发工具集',
-    description: '日常开发中积累的脚本、模板和排错经验，后续会逐步整理成可复用工具。',
+    name: 'NLP Code Assistant',
+    description: '围绕代码审查、可信验证、记忆增强和多模型协作展开的 NLP/AI 工程实践项目。',
     icon: '⌘',
-    tag: 'Tools',
-    techStack: 'JavaScript, PowerShell, Markdown',
-    category: 'tool',
-    status: '开发中',
+    tag: 'AI 工程',
+    techStack: 'Python, FastAPI, Vue3, JavaScript, Markdown',
+    category: 'ai',
+    status: '持续完善',
+    isOpenSource: 1,
+    isActive: 1,
+    url: '#',
+    githubUrl: 'https://github.com/EthanZhao02/nlp-code-assistant',
+    stats: 'AI + Code Review',
+    features: ['代码审查流程', '实验记录', '项目验收材料', '知识库沉淀'],
+    createTime: '2026-06-29T10:00:00',
+  },
+  {
+    id: 3,
+    name: 'Knowledge Learning Archive',
+    description: '把英语、数学、计算机和 AI 学习记录整理为可复盘、可展示、可长期维护的知识档案。',
+    icon: '◎',
+    tag: 'Knowledge',
+    techStack: 'Markdown, GitHub Pages, Obsidian, AI Workflow',
+    category: 'knowledge',
+    status: '规划中',
     isOpenSource: 0,
     isActive: 1,
     url: '#',
-    stats: 'WIP',
+    stats: 'Learning System',
+    features: ['学习路线', '阶段复盘', '专业课笔记', '复试材料'],
     createTime: '2026-06-20T10:00:00',
+  },
+]
+
+const learningTracks = [
+  {
+    title: 'Computer Science',
+    description: '数据结构、操作系统、网络、数据库和工程化基础。',
+    progress: 68,
+  },
+  {
+    title: 'AI Engineering',
+    description: 'NLP、代码智能、模型工具链和可信评测。',
+    progress: 62,
+  },
+  {
+    title: 'English & Interview',
+    description: '英语听说表达、项目介绍和复试问答。',
+    progress: 55,
+  },
+]
+
+const researchInterests = [
+  'AI-assisted code review',
+  'Knowledge management',
+  'Learning system design',
+  'Web full-stack engineering',
+]
+
+const timeline = [
+  {
+    time: '2026',
+    title: 'Future Lab 改版',
+    text: '把博客重构为作品集、学习档案与 AI 工程实践入口。',
+  },
+  {
+    time: '2026',
+    title: 'NLP 代码审查项目',
+    text: '沉淀毕业设计、实验记录、验收材料和工程复盘。',
+  },
+  {
+    time: 'Next',
+    title: '复试与求职材料',
+    text: '补齐项目 README、在线 Demo、简历 PDF 和研究兴趣页。',
   },
 ]
 
@@ -225,7 +300,7 @@ const friends = [
   {
     id: 1,
     name: 'Souta',
-    description: '可能是一个笨蛋',
+    description: '技术博客与个人站点参考',
     avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=souta',
     url: 'https://souta.cc',
     category: 'tech',
@@ -256,8 +331,8 @@ const messages = [
     id: 1,
     nickname: 'Ethan',
     avatar,
-    content: '欢迎来到我的留言板。静态部署模式下，你的留言会先保存在当前浏览器本地。',
-    createTime: '2026-07-02T09:00:00',
+    content: '欢迎来到 Ethan Future Lab。静态部署模式下，留言区使用 GitHub Discussions 保存。',
+    createTime: '2026-07-03T10:00:00',
   },
 ]
 
@@ -267,8 +342,8 @@ const comments = {
       id: 1,
       nickname: 'Ethan',
       userAvatar: avatar,
-      content: '这一版先保证博客能稳定上线；后端部署后，评论会切回真实接口。',
-      createTime: '2026-07-02T10:00:00',
+      content: '这一版先把首页定位和静态展示做好；后端部署后，站内登录与写文章会切回真实接口。',
+      createTime: '2026-07-03T10:20:00',
       children: [],
     },
   ],
@@ -277,18 +352,38 @@ const comments = {
 }
 
 export const siteConfig = {
-  name: 'Ethan',
+  name: 'Ethan Zhao',
+  shortName: 'Ethan',
   avatar,
-  subtitle: '代码、热爱与未来感的个人实验室',
+  role: 'AI / Web Developer / Knowledge System Builder',
+  subtitle: 'Building intelligent tools for learning, creation, and the future.',
+  positioning: '一个年轻开发者 / AI 学习者 / 技术创作者的数字空间',
   photos,
   socials,
   projects,
   friends,
+  learningTracks,
+  researchInterests,
+  timeline,
   about: {
-    bio: '我是 Ethan，喜欢后端与全栈实践，也在把学习、项目和生活碎片整理成长期可访问的作品。',
-    skills: ['Java', 'Spring Boot', 'Vue3', 'MySQL', 'Redis'],
-    interests: ['编程', '游戏', '新技术'],
-    location: '地球',
+    tagline: 'AI Learner · Web Developer · Knowledge System Builder',
+    bio: '我是 Ethan Zhao，正在把 AI、Web 开发、知识管理和学习系统结合起来，持续沉淀项目、文章、复盘和成长记录。这个站点既是个人表达空间，也是面向复试和求职展示的作品集入口。',
+    skills: [
+      { name: 'Java / Spring Boot', level: 78 },
+      { name: 'Vue3 / Vite', level: 76 },
+      { name: 'MySQL / Data Modeling', level: 70 },
+      { name: 'Python / NLP Practice', level: 66 },
+      { name: 'Git / Deployment', level: 72 },
+      { name: 'AI Workflow', level: 68 },
+    ],
+    interests: ['AI 工程', '知识管理', 'Web 全栈', '考研复试', '英文表达', '长期主义'],
+    status: 'Building in public',
+    location: 'China',
+    footer: '独立博客是家，GitHub 是证据，项目是最好的自我介绍',
+  },
+  auth: {
+    staticNotice: '当前 GitHub Pages 只能展示静态页面；站内账号登录需要单独部署 Spring Boot 后端与 MySQL。',
+    localNotice: '本地或服务器模式下可使用数据库中的账号登录，默认初始化账号为 admin / 123456。',
   },
   donateIntro: '如果我的博客对你有帮助，欢迎随手支持一下。',
   wechatPay: '',
