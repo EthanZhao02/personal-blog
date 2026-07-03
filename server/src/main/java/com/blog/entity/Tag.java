@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 标签实体类
  */
 @Data
-@TableName("tag")
+@TableName("test.blog_tag")
 public class Tag implements Serializable {
     
     @TableId(type = IdType.AUTO)

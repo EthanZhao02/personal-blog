@@ -9,7 +9,7 @@ import java.io.Serializable;
  * 文章标签关联实体
  */
 @Data
-@TableName("article_tag")
+@TableName("test.blog_article_tag")
 public class ArticleTag implements Serializable {
     
     private Long articleId;

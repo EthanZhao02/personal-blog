@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("friend_link")
+@TableName("test.blog_friend_link")
 public class FriendLink implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;

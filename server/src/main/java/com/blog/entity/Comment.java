@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 评论实体类
  */
 @Data
-@TableName("comment")
+@TableName("test.blog_comment")
 public class Comment implements Serializable {
     
     @TableId(type = IdType.AUTO)

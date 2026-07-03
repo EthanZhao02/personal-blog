@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 用户实体类
  */
 @Data
-@TableName("user")
+@TableName("test.blog_user")
 public class User implements Serializable {
     
     @TableId(type = IdType.AUTO)

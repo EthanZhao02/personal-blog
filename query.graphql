@@ -1,0 +1,11 @@
+query {
+  repository(owner: "EthanZhao02", name: "personal-blog") {
+    discussionCategories(first: 20) {
+      nodes {
+        id
+        name
+        emoji
+      }
+    }
+  }
+}

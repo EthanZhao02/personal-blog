@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("project")
+@TableName("test.blog_project")
 public class Project implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
