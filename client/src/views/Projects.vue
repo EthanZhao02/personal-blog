@@ -82,30 +82,84 @@
               </div>
             </div>
           </transition>
+
+          <!-- 管理员按钮 -->
+          <div class="cell-admin-bar" v-if="userStore.isAdmin">
+            <button @click.stop="openEdit(project)" class="cell-admin-btn">编辑</button>
+            <button @click.stop="handleDelete(project.id)" class="cell-admin-btn cell-del-btn">删除</button>
+          </div>
         </div>
 
         <!-- 空状态 -->
-        <div v-if="!projects.length" class="empty-state">
+        <div v-if="!loading && !projects.length" class="empty-state">
           <div class="empty-icon">◇</div>
           <p>暂无项目</p>
+          <button v-if="userStore.isAdmin" class="add-project-btn" @click="openAdd">+ 添加项目</button>
         </div>
       </main>
+
+      <!-- 管理员添加按钮 -->
+      <button v-if="userStore.isAdmin && !loading && projects.length" class="add-project-btn" @click="openAdd">
+        + 添加项目
+      </button>
+
+      <!-- 表单弹窗 -->
+      <div v-if="showForm" class="form-overlay" @click.self="showForm = false">
+        <div class="form-panel">
+          <h3 class="form-title">{{ editingId ? '编辑项目' : '添加项目' }}</h3>
+          <div class="form-row"><label>名称 *</label><input v-model="form.name" placeholder="项目名称" /></div>
+          <div class="form-row"><label>图标</label><input v-model="form.icon" placeholder="如：◇ / 🚀 / 🔧" /></div>
+          <div class="form-row"><label>主题色</label><input v-model="form.color" type="color" /></div>
+          <div class="form-row"><label>标签</label><input v-model="form.tag" placeholder="如：TOOL / OPEN-SOURCE" /></div>
+          <div class="form-row"><label>描述</label><input v-model="form.description" placeholder="一句话描述" /></div>
+          <div class="form-row"><label>状态</label><input v-model="form.status" placeholder="如：已上线 / 开发中" /></div>
+          <div class="form-row"><label>技术栈</label><input v-model="form.techStack" placeholder="用, 分隔" /></div>
+          <div class="form-row"><label>功能</label><input v-model="form.features" placeholder="用, 分隔" /></div>
+          <div class="form-row"><label>项目链接</label><input v-model="form.url" placeholder="https://..." /></div>
+          <div class="form-row"><label>GitHub</label><input v-model="form.githubUrl" placeholder="https://github.com/..." /></div>
+          <div class="form-actions">
+            <button class="form-cancel" @click="showForm = false">取消</button>
+            <button class="form-ok" @click="submitForm">{{ editingId ? '更新' : '添加' }}</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import siteConfig from '../config/site.config'
+import { useUserStore } from '../stores/user'
+import { getProjects, addProject, updateProject, deleteProject } from '../api/project'
 
 const route = useRoute()
+const userStore = useUserStore()
 const expandedId = ref(null)
+const projects = ref([])
+const loading = ref(true)
+const showForm = ref(false)
+const editingId = ref(null)
+const form = ref({ name: '', icon: '', color: '#38f8ff', tag: '', description: '', status: '', techStack: '', features: '', url: '', githubUrl: '' })
 
-// 从配置获取项目列表
-const projects = computed(() => {
-  return siteConfig.projects || []
-})
+const loadProjects = async () => {
+  loading.value = true
+  try {
+    const url = userStore.isAdmin ? '/project/all' : '/project/list'
+    const res = await getProjects(url)
+    if (res.code === 200 || res.code === 0) {
+      projects.value = (res.data || []).map(p => ({
+        ...p,
+        features: p.features ? (typeof p.features === 'string' ? p.features.split(', ') : []) : []
+      }))
+    } else {
+      projects.value = []
+    }
+  } catch (e) {
+    projects.value = []
+  }
+  loading.value = false
+}
 
 // 切换展开
 const toggleExpand = (id) => {
@@ -117,6 +171,51 @@ if (route.query.id) {
   const id = isNaN(Number(route.query.id)) ? route.query.id : Number(route.query.id)
   expandedId.value = id
 }
+
+const openAdd = () => {
+  editingId.value = null
+  form.value = { name: '', icon: '◇', color: '#38f8ff', tag: '', description: '', status: '', techStack: '', features: '', url: '', githubUrl: '' }
+  showForm.value = true
+}
+
+const openEdit = (p) => {
+  editingId.value = p.id
+  form.value = {
+    name: p.name || '', icon: p.icon || '◇', color: p.color || '#38f8ff',
+    tag: p.tag || '', description: p.description || '', status: p.status || '',
+    techStack: p.techStack || '', features: Array.isArray(p.features) ? p.features.join(', ') : (p.features || ''),
+    url: p.url || '', githubUrl: p.githubUrl || ''
+  }
+  showForm.value = true
+}
+
+const submitForm = async () => {
+  if (!form.value.name) { alert('项目名称必填'); return }
+  const data = { ...form.value }
+  try {
+    if (editingId.value) {
+      await updateProject(editingId.value, data)
+    } else {
+      await addProject(data)
+    }
+    showForm.value = false
+    loadProjects()
+  } catch (e) {
+    alert('操作失败：' + (e?.message || '网络错误'))
+  }
+}
+
+const handleDelete = async (id) => {
+  if (!confirm('确定删除这个项目吗？')) return
+  try {
+    await deleteProject(id)
+    loadProjects()
+  } catch (e) {
+    alert('删除失败：' + (e?.message || '网络错误'))
+  }
+}
+
+onMounted(loadProjects)
 </script>
 
 <style scoped>
@@ -430,6 +529,142 @@ if (route.query.id) {
   font-size: 48px;
   margin-bottom: 16px;
   opacity: 0.3;
+}
+
+/* 管理员按钮 */
+.cell-admin-bar {
+  display: flex;
+  gap: 6px;
+  padding: 0 20px 12px;
+}
+
+.cell-admin-btn {
+  padding: 3px 10px;
+  font-size: 11px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: none;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cell-admin-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cell-del-btn:hover {
+  border-color: #ff6464;
+  color: #ff6464;
+}
+
+.add-project-btn {
+  display: block;
+  margin: 24px auto 0;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, rgba(56, 248, 255, 0.2), rgba(155, 92, 255, 0.2));
+  border: 1px solid rgba(56, 248, 255, 0.4);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-project-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(56, 248, 255, 0.2);
+}
+
+/* 表单弹窗 */
+.form-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.form-panel {
+  background: rgba(12, 20, 35, 0.95);
+  border: 1px solid rgba(56, 248, 255, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+}
+
+.form-title {
+  font-size: 16px;
+  color: #fff;
+  margin: 0 0 16px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.form-row label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.form-row input {
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+}
+
+.form-row input:focus {
+  border-color: var(--accent);
+}
+
+.form-row input[type="color"] {
+  width: 60px;
+  height: 36px;
+  padding: 2px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.form-cancel {
+  padding: 6px 16px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.form-ok {
+  padding: 6px 16px;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: var(--bg);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 /* 响应式 */

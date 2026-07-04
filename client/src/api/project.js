@@ -1,11 +1,7 @@
 import request from '../utils/request'
 
-export function getProjects() {
-  return request({ url: '/project/list', method: 'get' })
-}
-
-export function getAllProjects() {
-  return request({ url: '/project/all', method: 'get' })
+export function getProjects(url) {
+  return request({ url, method: 'get' })
 }
 
 export function addProject(data) {
