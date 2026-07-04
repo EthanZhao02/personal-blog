@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>Ethan Nexus</title>
+    <link>https://ethanzhao02.github.io/personal-blog/</link>
+    <description>Projects, notes, AI learning, and personal archive from Ethan Zhao.</description>
+    <language>zh-CN</language>
+    <lastBuildDate>Sun, 05 Jul 2026 00:00:00 +0800</lastBuildDate>
+    <item>
+      <title>Ethan Nexus：把个人博客升级成知识与项目档案</title>
+      <link>https://ethanzhao02.github.io/personal-blog/#/article/1</link>
+      <guid>https://ethanzhao02.github.io/personal-blog/#/article/1</guid>
+      <pubDate>Fri, 03 Jul 2026 10:20:00 +0800</pubDate>
+      <description>这次改版把首页从普通文章入口升级为面向复试、求职和长期成长记录的个人技术枢纽。</description>
+    </item>
+    <item>
+      <title>Vue3 + Spring Boot 个人博客项目结构说明</title>
+      <link>https://ethanzhao02.github.io/personal-blog/#/article/2</link>
+      <guid>https://ethanzhao02.github.io/personal-blog/#/article/2</guid>
+      <pubDate>Thu, 02 Jul 2026 20:15:00 +0800</pubDate>
+      <description>梳理前端、后端、数据库和静态部署模式的职责边界，以及登录功能真正可用的前提。</description>
+    </item>
+    <item>
+      <title>学习档案：数学、英语、计算机与 AI 的长期路线</title>
+      <link>https://ethanzhao02.github.io/personal-blog/#/article/3</link>
+      <guid>https://ethanzhao02.github.io/personal-blog/#/article/3</guid>
+      <pubDate>Sun, 28 Jun 2026 18:00:00 +0800</pubDate>
+      <description>把复试准备、专业基础和 AI/Web 项目积累拆成可持续更新的学习轨道。</description>
+    </item>
+  </channel>
+</rss>

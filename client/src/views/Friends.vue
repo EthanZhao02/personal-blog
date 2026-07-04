@@ -7,33 +7,81 @@
     <div class="friends-container">
       <!-- 页面头部 -->
       <header class="page-header">
-        <div class="header-badge">CONNECTIONS</div>
-        <h1 class="page-title">友情链接</h1>
-        <p class="page-desc">连接彼此，共同成长</p>
+        <div class="header-badge">{{ ui.badge }}</div>
+        <h1 class="page-title">{{ ui.title }}</h1>
+        <p class="page-desc">{{ ui.desc }}</p>
       </header>
 
-      <!-- 顶部申请区域 -->
-      <div class="apply-panel">
+      <!-- 申请入口 -->
+      <section class="apply-panel apply-compact">
         <div class="apply-info">
-          <div class="apply-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38f8ff" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+          <div class="apply-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38f8ff" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
           <div>
-            <h3 class="apply-title">申请友链</h3>
-            <p class="apply-desc">在留言板留言申请友链，提供你的博客名称、链接和简介</p>
+            <h3 class="apply-title">{{ ui.applyTitle }}</h3>
+            <p class="apply-desc">{{ ui.applyDesc }}</p>
           </div>
         </div>
-        <router-link to="/message" class="apply-btn">前往留言板</router-link>
-      </div>
+        <button class="apply-cta" type="button" @click="openApplyForm">{{ ui.applyAction }}</button>
+      </section>
+
+      <transition name="apply-modal">
+        <div v-if="showApplyForm" class="apply-modal-overlay" @click.self="closeApplyForm">
+          <form class="apply-modal-panel friend-apply-form" @submit.prevent="submitApplication">
+            <button class="apply-modal-close" type="button" @click="closeApplyForm" :aria-label="ui.close">×</button>
+            <div class="apply-modal-head">
+              <span>{{ ui.applyBadge }}</span>
+              <h3>{{ ui.applyTitle }}</h3>
+              <p>{{ ui.applyModalDesc }}</p>
+            </div>
+        <div class="apply-form-grid">
+          <label>
+                <span>{{ ui.siteName }}</span>
+                <input v-model.trim="applyForm.name" :placeholder="ui.siteNamePlaceholder" maxlength="40" />
+          </label>
+          <label>
+                <span>{{ ui.siteUrl }}</span>
+            <input v-model.trim="applyForm.url" placeholder="https://example.com" />
+          </label>
+          <label>
+                <span>{{ ui.avatar }}</span>
+            <input v-model.trim="applyForm.avatar" placeholder="https://example.com/avatar.png" />
+          </label>
+          <label>
+                <span>{{ ui.email }}</span>
+            <input v-model.trim="applyForm.email" placeholder="contact@example.com" maxlength="80" />
+          </label>
+          <label>
+                <span>{{ ui.category }}</span>
+                <input v-model.trim="applyForm.category" :placeholder="ui.categoryPlaceholder" maxlength="40" />
+          </label>
+          <label class="apply-wide">
+                <span>{{ ui.intro }}</span>
+                <input v-model.trim="applyForm.description" :placeholder="ui.introPlaceholder" maxlength="100" />
+          </label>
+        </div>
+
+        <div class="apply-actions">
+          <button class="apply-btn" type="submit" :disabled="applying">
+                {{ applying ? ui.submitting : ui.submit }}
+          </button>
+          <p v-if="applyMsg" class="apply-msg" :class="{ ok: applyOk }">{{ applyMsg }}</p>
+        </div>
+          </form>
+        </div>
+      </transition>
 
       <!-- 管理员添加按钮(有友链时) -->
       <button v-if="userStore.isAdmin && !loading && friends.length" class="add-friend-btn" @click="openAdd">
-        + 添加友链
+        + {{ ui.addFriend }}
       </button>
 
       <!-- 友链网格 -->
       <main class="friends-grid" v-if="!loading && friends.length">
         <div
           v-for="friend in friends"
-          :key="friend.id"
+          :key="friend.id || friend.url"
           class="friend-node"
           :class="{ 'friend-pending': friend.isActive === 0 }"
         >
@@ -79,9 +127,9 @@
       <!-- 空状态 -->
       <div v-if="!loading && !friends.length" class="empty-state">
         <div class="empty-icon">◉</div>
-        <p>暂无友链</p>
-        <p class="empty-hint">成为第一个连接的节点</p>
-        <button v-if="userStore.isAdmin" class="add-friend-btn" @click="openAdd">+ 添加友链</button>
+        <p>{{ ui.empty }}</p>
+        <p class="empty-hint">{{ ui.emptyHint }}</p>
+        <button v-if="userStore.isAdmin" class="add-friend-btn" @click="openAdd">+ {{ ui.addFriend }}</button>
       </div>
 
       <!-- 编辑/添加表单弹窗 -->
@@ -123,34 +171,132 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, inject, ref, onMounted } from 'vue'
 import { useUserStore } from '../stores/user'
-import { getFriendLinks, addFriendLink, updateFriendLink, deleteFriendLink } from '../api/friend'
+import { getFriendLinks, addFriendLink, applyFriendLink, updateFriendLink, deleteFriendLink } from '../api/friend'
 import { uploadImage } from '../api/upload'
 import CropDialog from '../components/CropDialog.vue'
+import { fallbackFriends } from '../config/site.config.js'
 
 const userStore = useUserStore()
 const friends = ref([])
 const loading = ref(true)
 const showForm = ref(false)
+const showApplyForm = ref(false)
 const editingId = ref(null)
 const form = ref({ name: '', url: '', avatar: '', description: '', category: '', email: '' })
+const applyForm = ref({ name: '', url: '', avatar: '', description: '', category: '', email: '' })
+const applying = ref(false)
+const applyMsg = ref('')
+const applyOk = ref(false)
 const avatarFileInput = ref(null)
+const siteLanguage = inject('siteLanguage', ref(localStorage.getItem('ethan-language') || 'zh'))
+
+const ui = computed(() => siteLanguage.value === 'en'
+  ? {
+      badge: 'CONNECTIONS',
+      title: 'Friend Links',
+      desc: 'Connected nodes, shared growth.',
+      applyTitle: 'Apply For A Link',
+      applyDesc: 'The page keeps the link network clean. Open the application cabin only when you need to submit a site.',
+      applyAction: 'Apply',
+      applyBadge: 'LINK REQUEST',
+      applyModalDesc: 'Submit your site information here. When the backend is available, it will enter the review queue.',
+      siteName: 'Site Name *',
+      siteNamePlaceholder: 'Example: Ethan Nexus',
+      siteUrl: 'Site URL *',
+      avatar: 'Avatar URL',
+      email: 'Email',
+      category: 'Category / ICP note',
+      categoryPlaceholder: 'Tech blog / ICP ready / Personal site',
+      intro: 'One-line Intro',
+      introPlaceholder: 'Describe your site style and content direction',
+      submit: 'Submit Request',
+      submitting: 'Submitting...',
+      required: 'Please fill in at least the site name and URL.',
+      success: 'Request submitted. Waiting for review.',
+      offlineSaved: 'Backend is not connected. The request has been cached locally and shown as a pending node.',
+      failed: 'Submit failed. Please try again later.',
+      close: 'Close application form',
+      addFriend: 'Add Link',
+      empty: 'No friend links yet',
+      emptyHint: 'Become the first connected node',
+    }
+  : {
+      badge: 'CONNECTIONS',
+      title: '友情链接',
+      desc: '连接彼此，共同成长',
+      applyTitle: '申请友链',
+      applyDesc: '友链页先展示关系网络，需要提交站点时再打开申请舱，页面不会一进来就铺满表单。',
+      applyAction: '申请友链',
+      applyBadge: 'LINK REQUEST',
+      applyModalDesc: '把站点资料投递到这里，后台开启后会以待审核节点进入管理列表。',
+      siteName: '站点名称 *',
+      siteNamePlaceholder: '例如：Ethan Nexus',
+      siteUrl: '站点链接 *',
+      avatar: '头像 URL',
+      email: '邮箱',
+      category: '分类 / 备案备注',
+      categoryPlaceholder: '技术博客 / 已备案 / 个人站',
+      intro: '一句话简介',
+      introPlaceholder: '介绍一下你的站点风格和内容方向',
+      submit: '提交申请',
+      submitting: '提交中...',
+      required: '请至少填写站点名称和链接。',
+      success: '申请已提交，等待后台审核。',
+      offlineSaved: '后端暂未连接，申请已先暂存在本机并显示为待审核节点。',
+      failed: '提交失败，请稍后重试。',
+      close: '关闭申请表单',
+      addFriend: '添加友链',
+      empty: '暂无友链',
+      emptyHint: '成为第一个连接的节点',
+    })
+
+const useFallbackFriends = () => {
+  friends.value = fallbackFriends.map(friend => ({
+    ...friend,
+    avatar: resolveUploadUrl(friend.avatar),
+  }))
+}
 
 const loadFriends = async () => {
   loading.value = true
   try {
     const url = userStore.isAdmin ? '/friend/link/all' : '/friend/link/list'
     const res = await getFriendLinks(url)
-    if (res.code === 200 || res.code === 0) {
-      friends.value = res.data || []
+    if ((res.code === 200 || res.code === 0) && res.data?.length) {
+      friends.value = res.data.map(friend => ({
+        ...friend,
+        avatar: resolveUploadUrl(friend.avatar),
+      }))
     } else {
-      friends.value = []
+      useFallbackFriends()
     }
   } catch (e) {
-    friends.value = []
+    useFallbackFriends()
   }
   loading.value = false
+}
+
+const appendPendingFriend = (payload) => {
+  const pending = {
+    ...payload,
+    id: `pending-${Date.now()}`,
+    avatar: resolveUploadUrl(payload.avatar),
+    isActive: 0,
+  }
+  friends.value = [pending, ...friends.value.filter(item => item.url !== payload.url)]
+}
+
+const cachePendingApplication = (payload) => {
+  const key = 'ethan-friend-applications'
+  let oldList = []
+  try {
+    oldList = JSON.parse(localStorage.getItem(key) || '[]')
+  } catch {
+    oldList = []
+  }
+  localStorage.setItem(key, JSON.stringify([{ ...payload, createTime: new Date().toISOString() }, ...oldList].slice(0, 20)))
 }
 
 const onAvatarError = (e) => {
@@ -201,6 +347,50 @@ const openEdit = (f) => {
   editingId.value = f.id
   form.value = { name: f.name || '', url: f.url || '', avatar: f.avatar || '', description: f.description || '', category: f.category || '', email: f.email || '' }
   showForm.value = true
+}
+
+const openApplyForm = () => {
+  applyMsg.value = ''
+  applyOk.value = false
+  showApplyForm.value = true
+}
+
+const closeApplyForm = () => {
+  if (applying.value) return
+  showApplyForm.value = false
+}
+
+const submitApplication = async () => {
+  if (!applyForm.value.name || !applyForm.value.url) {
+    applyMsg.value = ui.value.required
+    applyOk.value = false
+    return
+  }
+
+  applying.value = true
+  applyMsg.value = ''
+  applyOk.value = false
+  const payload = { ...applyForm.value }
+
+  try {
+    const res = await applyFriendLink(payload)
+    if (res.code === 200 || res.code === 0) {
+      appendPendingFriend(payload)
+      applyMsg.value = res.message || res.data || ui.value.success
+      applyOk.value = true
+      applyForm.value = { name: '', url: '', avatar: '', description: '', category: '', email: '' }
+      return
+    }
+    applyMsg.value = res.message || ui.value.failed
+  } catch (e) {
+    cachePendingApplication(payload)
+    appendPendingFriend(payload)
+    applyMsg.value = ui.value.offlineSaved
+    applyOk.value = true
+    applyForm.value = { name: '', url: '', avatar: '', description: '', category: '', email: '' }
+  } finally {
+    applying.value = false
+  }
 }
 
 const submitForm = async () => {
@@ -296,14 +486,24 @@ onMounted(loadFriends)
 /* 申请面板 */
 .apply-panel {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 24px;
-  background: linear-gradient(135deg, rgba(12, 20, 35, 0.8), rgba(20, 30, 50, 0.6));
-  border: 1px solid rgba(56, 248, 255, 0.2);
-  border-radius: 16px;
-  margin-bottom: 40px;
-  backdrop-filter: blur(10px);
+  justify-content: space-between;
+  gap: 22px;
+  padding: 18px 0 22px !important;
+  margin-bottom: 34px;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(126, 238, 255, 0.16) !important;
+  border-radius: 0 !important;
+  background:
+    linear-gradient(90deg, rgba(56, 248, 255, 0.08), transparent 58%),
+    transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.apply-compact::before,
+.apply-compact::after {
+  display: none !important;
 }
 
 .apply-info {
@@ -335,12 +535,153 @@ onMounted(loadFriends)
   font-size: 13px;
   color: rgba(255, 255, 255, 0.5);
   margin: 0;
+  line-height: 1.7;
+}
+
+.apply-cta {
+  flex-shrink: 0;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(56, 248, 255, 0.42);
+  border-radius: 8px;
+  background: rgba(56, 248, 255, 0.08);
+  color: #f8fbff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.22s var(--ease-out), border-color 0.22s, box-shadow 0.22s;
+}
+
+.apply-cta:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 248, 255, 0.68);
+  box-shadow: 0 14px 28px rgba(56, 248, 255, 0.13);
+}
+
+.apply-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(2, 6, 18, 0.72);
+  backdrop-filter: blur(14px);
+}
+
+.apply-modal-panel {
+  position: relative;
+  width: min(760px, 100%);
+  max-height: min(86vh, 780px);
+  overflow-y: auto;
+  padding: clamp(22px, 4vw, 32px);
+  border: 1px solid rgba(125, 211, 252, 0.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(16, 29, 54, 0.95), rgba(5, 9, 21, 0.94)),
+    repeating-linear-gradient(90deg, rgba(125, 211, 252, 0.045) 0 1px, transparent 1px 76px);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.48), inset 0 0 80px rgba(56, 248, 255, 0.045);
+}
+
+.apply-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  border: 0;
+  background: transparent;
+  color: rgba(226, 239, 255, 0.56);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.apply-modal-head {
+  max-width: 560px;
+  margin-bottom: 22px;
+}
+
+.apply-modal-head span {
+  color: #7dd3fc;
+  font: 800 11px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.16em;
+}
+
+.apply-modal-head h3 {
+  margin: 12px 0 8px;
+  color: #f8fbff;
+  font-size: clamp(1.55rem, 4vw, 2.6rem);
+  line-height: 1.05;
+}
+
+.apply-modal-head p {
+  margin: 0;
+  color: rgba(226, 239, 255, 0.62);
+  line-height: 1.8;
+}
+
+.apply-modal-enter-active,
+.apply-modal-leave-active {
+  transition: opacity 0.25s var(--ease-out), filter 0.25s var(--ease-out);
+}
+
+.apply-modal-enter-from,
+.apply-modal-leave-to {
+  opacity: 0;
+  filter: blur(8px);
+}
+
+.apply-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.apply-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.apply-form-grid span {
+  color: rgba(226, 239, 255, 0.52);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.apply-form-grid input {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  border-radius: 8px;
+  background: rgba(5, 8, 22, 0.42);
+  color: #eef7ff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.apply-form-grid input:focus {
+  border-color: rgba(56, 248, 255, 0.48);
+  box-shadow: 0 0 0 4px rgba(56, 248, 255, 0.08);
+}
+
+.apply-wide {
+  grid-column: 1 / -1;
+}
+
+.apply-actions {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 .apply-btn {
+  border: 1px solid rgba(56, 248, 255, 0.4);
   padding: 12px 24px;
   background: linear-gradient(135deg, rgba(56, 248, 255, 0.2), rgba(155, 92, 255, 0.2));
-  border: 1px solid rgba(56, 248, 255, 0.4);
   border-radius: 8px;
   color: #fff;
   font-size: 13px;
@@ -348,11 +689,31 @@ onMounted(loadFriends)
   text-decoration: none;
   transition: all 0.2s ease;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .apply-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(56, 248, 255, 0.2);
+}
+
+.apply-btn:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.apply-msg {
+  flex: 1;
+  min-width: min(100%, 240px);
+  margin: 0;
+  color: #ff9f9f;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.apply-msg.ok {
+  color: #7dd3fc;
 }
 
 /* 友链网格 */
@@ -463,7 +824,7 @@ onMounted(loadFriends)
   gap: 6px;
   font-size: 10px;
   font-weight: 600;
-  color: #4ade80;
+  color: #38bdf8;
   letter-spacing: 0.1em;
 }
 
@@ -471,9 +832,18 @@ onMounted(loadFriends)
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4ade80;
-  box-shadow: 0 0 8px #4ade80;
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
   animation: pulse 2s ease-in-out infinite;
+}
+
+.status-dot.status-pending {
+  background: #ffbd66;
+  box-shadow: 0 0 8px rgba(255, 189, 102, 0.76);
+}
+
+.friend-pending .node-status {
+  color: #ffbd66;
 }
 
 @keyframes pulse {
@@ -699,14 +1069,23 @@ onMounted(loadFriends)
   }
   
   .apply-panel {
+    align-items: stretch;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
     text-align: center;
   }
   
   .apply-info {
     flex-direction: column;
     text-align: center;
+  }
+
+  .apply-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .apply-actions {
+    justify-content: center;
   }
   
   .friends-grid {

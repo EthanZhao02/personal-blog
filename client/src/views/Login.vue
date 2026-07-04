@@ -2,33 +2,33 @@
   <div class="auth-page">
     <div class="auth-card">
       <div class="ornament">✦</div>
-      <h2 class="auth-title">账号登录</h2>
-      <p class="auth-subtitle">{{ isStaticMode ? '静态部署说明' : '欢迎回来' }}</p>
+      <h2 class="auth-title">{{ ui.title }}</h2>
+      <p class="auth-subtitle">{{ isStaticMode ? ui.staticSubtitle : ui.subtitle }}</p>
 
       <div class="auth-notice" :class="{ static: isStaticMode }">
-        <strong>{{ isStaticMode ? '当前线上静态站不能直接登录' : '后端登录已接入' }}</strong>
-        <p>{{ isStaticMode ? siteConfig.auth.staticNotice : siteConfig.auth.localNotice }}</p>
-        <router-link v-if="isStaticMode" to="/message">留言区可使用 GitHub 账号</router-link>
+        <strong>{{ isStaticMode ? ui.staticTitle : ui.localTitle }}</strong>
+        <p>{{ isStaticMode ? ui.staticNotice : ui.localNotice }}</p>
+        <router-link v-if="isStaticMode" to="/message">{{ ui.githubMessage }}</router-link>
       </div>
 
       <form @submit.prevent="handleLogin" class="auth-form">
         <div class="form-group">
-          <label class="form-label">用户名</label>
+          <label class="form-label">{{ ui.username }}</label>
           <input
             v-model="form.username"
             type="text"
-            placeholder="请输入用户名"
+            :placeholder="ui.usernamePlaceholder"
             class="form-input"
             :disabled="isStaticMode"
             required
           />
         </div>
         <div class="form-group">
-          <label class="form-label">密码</label>
+          <label class="form-label">{{ ui.password }}</label>
           <input
             v-model="form.password"
             type="password"
-            placeholder="请输入密码"
+            :placeholder="ui.passwordPlaceholder"
             class="form-input"
             :disabled="isStaticMode"
             required
@@ -38,34 +38,76 @@
         <div class="form-error" v-if="error">{{ error }}</div>
 
         <button type="submit" class="btn btn-block" :disabled="loading || isStaticMode">
-          {{ isStaticMode ? '等待后端部署' : (loading ? '登录中...' : '登录') }}
+          {{ isStaticMode ? ui.waitBackend : (loading ? ui.loggingIn : ui.login) }}
         </button>
       </form>
 
       <div class="auth-footer">
-        {{ isStaticMode ? '部署后设置 VITE_API_BASE_URL 即可启用站内账号。' : '仅管理员可登录。' }}
+        {{ isStaticMode ? ui.footerStatic : ui.footerLocal }}
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import siteConfig, { isStaticMode } from '../config/site.config'
 
 const router = useRouter()
 const userStore = useUserStore()
+const siteLanguage = inject('siteLanguage', ref(localStorage.getItem('ethan-language') || 'zh'))
 
 const form = ref({ username: '', password: '' })
 const loading = ref(false)
 const error = ref('')
+const ui = computed(() => siteLanguage.value === 'en'
+  ? {
+      title: 'Account Login',
+      subtitle: 'Welcome back',
+      staticSubtitle: 'Static Deployment',
+      staticTitle: 'Static site cannot log in directly',
+      localTitle: 'Backend login is connected',
+      staticNotice: 'The current online static site does not connect to the backend login service.',
+      localNotice: 'Admin login is available when the backend service is running.',
+      githubMessage: 'Use GitHub account in the message board',
+      username: 'Username',
+      password: 'Password',
+      usernamePlaceholder: 'Enter username',
+      passwordPlaceholder: 'Enter password',
+      waitBackend: 'Waiting for backend',
+      loggingIn: 'Logging in...',
+      login: 'Login',
+      footerStatic: 'Set VITE_API_BASE_URL after deployment to enable site accounts.',
+      footerLocal: 'Admin only.',
+      failed: 'Login failed. Please check username and password.',
+    }
+  : {
+      title: '账号登录',
+      subtitle: '欢迎回来',
+      staticSubtitle: '静态部署说明',
+      staticTitle: '当前线上静态站不能直接登录',
+      localTitle: '后端登录已接入',
+      staticNotice: siteConfig.auth.staticNotice,
+      localNotice: siteConfig.auth.localNotice,
+      githubMessage: '留言区可使用 GitHub 账号',
+      username: '用户名',
+      password: '密码',
+      usernamePlaceholder: '请输入用户名',
+      passwordPlaceholder: '请输入密码',
+      waitBackend: '等待后端部署',
+      loggingIn: '登录中...',
+      login: '登录',
+      footerStatic: '部署后设置 VITE_API_BASE_URL 即可启用站内账号。',
+      footerLocal: '仅管理员可登录。',
+      failed: '登录失败，请检查用户名和密码',
+    })
 
 const handleLogin = async () => {
   error.value = ''
   if (isStaticMode) {
-    error.value = siteConfig.auth.staticNotice
+    error.value = ui.value.staticNotice
     return
   }
   loading.value = true
@@ -73,7 +115,7 @@ const handleLogin = async () => {
     await userStore.login(form.value.username, form.value.password)
     router.push('/')
   } catch (e) {
-    error.value = e.message || '登录失败，请检查用户名和密码'
+    error.value = e.message || ui.value.failed
   } finally {
     loading.value = false
   }
@@ -122,9 +164,9 @@ const handleLogin = async () => {
 .auth-notice {
   margin-bottom: 26px;
   padding: 14px 16px;
-  border: 1px solid rgba(141, 248, 199, 0.22);
+  border: 1px solid rgba(125, 211, 252, 0.22);
   border-radius: 8px;
-  background: rgba(141, 248, 199, 0.07);
+  background: rgba(125, 211, 252, 0.07);
   text-align: left;
 }
 

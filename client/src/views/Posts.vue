@@ -10,24 +10,24 @@
       <!-- 页面头部 -->
       <header class="page-header">
         <div class="header-content">
-          <div class="header-badge">ARCHIVE</div>
-          <h1 class="page-title">文章归档</h1>
-          <p class="page-desc">探索技术、记录思考、分享经验</p>
+          <div class="header-badge">{{ ui.badge }}</div>
+          <h1 class="page-title">{{ ui.title }}</h1>
+          <p class="page-desc">{{ ui.desc }}</p>
         </div>
         <div class="header-stats">
           <div class="stat-box">
             <span class="stat-num">{{ totalCount }}</span>
-            <span class="stat-label">篇文章</span>
+            <span class="stat-label">{{ ui.articleCount }}</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-box">
             <span class="stat-num">{{ categories.length }}</span>
-            <span class="stat-label">个分类</span>
+            <span class="stat-label">{{ ui.categoryCount }}</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-box">
             <span class="stat-num">{{ allTags.length }}</span>
-            <span class="stat-label">个标签</span>
+            <span class="stat-label">{{ ui.tagCount }}</span>
           </div>
         </div>
       </header>
@@ -35,13 +35,13 @@
       <!-- 筛选栏 -->
       <div class="filter-panel">
         <div class="filter-section">
-          <span class="filter-label">分类</span>
+          <span class="filter-label">{{ ui.category }}</span>
           <div class="filter-chips">
             <button
               class="chip"
               :class="{ active: !selectedCategoryId }"
               @click="selectCategory(null)"
-            >全部</button>
+            >{{ ui.all }}</button>
             <button
               v-for="cat in categories"
               :key="cat.id"
@@ -52,9 +52,9 @@
           </div>
         </div>
         <div class="filter-section" v-if="allTags.length">
-          <span class="filter-label">标签</span>
+          <span class="filter-label">{{ ui.tag }}</span>
           <select v-model="selectedTagName" class="filter-select">
-            <option value="">全部标签</option>
+            <option value="">{{ ui.allTags }}</option>
             <option v-for="tag in allTags" :key="tag.id" :value="tag.name">{{ tag.name }}</option>
           </select>
         </div>
@@ -64,12 +64,12 @@
       <main class="timeline-wrapper">
         <div v-if="loading" class="loading-state">
           <div class="loading-spinner"></div>
-          <span>加载中...</span>
+          <span>{{ ui.loading }}</span>
         </div>
 
         <div v-else-if="filteredArticles.length === 0" class="empty-state">
           <div class="empty-icon">◈</div>
-          <p>暂无文章</p>
+          <p>{{ ui.empty }}</p>
         </div>
 
         <div v-else class="timeline">
@@ -116,7 +116,7 @@
                       </span>
                     </div>
                   </div>
-                  <span class="card-read">阅读 →</span>
+                  <span class="card-read">{{ ui.read }} →</span>
                 </router-link>
               </article>
             </div>
@@ -128,7 +128,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, inject, onMounted } from 'vue'
 import { getArticleList } from '../api/article'
 import { getTagList } from '../api/tag'
 import { getCategoryList } from '../api/category'
@@ -142,6 +142,39 @@ const allTags = ref([])
 const selectedCategoryId = ref(null)
 const selectedTagName = ref('')
 const loading = ref(true)
+const siteLanguage = inject('siteLanguage', ref(localStorage.getItem('ethan-language') || 'zh'))
+
+const ui = computed(() => siteLanguage.value === 'en'
+  ? {
+      badge: 'ARCHIVE',
+      title: 'Article Archive',
+      desc: 'Explore technology, record thoughts, and share experience.',
+      articleCount: 'Posts',
+      categoryCount: 'Categories',
+      tagCount: 'Tags',
+      category: 'Category',
+      tag: 'Tag',
+      all: 'All',
+      allTags: 'All Tags',
+      loading: 'Loading...',
+      empty: 'No articles yet',
+      read: 'Read',
+    }
+  : {
+      badge: 'ARCHIVE',
+      title: '文章归档',
+      desc: '探索技术、记录思考、分享经验',
+      articleCount: '篇文章',
+      categoryCount: '个分类',
+      tagCount: '个标签',
+      category: '分类',
+      tag: '标签',
+      all: '全部',
+      allTags: '全部标签',
+      loading: '加载中...',
+      empty: '暂无文章',
+      read: '阅读',
+    })
 
 // 筛选后的文章
 const filteredArticles = computed(() => {

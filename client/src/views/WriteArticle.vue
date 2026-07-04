@@ -1,7 +1,14 @@
 <template>
   <div class="write-page">
     <div class="page-header">
-      <h2 class="page-title">{{ isEdit ? t('editTitle') : t('writeTitle') }}</h2>
+      <div>
+        <span class="page-kicker">{{ isEdit ? t('editBadge') : t('writeBadge') }}</span>
+        <h2 class="page-title">{{ isEdit ? t('editTitle') : t('writeTitle') }}</h2>
+      </div>
+      <div class="write-status">
+        <span>{{ t('autosave') }}</span>
+        <span>{{ t('splitView') }}</span>
+      </div>
     </div>
 
     <div class="editor-layout">
@@ -133,7 +140,7 @@
         <!-- 内容编辑：左编辑右预览 -->
         <div class="editor-container">
           <div class="editor-pane">
-            <div class="pane-label">Markdown</div>
+            <div class="pane-label">{{ t('markdownLabel') }}</div>
             <textarea
               ref="contentTextarea"
               v-model="article.content"
@@ -142,7 +149,7 @@
             ></textarea>
           </div>
           <div class="preview-pane">
-            <div class="pane-label">预览</div>
+            <div class="pane-label">{{ t('previewLabel') }}</div>
             <div class="preview-content" v-html="renderedContent"></div>
           </div>
         </div>
@@ -197,7 +204,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
+import { ref, computed, inject, onMounted, watch, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { getArticleList, getArticleDetail, createArticle, updateArticle, deleteArticle, getMyArticles } from '../api/article'
@@ -212,7 +219,7 @@ import 'highlight.js/styles/github-dark.css'
 const route = useRoute()
 const userStore = useUserStore()
 
-const lang = ref(localStorage.getItem('lang') || 'zh')
+const lang = inject('siteLanguage', ref(localStorage.getItem('ethan-language') || 'zh'))
 
 const translations = {
   zh: {
@@ -240,6 +247,13 @@ const translations = {
     publishing: '发布中...',
     unpublish: '撤回',
     delete: '删除'
+    ,
+    writeBadge: 'WRITE LAB',
+    editBadge: 'EDIT LAB',
+    autosave: '自动草稿',
+    splitView: '双栏预览',
+    markdownLabel: 'Markdown',
+    previewLabel: '预览'
   },
   en: {
     editTitle: 'Edit Article',
@@ -265,7 +279,13 @@ const translations = {
     publish: 'Publish',
     publishing: 'Publishing...',
     unpublish: 'Unpublish',
-    delete: 'Delete'
+    delete: 'Delete',
+    writeBadge: 'WRITE LAB',
+    editBadge: 'EDIT LAB',
+    autosave: 'Auto Draft',
+    splitView: 'Split Preview',
+    markdownLabel: 'Markdown',
+    previewLabel: 'Preview'
   }
 }
 
@@ -1387,11 +1407,278 @@ onBeforeUnmount(() => {
   vertical-align: middle;
 }
 .item-status.published {
-  background: rgba(141, 248, 199, 0.14);
+  background: rgba(125, 211, 252, 0.14);
   color: var(--ink-blue);
 }
 .item-status.draft {
   background: rgba(255, 189, 102, 0.14);
   color: var(--amber);
+}
+
+/* Future writing console polish */
+.write-page {
+  max-width: 1380px;
+  padding: 18px clamp(14px, 3vw, 34px) 40px;
+}
+
+.page-header {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding: 18px 0 22px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.18);
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(56, 248, 255, 0.72), rgba(167, 139, 250, 0.34), transparent);
+  box-shadow: 0 0 18px rgba(56, 248, 255, 0.22);
+}
+
+.page-kicker,
+.write-status span {
+  color: rgba(125, 211, 252, 0.72);
+  font: 800 11px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.16em;
+}
+
+.page-title {
+  margin: 8px 0 0;
+  color: #f8fbff;
+  font-size: clamp(2rem, 4vw, 4.4rem);
+  font-weight: 950;
+  line-height: 0.95;
+  letter-spacing: 0;
+  text-shadow: 0 0 30px rgba(56, 248, 255, 0.18);
+}
+
+.write-status {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.write-status span {
+  padding: 8px 10px;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  border-radius: 7px;
+  background: rgba(6, 12, 28, 0.56);
+  color: rgba(226, 239, 255, 0.62);
+}
+
+.editor-layout {
+  display: grid;
+  grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+  gap: clamp(16px, 2vw, 24px);
+  align-items: start;
+}
+
+.article-sidebar,
+.editor-main {
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(11, 20, 40, 0.86), rgba(5, 9, 22, 0.82)),
+    repeating-linear-gradient(90deg, rgba(125, 211, 252, 0.04) 0 1px, transparent 1px 84px);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.26), inset 0 0 70px rgba(56, 248, 255, 0.035);
+}
+
+.article-sidebar {
+  width: auto;
+  position: sticky;
+  top: 112px;
+  padding: 18px;
+}
+
+.sidebar-heading {
+  color: rgba(226, 239, 255, 0.66);
+  border-bottom-color: rgba(125, 211, 252, 0.16);
+}
+
+.article-item {
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 10px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+}
+
+.article-item:hover,
+.article-item.active {
+  background: rgba(56, 248, 255, 0.06);
+  border-color: rgba(56, 248, 255, 0.18);
+}
+
+.item-title {
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.item-actions {
+  flex-direction: column;
+}
+
+.item-btn,
+.btn-new,
+.attach-btn,
+.btn,
+.tag-btn {
+  border-radius: 7px;
+}
+
+.editor-main {
+  padding: clamp(20px, 3vw, 34px);
+}
+
+.cover-upload,
+.cover-preview {
+  max-width: none;
+  height: 150px;
+  border-radius: 8px;
+}
+
+.cover-upload {
+  border: 1px dashed rgba(125, 211, 252, 0.28);
+  background:
+    radial-gradient(circle at 20% 30%, rgba(56, 248, 255, 0.12), transparent 34%),
+    rgba(6, 12, 28, 0.54);
+}
+
+.cover-upload:hover {
+  border-color: rgba(56, 248, 255, 0.58);
+  color: #eaf7ff;
+}
+
+.title-input {
+  padding: 18px 0;
+  font-size: clamp(1.55rem, 3vw, 2.6rem);
+  border-bottom-color: rgba(125, 211, 252, 0.18);
+}
+
+.meta-field select,
+.new-tag-input,
+.content-textarea,
+.preview-content,
+.summary-textarea,
+.attachment-item {
+  border-color: rgba(125, 211, 252, 0.16);
+  background: rgba(3, 8, 20, 0.56);
+}
+
+.toolbar {
+  gap: 6px;
+  padding: 10px;
+  border-color: rgba(125, 211, 252, 0.18);
+  border-radius: 8px;
+  background: rgba(5, 11, 25, 0.74);
+}
+
+.tool-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(125, 211, 252, 0.12);
+  border-radius: 7px;
+  color: rgba(226, 239, 255, 0.66);
+}
+
+.tool-btn:hover {
+  color: #ffffff;
+  border-color: rgba(56, 248, 255, 0.42);
+  background: rgba(56, 248, 255, 0.08);
+}
+
+.editor-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.pane-label {
+  color: rgba(125, 211, 252, 0.74);
+  font-weight: 800;
+}
+
+.content-textarea,
+.preview-content {
+  min-height: 470px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 42px rgba(56, 248, 255, 0.025);
+}
+
+.content-textarea:focus,
+.summary-textarea:focus,
+.meta-field select:focus {
+  border-color: rgba(56, 248, 255, 0.56);
+  box-shadow: 0 0 0 3px rgba(56, 248, 255, 0.08);
+}
+
+.action-bar {
+  border-top-color: rgba(125, 211, 252, 0.16);
+}
+
+.btn-primary {
+  border-color: rgba(56, 248, 255, 0.72);
+  background: linear-gradient(135deg, #38f8ff, #8b5cf6);
+  color: #06101f;
+  font-weight: 850;
+}
+
+.btn-primary:hover {
+  border-color: #38f8ff;
+  background: linear-gradient(135deg, #6ffaff, #a78bfa);
+}
+
+.btn-ghost:hover,
+.attach-btn:hover,
+.btn-new:hover,
+.tag-btn:hover {
+  border-color: rgba(56, 248, 255, 0.44);
+  color: #eaf7ff;
+}
+
+@media (max-width: 980px) {
+  .editor-layout,
+  .editor-container {
+    grid-template-columns: 1fr;
+  }
+
+  .article-sidebar {
+    position: relative;
+    top: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .write-page {
+    padding: 8px 12px 36px;
+  }
+
+  .page-header,
+  .meta-row,
+  .action-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .write-status {
+    justify-content: flex-start;
+  }
+
+  .editor-main {
+    padding: 16px;
+  }
+
+  .toolbar {
+    overflow-x: auto;
+  }
 }
 </style>

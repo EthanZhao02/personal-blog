@@ -1,10 +1,67 @@
 <template>
-  <div class="souta-app" @click="dropCandy" @touchstart="dropCandy">
+  <div class="souta-app" :style="pointerStyle" @click="dropCandy" @touchstart="dropCandy" @pointermove="trackPointer">
+    <div class="cursor-aura" aria-hidden="true"></div>
+
     <div class="ambient-layer" aria-hidden="true">
       <span class="ambient-line line-a"></span>
       <span class="ambient-line line-b"></span>
-      <span class="ambient-stamp">ETHAN LAB<br />FUTURE 2026</span>
+      <span class="ambient-node node-one"></span>
+      <span class="ambient-node node-two"></span>
+      <span class="ambient-node node-three"></span>
+      <span class="ambient-node node-four"></span>
     </div>
+
+    <transition name="welcome">
+      <section v-if="welcomeVisible" class="welcome-portal" aria-label="欢迎进入个人博客" @click.stop @touchstart.stop>
+        <div class="portal-grid" aria-hidden="true"></div>
+        <div class="portal-core" aria-hidden="true">
+          <span class="portal-ring ring-a"></span>
+          <span class="portal-ring ring-b"></span>
+          <span class="portal-ring ring-c"></span>
+          <span class="portal-beam beam-a"></span>
+          <span class="portal-beam beam-b"></span>
+          <span class="portal-beam beam-c"></span>
+          <span class="portal-node node-a"></span>
+          <span class="portal-node node-b"></span>
+          <span class="portal-node node-c"></span>
+        </div>
+        <div class="welcome-copy">
+          <span class="welcome-code">{{ welcomeCopy.code }}</span>
+          <h1>{{ welcomeCopy.title }}</h1>
+          <p>{{ welcomeCopy.desc }}</p>
+          <div class="welcome-progress" aria-hidden="true"><span></span></div>
+          <button class="welcome-enter" type="button" @click="enterWelcome">
+            <span>{{ welcomeCopy.action }}</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+          </button>
+        </div>
+        <button class="welcome-skip" type="button" @click="enterWelcome">SKIP</button>
+      </section>
+    </transition>
+
+    <transition name="time-gate">
+      <section v-if="showTimeGate" class="time-gate-overlay" @click.self="closeTimeGate" @touchstart.stop>
+        <div class="time-gate-panel">
+          <button class="time-gate-close" type="button" @click="closeTimeGate" :aria-label="timeGateCopy.close">×</button>
+          <div class="time-gate-orbit" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="time-gate-copy">
+            <span class="time-gate-code">{{ timeGateCopy.code }}</span>
+            <h2>{{ timeGateCopy.title }}</h2>
+            <p>{{ timeGateCopy.desc }}</p>
+            <div class="time-gate-path">
+              <span v-for="item in timeGateCopy.nodes" :key="item">{{ item }}</span>
+            </div>
+            <button class="time-gate-action" type="button" @click="enterTimeGate">
+              {{ timeGateCopy.action }}
+            </button>
+          </div>
+        </div>
+      </section>
+    </transition>
 
     <!-- 特效容器 -->
     <div class="candy-container" aria-hidden="true">
@@ -30,21 +87,29 @@
     <!-- 顶部固定导航 -->
     <header class="souta-nav" @click.stop @touchstart.stop>
       <nav class="souta-nav-inner" @click.stop @touchstart.stop>
-        <router-link to="/" class="nav-brand" aria-label="Ethan Future Lab">
+        <router-link to="/" class="nav-brand" aria-label="Ethan Nexus">
           <strong>Ethan</strong>
-          <span>Future Lab</span>
+          <span>Nexus</span>
         </router-link>
 
-        <router-link
-          v-for="link in navLinks"
-          :key="link.path"
-          :to="link.path"
-          class="nav-item"
-          :class="{ active: isActive(link.path) }"
-        >
-          <span class="nav-icon" aria-hidden="true">{{ link.icon }}</span>
-          <span>{{ link.name }}</span>
-        </router-link>
+        <div class="nav-links" aria-label="Primary navigation">
+          <router-link
+            v-for="link in navLinks"
+            :key="link.path"
+            :to="link.path"
+            class="nav-item"
+            :class="{ active: isActive(link.path) }"
+          >
+            <span class="nav-icon" aria-hidden="true">{{ link.icon }}</span>
+            <span>{{ link.name }}</span>
+          </router-link>
+        </div>
+
+        <div class="nav-tools" aria-label="Site utilities">
+          <button class="nav-tool" type="button" :title="languageTitle" @click="toggleLanguage">{{ languageLabel }}</button>
+          <button class="nav-tool" type="button" :title="themeTitle" @click="toggleTheme">{{ themeGlyph }}</button>
+          <a class="nav-tool" :href="rssUrl" target="_blank" rel="noopener" title="RSS 订阅">RSS</a>
+        </div>
       </nav>
     </header>
 
@@ -75,12 +140,17 @@
           </router-link>
         </template>
       </div>
+      <div class="future-rail-links">
+        <button type="button" @click="openTimeGate('past')">{{ railCopy.past }}</button>
+        <button type="button" @click="openTimeGate('future')">{{ railCopy.future }}</button>
+        <a :href="rssUrl" target="_blank" rel="noopener">{{ railCopy.rss }}</a>
+      </div>
     </footer>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, provide, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router'
 import { useUserStore } from './stores/user'
@@ -89,6 +159,111 @@ import { isStaticMode } from './config/site.config'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const pointer = ref({ x: '50vw', y: '40vh' })
+const language = ref(localStorage.getItem('ethan-language') || 'zh')
+const themeMode = ref(localStorage.getItem('ethan-theme') || 'dark')
+const showWelcome = ref(false)
+const showTimeGate = ref(false)
+const timeGateMode = ref('future')
+let welcomeTimer = null
+
+provide('siteLanguage', language)
+
+const pointerStyle = computed(() => ({
+  '--cursor-x': pointer.value.x,
+  '--cursor-y': pointer.value.y,
+}))
+
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
+const rssUrl = computed(() => `${baseUrl || ''}/rss.xml`)
+
+const navText = {
+  zh: [
+    { name: '首页', path: '/', icon: '⌂' },
+    { name: '文章', path: '/posts', icon: '☷' },
+    { name: '项目', path: '/projects', icon: '◇' },
+    { name: '友链', path: '/friends', icon: '∞' },
+    { name: '留言板', path: '/message', icon: '✎' },
+    { name: '关于', path: '/about', icon: '○' },
+  ],
+  en: [
+    { name: 'Home', path: '/', icon: '⌂' },
+    { name: 'Posts', path: '/posts', icon: '☷' },
+    { name: 'Projects', path: '/projects', icon: '◇' },
+    { name: 'Friends', path: '/friends', icon: '∞' },
+    { name: 'Board', path: '/message', icon: '✎' },
+    { name: 'About', path: '/about', icon: '○' },
+  ],
+}
+
+const navLinks = computed(() => navText[language.value] || navText.zh)
+const languageLabel = computed(() => (language.value === 'zh' ? 'EN' : '中'))
+const languageTitle = computed(() => (language.value === 'zh' ? 'Switch to English' : '切换到中文'))
+const themeGlyph = computed(() => (themeMode.value === 'dark' ? 'LOW' : 'DEEP'))
+const themeTitle = computed(() => (themeMode.value === 'dark' ? '切换到柔和深空模式' : '切换到高能深空模式'))
+const welcomeVisible = computed(() => showWelcome.value && route.path === '/')
+const welcomeCopy = computed(() => language.value === 'zh'
+  ? {
+      code: '个人博客 / 正在启动',
+      title: '欢迎来到我的博客',
+      desc: '正在进入个人空间，接入文章、项目、生命轨迹与 AI 档案。',
+      action: '进入博客',
+    }
+  : {
+      code: 'Personal Blog / Starting',
+      title: 'Welcome to My Blog',
+      desc: 'Entering a personal space for articles, projects, timeline, and AI archive.',
+      action: 'Enter Blog',
+    })
+
+const railCopy = computed(() => language.value === 'zh'
+  ? { past: '开往过去', future: '开往未来', rss: 'RSS 订阅' }
+  : { past: 'Past Gate', future: 'Future Gate', rss: 'RSS' })
+
+const timeGateCopy = computed(() => {
+  const isPast = timeGateMode.value === 'past'
+  if (language.value === 'en') {
+    return isPast
+      ? {
+          code: 'TIME ROUTE / 2021-2024',
+          title: 'Past Learning Archive',
+          desc: 'Replaying the path from frontend basics, PHP and databases to backend languages and programming foundations.',
+          nodes: ['Frontend', 'PHP / DB', 'Python', 'C / C++'],
+          action: 'Open Archive',
+          route: '/posts',
+          close: 'Close time gate',
+        }
+      : {
+          code: 'TIME ROUTE / 2025-2026',
+          title: 'Future AI Route',
+          desc: 'Entering the AI-facing world: NLP, intelligent tools, project experiments, and the next build log.',
+          nodes: ['AI', 'NLP', 'Agents', 'Projects'],
+          action: 'Enter Projects',
+          route: '/projects',
+          close: 'Close time gate',
+        }
+  }
+
+  return isPast
+    ? {
+        code: 'TIME ROUTE / 2021-2024',
+        title: '开往过去：学习档案',
+        desc: '回放从前端、PHP、数据库，到 Python、C/C++ 与后端基础的成长轨迹，不再只是跳到文章列表。',
+        nodes: ['前端入门', 'PHP / 数据库', '后端语言', '阶段复盘'],
+        action: '查看学习档案',
+        route: '/posts',
+        close: '关闭时空航线',
+      }
+    : {
+        code: 'TIME ROUTE / 2025-2026',
+        title: '开往未来：AI 航线',
+        desc: '进入 AI / NLP、智能工具和项目实验的下一层世界，像进入新空间一样看作品与计划。',
+        nodes: ['AI', 'NLP', '智能工具', '项目实践'],
+        action: '进入未来项目',
+        route: '/projects',
+        close: '关闭时空航线',
+      }
+})
 
 const handleLogout = () => {
   if (!confirm('确定要退出登录吗？')) return
@@ -96,17 +271,15 @@ const handleLogout = () => {
   router.push('/login')
 }
 
+const trackPointer = (event) => {
+  pointer.value = {
+    x: `${event.clientX}px`,
+    y: `${event.clientY}px`,
+  }
+}
+
 const candies = ref([])
 let candyId = 0
-
-const navLinks = [
-  { name: '首页', path: '/', icon: '⌂' },
-  { name: '文章', path: '/posts', icon: '☷' },
-  { name: '项目', path: '/projects', icon: '◇' },
-  { name: '友链', path: '/friends', icon: '∞' },
-  { name: '留言板', path: '/message', icon: '✎' },
-  { name: '关于', path: '/about', icon: '○' },
-]
 
 const authNavLabel = computed(() => isStaticMode ? '账号说明' : '登录')
 
@@ -116,7 +289,42 @@ const isActive = (path) => {
 }
 
 // 光点特效配置
-const DUST_COLORS = ['#38f8ff', '#9b5cff', '#8df8c7', '#ffbd66']
+const DUST_COLORS = ['#38f8ff', '#7c3aed', '#7dd3fc', '#ffbd66', '#ff4fd8']
+
+const toggleLanguage = () => {
+  language.value = language.value === 'zh' ? 'en' : 'zh'
+}
+
+const toggleTheme = () => {
+  themeMode.value = themeMode.value === 'dark' ? 'light' : 'dark'
+}
+
+const applyTheme = () => {
+  document.documentElement.dataset.theme = themeMode.value
+}
+
+const enterWelcome = () => {
+  showWelcome.value = false
+  if (welcomeTimer) {
+    clearTimeout(welcomeTimer)
+    welcomeTimer = null
+  }
+}
+
+const openTimeGate = (mode) => {
+  timeGateMode.value = mode
+  showTimeGate.value = true
+}
+
+const closeTimeGate = () => {
+  showTimeGate.value = false
+}
+
+const enterTimeGate = () => {
+  const target = timeGateCopy.value.route
+  showTimeGate.value = false
+  router.push(target)
+}
 
 const dropCandy = (e) => {
   // 排除导航、按钮、链接、输入框等交互元素
@@ -175,7 +383,17 @@ const dropCandy = (e) => {
   }, 1800)
 }
 
-onMounted(() => {
+const startWelcomeIfHome = () => {
+  if (route.path !== '/') return
+  showWelcome.value = true
+  welcomeTimer = window.setTimeout(enterWelcome, 7600)
+}
+
+onMounted(async () => {
+  applyTheme()
+  await router.isReady()
+  startWelcomeIfHome()
+
   setTimeout(() => {
     dropCandy({
       clientX: window.innerWidth / 2,
@@ -183,6 +401,25 @@ onMounted(() => {
       target: { closest: () => null }
     })
   }, 650)
+})
+
+watch(language, (value) => {
+  localStorage.setItem('ethan-language', value)
+})
+
+watch(themeMode, (value) => {
+  localStorage.setItem('ethan-theme', value)
+  applyTheme()
+}, { immediate: true })
+
+watch(() => route.path, (path) => {
+  if (path !== '/' && showWelcome.value) {
+    enterWelcome()
+  }
+})
+
+onUnmounted(() => {
+  if (welcomeTimer) clearTimeout(welcomeTimer)
 })
 </script>
 
@@ -195,12 +432,283 @@ onMounted(() => {
   overflow-x: hidden;
 }
 
+.cursor-aura {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  width: 360px;
+  height: 360px;
+  pointer-events: none;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(56, 248, 255, 0.18), rgba(124, 58, 237, 0.08) 38%, transparent 68%);
+  filter: blur(18px);
+  opacity: 0.72;
+  mix-blend-mode: screen;
+  transform: translate3d(calc(var(--cursor-x, 50vw) - 180px), calc(var(--cursor-y, 40vh) - 180px), 0);
+  transition: transform 0.12s linear, opacity 0.2s;
+}
+
+.welcome-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 28px;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(56, 248, 255, 0.22), transparent 30%),
+    radial-gradient(circle at 50% 48%, rgba(124, 58, 237, 0.22), transparent 52%),
+    linear-gradient(135deg, rgba(3, 7, 18, 0.98), rgba(6, 13, 34, 0.96));
+}
+
+.portal-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(125, 211, 252, 0.05) 1px, transparent 1px) 0 0 / 72px 72px,
+    linear-gradient(0deg, rgba(125, 211, 252, 0.04) 1px, transparent 1px) 0 0 / 72px 72px,
+    repeating-linear-gradient(115deg, transparent 0 12px, rgba(255, 255, 255, 0.025) 12px 13px);
+  mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 70%);
+  animation: portalGrid 7s linear infinite;
+}
+
+.portal-core {
+  position: absolute;
+  width: min(70vw, 680px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  filter: drop-shadow(0 0 34px rgba(56, 189, 248, 0.18));
+}
+
+.portal-ring {
+  position: absolute;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 211, 252, 0.32);
+  box-shadow: inset 0 0 34px rgba(56, 189, 248, 0.08), 0 0 34px rgba(56, 189, 248, 0.12);
+}
+
+.ring-a {
+  inset: 4%;
+  animation: portalSpin 15s linear infinite;
+}
+
+.ring-b {
+  inset: 16%;
+  border-style: dashed;
+  border-color: rgba(167, 139, 250, 0.42);
+  animation: portalSpin 9s linear infinite reverse;
+}
+
+.ring-c {
+  inset: 29%;
+  border-color: rgba(255, 255, 255, 0.16);
+  animation: portalPulse 2.8s ease-in-out infinite;
+}
+
+.portal-beam {
+  position: absolute;
+  width: 58%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.84), rgba(167, 139, 250, 0.72), transparent);
+  transform-origin: center;
+  filter: drop-shadow(0 0 14px rgba(56, 248, 255, 0.55));
+}
+
+.beam-a { transform: rotate(16deg); animation: beamSweep 4.6s ease-in-out infinite; }
+.beam-b { transform: rotate(104deg); animation: beamSweep 5.4s ease-in-out 0.7s infinite reverse; }
+.beam-c { transform: rotate(-38deg); animation: beamSweep 6s ease-in-out 1.1s infinite; }
+
+.portal-node {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #e0f7ff;
+  box-shadow: 0 0 18px rgba(56, 248, 255, 0.8);
+}
+
+.node-a { transform: translate(190px, -124px); animation: nodeFloat 4s ease-in-out infinite; }
+.node-b { transform: translate(-178px, 104px); animation: nodeFloat 5s ease-in-out 0.5s infinite reverse; }
+.node-c { transform: translate(28px, 218px); animation: nodeFloat 4.7s ease-in-out 1s infinite; }
+
+.welcome-copy {
+  position: relative;
+  z-index: 1;
+  width: min(680px, 100%);
+  text-align: center;
+  padding: clamp(28px, 5vw, 48px);
+}
+
+.welcome-code {
+  display: inline-flex;
+  margin-bottom: 18px;
+  color: rgba(191, 219, 254, 0.72);
+  font: 800 11px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.2em;
+}
+
+.welcome-copy h1 {
+  margin: 0;
+  color: transparent;
+  background: linear-gradient(90deg, #ffffff, #38f8ff 42%, #a78bfa 82%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-size: clamp(2.35rem, 7.2vw, 5.9rem);
+  line-height: 0.98;
+  font-weight: 950;
+  word-break: keep-all;
+  overflow-wrap: normal;
+  text-shadow: 0 0 34px rgba(56, 248, 255, 0.1);
+}
+
+.welcome-copy p {
+  max-width: 560px;
+  margin: 22px auto 0;
+  color: rgba(226, 239, 255, 0.76);
+  font-size: clamp(0.96rem, 2vw, 1.12rem);
+  line-height: 1.9;
+}
+
+.welcome-progress {
+  width: min(440px, 82%);
+  height: 2px;
+  margin: 28px auto 26px;
+  overflow: hidden;
+  background: rgba(125, 211, 252, 0.15);
+}
+
+.welcome-progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #38f8ff, #a78bfa, #ffffff);
+  transform-origin: left;
+  animation: portalLoad 7.2s var(--ease-out) forwards;
+}
+
+.welcome-enter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 1px solid rgba(125, 211, 252, 0.52);
+  border-radius: 8px;
+  background: rgba(8, 14, 27, 0.58);
+  color: #f8fbff;
+  font-weight: 850;
+  cursor: pointer;
+  box-shadow: 0 18px 44px rgba(56, 248, 255, 0.13);
+  transition: transform 0.22s var(--ease-out), border-color 0.22s, background 0.22s;
+}
+
+.welcome-enter svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.welcome-enter:hover {
+  transform: translateY(-2px);
+  border-color: #38f8ff;
+  background: rgba(56, 248, 255, 0.12);
+}
+
+.welcome-skip {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 2;
+  padding: 8px 10px;
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  border-radius: 8px;
+  background: rgba(8, 14, 27, 0.42);
+  color: rgba(226, 239, 255, 0.66);
+  font: 800 11px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.16em;
+  cursor: pointer;
+}
+
+.welcome-enter-active,
+.welcome-leave-active {
+  transition: opacity 0.46s var(--ease-out), filter 0.46s var(--ease-out);
+}
+
+.welcome-enter-from,
+.welcome-leave-to {
+  opacity: 0;
+  filter: blur(10px);
+}
+
+@keyframes portalGrid {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(72px, 72px, 0); }
+}
+
+@keyframes portalSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes portalPulse {
+  0%, 100% { opacity: 0.34; transform: scale(0.94); }
+  50% { opacity: 0.78; transform: scale(1.02); }
+}
+
+@keyframes beamSweep {
+  0%, 100% { opacity: 0.2; scale: 0.82 1; }
+  50% { opacity: 0.82; scale: 1.12 1; }
+}
+
+@keyframes nodeFloat {
+  0%, 100% { opacity: 0.54; filter: blur(0); }
+  50% { opacity: 1; filter: blur(0.4px); }
+}
+
+@keyframes portalLoad {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
 .ambient-layer {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  background:
+    linear-gradient(35deg, transparent 0 43%, rgba(125, 211, 252, 0.055) 43.5% 44%, transparent 44.5% 100%) 0 0 / 260px 260px,
+    linear-gradient(145deg, transparent 0 58%, rgba(167, 139, 250, 0.05) 58.5% 59%, transparent 59.5% 100%) 80px 40px / 300px 300px,
+    radial-gradient(circle, rgba(238, 247, 255, 0.32) 0 1px, transparent 1.6px) 0 0 / 138px 138px;
+  opacity: 0.82;
+}
+
+.ambient-layer::before,
+.ambient-layer::after {
+  content: '';
+  position: absolute;
+  inset: 9% 5%;
+  border: 1px solid rgba(126, 238, 255, 0.08);
+  border-radius: 18px;
+  transform: skewY(-4deg);
+  animation: frameBreath 7s ease-in-out infinite;
+}
+
+.ambient-layer::after {
+  inset: auto 8% 11% 12%;
+  height: 140px;
+  border-color: rgba(255, 189, 102, 0.1);
+  transform: skewY(3deg);
+  animation-delay: 1.4s;
 }
 
 .ambient-line {
@@ -229,26 +737,189 @@ onMounted(() => {
   animation: lineDrift 9s ease-in-out 0.8s infinite reverse;
 }
 
-.ambient-stamp {
-  position: absolute;
-  top: 18%;
-  right: 4.5%;
-  padding: 12px 9px;
-  border: 1px solid rgba(56, 248, 255, 0.32);
-  border-radius: 8px;
-  color: rgba(199, 251, 255, 0.64);
-  font-family: 'SF Mono', 'Consolas', monospace;
-  font-size: 11px;
-  line-height: 1.55;
-  writing-mode: vertical-rl;
-  letter-spacing: 1.5px;
-  background: rgba(8, 14, 27, 0.45);
-  box-shadow: 0 0 28px rgba(56, 248, 255, 0.08);
-}
-
 @keyframes lineDrift {
   0%, 100% { opacity: 0.35; transform: translateY(0) rotate(var(--r, -7deg)); }
   50% { opacity: 0.75; transform: translateY(12px) rotate(var(--r, -7deg)); }
+}
+
+.ambient-node {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(226, 247, 255, 0.9);
+  box-shadow: 0 0 18px rgba(56, 248, 255, 0.66), 0 0 34px rgba(167, 139, 250, 0.16);
+  animation: nodeSignal 6.4s ease-in-out infinite;
+}
+
+.node-one { left: 14%; top: 26%; }
+.node-two { right: 18%; top: 32%; animation-delay: 1.1s; }
+.node-three { left: 24%; bottom: 19%; animation-delay: 2.2s; }
+.node-four { right: 28%; bottom: 23%; animation-delay: 3.3s; }
+
+@keyframes frameBreath {
+  0%, 100% { opacity: 0.3; transform: translateY(0) skewY(-4deg); }
+  50% { opacity: 0.72; transform: translateY(10px) skewY(-4deg); }
+}
+
+@keyframes nodeSignal {
+  0%, 100% { opacity: 0.35; transform: scale(0.86); }
+  45% { opacity: 1; transform: scale(1.12); }
+}
+
+.time-gate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(56, 248, 255, 0.14), transparent 32%),
+    rgba(2, 6, 18, 0.76);
+  backdrop-filter: blur(16px);
+}
+
+.time-gate-panel {
+  position: relative;
+  width: min(760px, 100%);
+  min-height: 430px;
+  display: grid;
+  grid-template-columns: minmax(210px, 0.72fr) minmax(0, 1fr);
+  gap: clamp(18px, 4vw, 34px);
+  align-items: center;
+  overflow: hidden;
+  padding: clamp(24px, 5vw, 42px);
+  border: 1px solid rgba(125, 211, 252, 0.26);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(12, 24, 46, 0.86), rgba(4, 8, 20, 0.88)),
+    repeating-linear-gradient(90deg, rgba(125, 211, 252, 0.055) 0 1px, transparent 1px 84px);
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.46), inset 0 0 90px rgba(56, 248, 255, 0.06);
+}
+
+.time-gate-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 2;
+  border: 0;
+  background: transparent;
+  color: rgba(226, 239, 255, 0.56);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.time-gate-orbit {
+  position: relative;
+  width: min(260px, 52vw);
+  aspect-ratio: 1;
+  justify-self: center;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 211, 252, 0.3);
+  box-shadow: inset 0 0 42px rgba(56, 248, 255, 0.08), 0 0 42px rgba(56, 248, 255, 0.1);
+}
+
+.time-gate-orbit::before,
+.time-gate-orbit::after {
+  content: '';
+  position: absolute;
+  inset: 16%;
+  border-radius: inherit;
+  border: 1px dashed rgba(167, 139, 250, 0.38);
+  animation: portalSpin 12s linear infinite;
+}
+
+.time-gate-orbit::after {
+  inset: 34%;
+  border-style: solid;
+  border-color: rgba(255, 189, 102, 0.28);
+  animation-duration: 7s;
+  animation-direction: reverse;
+}
+
+.time-gate-orbit span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 48%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(56, 248, 255, 0.9), transparent);
+  transform-origin: left center;
+  animation: portalSpin 4.6s linear infinite;
+}
+
+.time-gate-orbit span:nth-child(2) { animation-delay: -1.4s; opacity: 0.58; }
+.time-gate-orbit span:nth-child(3) { animation-delay: -2.8s; opacity: 0.34; }
+
+.time-gate-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.time-gate-code {
+  color: #7dd3fc;
+  font: 800 11px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.18em;
+}
+
+.time-gate-copy h2 {
+  margin: 16px 0 12px;
+  color: #f8fbff;
+  font-size: clamp(2rem, 5vw, 4.2rem);
+  line-height: 1;
+}
+
+.time-gate-copy p {
+  margin: 0;
+  color: rgba(226, 239, 255, 0.7);
+  line-height: 1.85;
+}
+
+.time-gate-path {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.time-gate-path span {
+  padding: 7px 10px;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  border-radius: 999px;
+  background: rgba(8, 14, 27, 0.48);
+  color: rgba(226, 239, 255, 0.72);
+  font-size: 12px;
+}
+
+.time-gate-action {
+  margin-top: 28px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid rgba(56, 248, 255, 0.54);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(56, 248, 255, 0.2), rgba(124, 58, 237, 0.22));
+  color: #f8fbff;
+  font-weight: 850;
+  cursor: pointer;
+  transition: transform 0.22s var(--ease-out), box-shadow 0.22s;
+}
+
+.time-gate-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(56, 248, 255, 0.16);
+}
+
+.time-gate-enter-active,
+.time-gate-leave-active {
+  transition: opacity 0.28s var(--ease-out), filter 0.28s var(--ease-out);
+}
+
+.time-gate-enter-from,
+.time-gate-leave-to {
+  opacity: 0;
+  filter: blur(8px);
 }
 
 /* 特效容器 */
@@ -308,6 +979,7 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   padding: 14px clamp(14px, 4vw, 44px);
+  pointer-events: none;
 }
 
 .souta-nav-inner {
@@ -316,16 +988,16 @@ onMounted(() => {
   gap: 6px;
   width: min(1280px, 100%);
   max-width: min(100%, 1280px);
-  padding: 8px;
-  border: 1px solid rgba(126, 238, 255, 0.24);
-  border-radius: 12px;
-  background:
-    linear-gradient(135deg, rgba(15, 24, 45, 0.62), rgba(8, 12, 24, 0.48));
-  backdrop-filter: blur(22px) saturate(1.25);
-  -webkit-backdrop-filter: blur(22px) saturate(1.25);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22), 0 0 34px rgba(56, 248, 255, 0.06);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  pointer-events: auto;
 }
 
 .nav-brand {
@@ -333,12 +1005,12 @@ onMounted(() => {
   z-index: 1;
   min-width: 170px;
   margin-right: auto;
-  padding: 7px 14px 7px 12px;
+  padding: 8px 13px 8px 0;
   display: inline-grid;
   gap: 2px;
-  border-right: 1px solid rgba(126, 238, 255, 0.18);
   color: var(--text);
   line-height: 1.05;
+  text-shadow: 0 0 18px rgba(56, 248, 255, 0.2), 0 2px 12px rgba(0, 0, 0, 0.65);
 }
 
 .nav-brand strong {
@@ -357,13 +1029,36 @@ onMounted(() => {
   text-transform: uppercase;
 }
 
+.nav-links {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  min-width: 0;
+}
+
 .souta-nav-inner::before {
   content: '';
   position: absolute;
-  inset: 1px;
-  border-radius: inherit;
-  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.12), transparent);
-  opacity: 0.65;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.22), rgba(124, 58, 237, 0.18), transparent);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.souta-nav-inner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  left: -140px;
+  background: linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.24), transparent);
+  animation: navSweep 6.2s var(--ease-out) infinite;
   pointer-events: none;
 }
 
@@ -373,16 +1068,17 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 15px;
+  padding: 8px 13px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
   color: var(--text-light, #666);
-  border-radius: 999px;
-  transition: color 0.22s, background 0.22s, transform 0.22s var(--ease-out);
+  border-radius: 0;
+  transition: color 0.22s, text-shadow 0.22s, transform 0.22s var(--ease-out);
   cursor: pointer;
   user-select: none;
   text-decoration: none;
   white-space: nowrap;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.72);
 }
 
 .nav-icon {
@@ -394,19 +1090,68 @@ onMounted(() => {
 
 .nav-item:hover {
   color: var(--accent-soft);
-  background: rgba(56, 248, 255, 0.1);
   transform: translateY(-1px);
+  text-shadow: 0 0 18px rgba(56, 248, 255, 0.52), 0 2px 12px rgba(0, 0, 0, 0.72);
 }
 
 .nav-item.active {
-  background: linear-gradient(135deg, rgba(56, 248, 255, 0.22), rgba(155, 92, 255, 0.24));
   color: #ffffff;
-  box-shadow: 0 10px 28px rgba(56, 248, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  text-shadow: 0 0 20px rgba(56, 248, 255, 0.62), 0 2px 12px rgba(0, 0, 0, 0.72);
+}
+
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 2px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 12px rgba(56, 248, 255, 0.6);
 }
 
 .nav-item.active .nav-icon {
   color: var(--accent-soft);
   opacity: 1;
+}
+
+.nav-tools {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 6px;
+}
+
+.nav-tool {
+  min-width: 34px;
+  height: 32px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 8px;
+  border: 1px solid rgba(125, 211, 252, 0.22);
+  border-radius: 8px;
+  background: rgba(5, 8, 22, 0.22);
+  color: rgba(226, 239, 255, 0.76);
+  font: 800 10px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.22s var(--ease-out), border-color 0.22s, color 0.22s, background 0.22s;
+}
+
+.nav-tool:hover {
+  transform: translateY(-1px);
+  border-color: rgba(56, 248, 255, 0.54);
+  color: #ffffff;
+  background: rgba(56, 248, 255, 0.08);
+}
+
+@keyframes navSweep {
+  0% { transform: translateX(0); opacity: 0; }
+  12% { opacity: 1; }
+  48%, 100% { transform: translateX(1420px); opacity: 0; }
 }
 
 /* 写文章按钮高亮 */
@@ -486,6 +1231,34 @@ onMounted(() => {
   opacity: 1;
 }
 
+.future-rail-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.future-rail-links a,
+.future-rail-links button {
+  color: rgba(226, 239, 255, 0.54);
+  border-bottom: 1px solid rgba(125, 211, 252, 0.2);
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, text-shadow 0.2s;
+}
+
+.future-rail-links a:hover,
+.future-rail-links button:hover {
+  color: #eaf7ff;
+  border-color: rgba(56, 248, 255, 0.58);
+  text-shadow: 0 0 16px rgba(56, 248, 255, 0.3);
+}
+
 .footer-admin-link {
   color: var(--text-lighter, #999);
   text-decoration: none;
@@ -535,11 +1308,8 @@ onMounted(() => {
   .souta-nav {
     padding: 10px 10px 8px;
     align-items: flex-start;
-    overflow-x: auto;
-    justify-content: flex-start;
-    scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 26px), transparent);
-    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 26px), transparent);
+    overflow: visible;
+    justify-content: center;
   }
 
   .souta-nav::-webkit-scrollbar {
@@ -547,18 +1317,22 @@ onMounted(() => {
   }
 
   .souta-nav-inner {
-    gap: 3px;
-    width: max-content;
-    max-width: none;
-    padding: 5px;
-    min-width: max-content;
-    border-radius: 10px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 6px;
+    column-gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 2px 0 0;
+    overflow: visible;
   }
 
   .nav-brand {
-    min-width: 104px;
-    margin-right: 2px;
-    padding: 6px 9px;
+    grid-column: 1;
+    min-width: 0;
+    margin-right: 0;
+    padding: 6px 0;
   }
 
   .nav-brand strong {
@@ -568,10 +1342,41 @@ onMounted(() => {
   .nav-brand span {
     font-size: 8px;
   }
+
+  .nav-links {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 4px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 0 8px;
+    scrollbar-width: none;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
   
   .nav-item {
+    flex: 0 0 auto;
     padding: 7px 9px;
     font-size: 12px;
+  }
+
+  .nav-tools {
+    grid-column: 2;
+    justify-self: end;
+    gap: 4px;
+    margin-left: 0;
+  }
+
+  .nav-tool {
+    min-width: 30px;
+    height: 30px;
+    padding: 0 7px;
   }
 
   .nav-icon {
@@ -579,30 +1384,53 @@ onMounted(() => {
   }
   
   .souta-main {
-    padding-top: 68px;
+    padding-top: 108px;
   }
 
-  .ambient-stamp {
-    display: none;
+  .portal-core {
+    width: min(104vw, 520px);
+  }
+
+  .welcome-copy {
+    padding: 24px 10px;
+  }
+
+  .time-gate-panel {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .time-gate-orbit {
+    width: min(220px, 60vw);
   }
 }
 
 /* 深色模式适配 */
 @media (prefers-color-scheme: dark) {
   .souta-nav-inner {
-    background: linear-gradient(135deg, rgba(15, 24, 45, 0.62), rgba(8, 12, 24, 0.48));
-    border-color: rgba(126, 238, 255, 0.24);
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22), 0 0 34px rgba(56, 248, 255, 0.06);
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
   }
   
   .nav-item:hover {
-    background: rgba(56, 248, 255, 0.1);
+    color: var(--accent-soft);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .candy,
   .ambient-line,
+  .portal-grid,
+  .portal-ring,
+  .portal-beam,
+  .portal-node,
+  .ambient-node,
+  .time-gate-orbit,
+  .time-gate-orbit::before,
+  .time-gate-orbit::after,
+  .time-gate-orbit span,
+  .welcome-progress span,
   .page-enter-active,
   .page-leave-active {
     animation: none !important;

@@ -8,6 +8,10 @@ export function addFriendLink(data) {
   return request({ url: '/friend/link/add', method: 'post', data })
 }
 
+export function applyFriendLink(data) {
+  return request({ url: '/friend/link/apply', method: 'post', data })
+}
+
 export function updateFriendLink(id, data) {
   return request({ url: `/friend/link/update/${id}`, method: 'put', data })
 }

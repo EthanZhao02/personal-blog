@@ -1,4 +1,4 @@
-/* Ethan Future Lab · 全局样式 */
+/* Ethan Nexus · 全局样式 */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=ZCOOL+XiaoWei&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
 
 *, *::before, *::after {
@@ -20,7 +20,7 @@
   --accent-dim: rgba(56, 248, 255, 0.12);
   --accent-soft: #c7fbff;
   --sage: #b16dff;
-  --ink-blue: #8df8c7;
+  --ink-blue: #7dd3fc;
   --violet: #9b5cff;
   --amber: #ffbd66;
   --primary: var(--accent);
@@ -38,6 +38,28 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+:root[data-theme="light"] {
+  --bg: #0b1020;
+  --bg-soft: #111a2d;
+  --paper: rgba(18, 28, 50, 0.7);
+  --paper-deep: rgba(14, 22, 42, 0.84);
+  --text: #f1f8ff;
+  --text-light: #bfd2ea;
+  --text-lighter: #7d91ad;
+  --accent: #7dd3fc;
+  --accent-dark: #38bdf8;
+  --accent-dim: rgba(125, 211, 252, 0.1);
+  --accent-soft: #e0f7ff;
+  --ink-blue: #9be8ff;
+  --violet: #a78bfa;
+  --card: rgba(13, 21, 39, 0.66);
+  --card-solid: #121d33;
+  --border: rgba(125, 211, 252, 0.16);
+  --border-strong: rgba(125, 211, 252, 0.3);
+  --shadow: 0 22px 60px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-hover: 0 30px 80px rgba(125, 211, 252, 0.12), 0 18px 50px rgba(0, 0, 0, 0.32);
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -47,7 +69,7 @@ body {
   background:
     linear-gradient(125deg, rgba(56, 248, 255, 0.13) 0%, transparent 28%),
     linear-gradient(235deg, rgba(155, 92, 255, 0.12) 0%, transparent 32%),
-    linear-gradient(180deg, rgba(141, 248, 199, 0.08) 0%, transparent 42%),
+    linear-gradient(180deg, rgba(125, 211, 252, 0.08) 0%, transparent 42%),
     linear-gradient(90deg, rgba(126, 238, 255, 0.06) 1px, transparent 1px) 0 0 / 68px 68px,
     linear-gradient(0deg, rgba(126, 238, 255, 0.045) 1px, transparent 1px) 0 0 / 68px 68px,
     repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 8px),
@@ -79,10 +101,12 @@ body::after {
   pointer-events: none;
   background-image:
     radial-gradient(circle, rgba(238, 247, 255, 0.34) 0 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(56, 248, 255, 0.2) 0 1px, transparent 1.5px);
-  background-size: 190px 190px, 270px 270px;
-  background-position: 23px 41px, 120px 90px;
-  opacity: 0.28;
+    radial-gradient(circle, rgba(56, 248, 255, 0.2) 0 1px, transparent 1.5px),
+    linear-gradient(36deg, transparent 0 48%, rgba(125, 211, 252, 0.065) 48.3% 48.7%, transparent 49% 100%),
+    linear-gradient(142deg, transparent 0 56%, rgba(167, 139, 250, 0.05) 56.3% 56.7%, transparent 57% 100%);
+  background-size: 190px 190px, 270px 270px, 260px 260px, 320px 320px;
+  background-position: 23px 41px, 120px 90px, 0 0, 70px 45px;
+  opacity: 0.34;
   animation: starDrift 18s linear infinite;
 }
 
@@ -592,7 +616,7 @@ textarea { resize: vertical; min-height: 100px; }
   .md-content { font-size: 14px; }
 }
 
-/* Phase 1 redesign: global future-lab interface language */
+/* Phase 1 redesign: global nexus interface language */
 .posts-page,
 .projects-page,
 .friends-page,
@@ -662,9 +686,9 @@ textarea { resize: vertical; min-height: 100px; }
   font: 700 11px/1 'SF Mono', 'Consolas', monospace !important;
   letter-spacing: 0.16em !important;
   padding: 7px 10px !important;
-  border: 1px solid rgba(141, 248, 199, 0.34) !important;
+  border: 1px solid rgba(125, 211, 252, 0.34) !important;
   border-radius: 999px !important;
-  background: rgba(141, 248, 199, 0.08) !important;
+  background: rgba(125, 211, 252, 0.08) !important;
 }
 
 .posts-title,
@@ -890,5 +914,633 @@ textarea { resize: vertical; min-height: 100px; }
   .message-list {
     grid-column: auto !important;
     grid-row: auto !important;
+  }
+}
+
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(125, 211, 252, 0.14), transparent 34%),
+    radial-gradient(circle at 88% 30%, rgba(167, 139, 250, 0.12), transparent 36%),
+    linear-gradient(90deg, rgba(125, 211, 252, 0.055) 1px, transparent 1px) 0 0 / 68px 68px,
+    linear-gradient(0deg, rgba(125, 211, 252, 0.04) 1px, transparent 1px) 0 0 / 68px 68px,
+    var(--bg);
+}
+
+:root[data-theme="light"] body::before {
+  background:
+    linear-gradient(115deg, rgba(7, 11, 23, 0.14), rgba(11, 19, 37, 0.58) 48%, rgba(125, 211, 252, 0.07)),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 4px);
+}
+
+:root[data-theme="light"] body::after {
+  opacity: 0.24;
+}
+
+/* Phase 2: unified future-tech motion for the real Vue pages */
+.posts-page,
+.projects-page,
+.friends-page,
+.message-page,
+.about-page,
+.article-page,
+.auth-page {
+  perspective: 1200px;
+}
+
+.posts-container,
+.projects-container,
+.friends-container,
+.message-container,
+.about-container {
+  width: min(1240px, calc(100% - 40px)) !important;
+  max-width: 1240px !important;
+}
+
+.page-header {
+  position: relative !important;
+  margin-bottom: 36px !important;
+  padding: clamp(24px, 4vw, 44px) !important;
+  border: 1px solid rgba(126, 238, 255, 0.24) !important;
+  border-bottom-color: rgba(126, 238, 255, 0.24) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at 84% 20%, rgba(56, 248, 255, 0.18), transparent 28%),
+    radial-gradient(circle at 12% 80%, rgba(255, 189, 102, 0.08), transparent 30%),
+    linear-gradient(135deg, rgba(12, 24, 46, 0.76), rgba(5, 8, 18, 0.62)) !important;
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.34), inset 0 0 70px rgba(56, 248, 255, 0.045) !important;
+  animation: cyberPageIn 0.66s var(--ease-out) both !important;
+}
+
+.page-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+.page-header::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 15px !important;
+  border: 1px solid rgba(126, 238, 255, 0.12) !important;
+  border-radius: 6px !important;
+  pointer-events: none !important;
+}
+
+.page-header::after {
+  content: 'FUTURE ARCHIVE' !important;
+  position: absolute !important;
+  right: 24px !important;
+  top: 22px !important;
+  color: rgba(125, 211, 252, 0.86) !important;
+  font: 800 10px/1 'SF Mono', 'Consolas', monospace !important;
+  letter-spacing: 0.16em !important;
+  padding: 7px 10px !important;
+  border: 1px solid rgba(125, 211, 252, 0.28) !important;
+  border-radius: 999px !important;
+  background: rgba(5, 8, 22, 0.42) !important;
+  box-shadow: 0 0 24px rgba(125, 211, 252, 0.1) !important;
+}
+
+.header-badge {
+  border-radius: 999px !important;
+  background: rgba(56, 248, 255, 0.08) !important;
+  box-shadow: inset 0 0 22px rgba(56, 248, 255, 0.04), 0 0 20px rgba(56, 248, 255, 0.08) !important;
+}
+
+.page-title {
+  font-size: clamp(2.45rem, 6vw, 5.2rem) !important;
+  line-height: 0.96 !important;
+  letter-spacing: 0 !important;
+  text-shadow: 0 0 34px rgba(56, 248, 255, 0.16) !important;
+}
+
+.page-desc {
+  max-width: 560px !important;
+  color: rgba(226, 239, 255, 0.62) !important;
+}
+
+.header-stats {
+  position: relative !important;
+  z-index: 1 !important;
+  padding: 14px 16px !important;
+  border: 1px solid rgba(126, 238, 255, 0.16) !important;
+  border-radius: 8px !important;
+  background: rgba(5, 8, 22, 0.42) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+.filter-panel,
+.apply-panel,
+.resume-panel,
+.auth-card,
+.article-main,
+.aside-card,
+.comment-form,
+.article-attachments,
+.project-cell,
+.friend-node,
+.article-card {
+  position: relative !important;
+  border-color: rgba(126, 238, 255, 0.18) !important;
+  border-radius: 8px !important;
+  background:
+    linear-gradient(135deg, rgba(15, 27, 50, 0.8), rgba(6, 10, 22, 0.68)),
+    rgba(8, 14, 27, 0.68) !important;
+  box-shadow: var(--shadow) !important;
+  backdrop-filter: blur(16px) saturate(1.18) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.18) !important;
+}
+
+.filter-panel,
+.apply-panel,
+.resume-panel,
+.auth-card,
+.article-main,
+.aside-card,
+.comment-form,
+.article-attachments,
+.project-cell,
+.friend-node {
+  overflow: hidden !important;
+}
+
+.filter-panel::before,
+.apply-panel::before,
+.resume-panel::before,
+.auth-card::before,
+.article-main::before,
+.aside-card::before,
+.comment-form::before,
+.article-attachments::before,
+.project-cell::before,
+.friend-node::before,
+.article-card::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background:
+    linear-gradient(120deg, transparent 0%, rgba(56, 248, 255, 0.09) 46%, rgba(125, 211, 252, 0.07) 50%, transparent 62%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 7px) !important;
+  opacity: 0.42 !important;
+  transform: translateX(-105%) !important;
+  transition: transform 0.8s var(--ease-out), opacity 0.25s !important;
+  mix-blend-mode: screen !important;
+}
+
+.filter-panel:hover::before,
+.apply-panel:hover::before,
+.resume-panel:hover::before,
+.auth-card:hover::before,
+.article-main:hover::before,
+.aside-card:hover::before,
+.comment-form:hover::before,
+.article-attachments:hover::before,
+.project-cell:hover::before,
+.friend-node:hover::before,
+.article-card:hover::before {
+  opacity: 0.72 !important;
+  transform: translateX(105%) !important;
+}
+
+.filter-panel > *,
+.apply-panel > *,
+.resume-panel > *,
+.auth-card > *,
+.article-main > *,
+.aside-card > *,
+.comment-form > *,
+.article-attachments > *,
+.project-cell > *,
+.friend-node > *,
+.article-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.article-card,
+.project-cell,
+.friend-node,
+.message-bubble,
+.connect-card,
+.tool-item,
+.hobby-card,
+.tag-pill {
+  transition: transform 0.25s var(--ease-out), border-color 0.25s, box-shadow 0.25s, background 0.25s !important;
+}
+
+.article-card:hover,
+.project-cell:hover,
+.friend-node:hover,
+.connect-card:hover,
+.tool-item:hover,
+.hobby-card:hover,
+.tag-pill:hover {
+  transform: translateY(-6px) !important;
+  border-color: rgba(56, 248, 255, 0.46) !important;
+  box-shadow: var(--shadow-hover) !important;
+}
+
+.article-card {
+  animation: cardMatrixIn 0.64s var(--ease-out) both !important;
+}
+
+.article-card:nth-child(2n),
+.project-cell:nth-child(2n),
+.friend-node:nth-child(2n) {
+  animation-delay: 70ms !important;
+}
+
+.article-card:nth-child(3n),
+.project-cell:nth-child(3n),
+.friend-node:nth-child(3n) {
+  animation-delay: 140ms !important;
+}
+
+.card-bg-fallback {
+  background:
+    radial-gradient(circle at 50% 35%, rgba(56, 248, 255, 0.18), transparent 36%),
+    linear-gradient(135deg, rgba(56, 248, 255, 0.08), rgba(155, 92, 255, 0.08)) !important;
+}
+
+.card-bg-fallback::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(56, 248, 255, 0.05) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(0deg, rgba(56, 248, 255, 0.035) 0 1px, transparent 1px 28px);
+  animation: gridSlide 9s linear infinite;
+}
+
+.card-read {
+  text-shadow: 0 0 14px rgba(56, 248, 255, 0.65) !important;
+}
+
+.article-main::after,
+.resume-panel::after,
+.auth-card::after,
+.project-cell::after,
+.friend-node::after {
+  content: '' !important;
+  position: absolute !important;
+  pointer-events: none !important;
+  inset: 10px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(126, 238, 255, 0.08) !important;
+}
+
+.project-cell .cell-icon,
+.friend-node .node-avatar,
+.sidebar-avatar,
+.about-avatar .avatar-wrapper {
+  filter: drop-shadow(0 0 16px rgba(56, 248, 255, 0.18));
+}
+
+.friend-node .node-avatar {
+  position: relative;
+  border-radius: 14px !important;
+}
+
+.friend-node .node-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border: 1px solid rgba(56, 248, 255, 0.26);
+  border-radius: 18px;
+  animation: nodeOrbit 4.8s linear infinite;
+}
+
+.message-bubble {
+  border-radius: 8px !important;
+  background:
+    linear-gradient(135deg, rgba(56, 248, 255, 0.08), rgba(255, 255, 255, 0.035)) !important;
+}
+
+.message-bubble:nth-child(2n) {
+  transform-origin: right center;
+}
+
+.send-btn,
+.btn-submit,
+.apply-btn,
+.action-btn,
+.btn-block {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.send-btn::after,
+.btn-submit::after,
+.apply-btn::after,
+.action-btn::after,
+.btn-block::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(110deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+  transform: translateX(-120%) !important;
+  transition: transform 0.52s var(--ease-out) !important;
+}
+
+.send-btn:hover::after,
+.btn-submit:hover::after,
+.apply-btn:hover::after,
+.action-btn:hover::after,
+.btn-block:hover::after {
+  transform: translateX(120%) !important;
+}
+
+.resume-panel {
+  max-width: 1060px !important;
+  margin: 0 auto !important;
+  border-radius: 8px !important;
+}
+
+.resume-sidebar {
+  position: relative !important;
+  background:
+    radial-gradient(circle at 50% 10%, rgba(56, 248, 255, 0.12), transparent 42%),
+    rgba(5, 8, 22, 0.24) !important;
+}
+
+.sidebar-avatar::before,
+.sidebar-avatar::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: -14px !important;
+  border: 1px solid rgba(56, 248, 255, 0.18) !important;
+  border-radius: 26px !important;
+  pointer-events: none !important;
+  animation: avatarOrbit 6s linear infinite !important;
+}
+
+.sidebar-avatar::after {
+  inset: -24px !important;
+  border-color: rgba(255, 189, 102, 0.13) !important;
+  animation-duration: 9s !important;
+  animation-direction: reverse !important;
+}
+
+.avatar-frame img,
+.avatar-placeholder {
+  animation: avatarSignal 5.8s ease-in-out infinite !important;
+}
+
+.skill-track {
+  position: relative !important;
+  height: 7px !important;
+  background: rgba(238, 247, 255, 0.055) !important;
+}
+
+.skill-bar {
+  position: relative !important;
+  animation: skillLoad 1.15s var(--ease-out) both !important;
+  box-shadow: 0 0 18px rgba(56, 248, 255, 0.3) !important;
+}
+
+.skill-bar::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: -3px;
+  width: 8px;
+  height: 15px;
+  border-radius: 999px;
+  background: #c7fbff;
+  box-shadow: 0 0 18px rgba(56, 248, 255, 0.72);
+}
+
+.auth-page {
+  align-items: center !important;
+  min-height: calc(100vh - 120px) !important;
+}
+
+.auth-card {
+  max-width: 500px !important;
+  animation: authBoot 0.7s var(--ease-out) both !important;
+}
+
+.auth-card .ornament {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 54px !important;
+  height: 54px !important;
+  margin-bottom: 14px !important;
+  border: 1px solid rgba(56, 248, 255, 0.28) !important;
+  border-radius: 14px !important;
+  color: var(--accent) !important;
+  background: rgba(56, 248, 255, 0.08) !important;
+  animation: authGlyph 5s linear infinite !important;
+}
+
+.auth-title {
+  background: linear-gradient(90deg, #fff, var(--accent), var(--ink-blue)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+.article-main {
+  animation: articleBoot 0.7s var(--ease-out) both !important;
+}
+
+.article-cover {
+  position: relative !important;
+  border: 1px solid rgba(126, 238, 255, 0.18) !important;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28) !important;
+}
+
+.article-cover img {
+  filter: saturate(1.04) contrast(1.08) !important;
+  transition: transform 0.9s var(--ease-out), filter 0.9s var(--ease-out) !important;
+}
+
+.article-cover:hover img {
+  transform: scale(1.035) !important;
+  filter: saturate(1.16) contrast(1.12) !important;
+}
+
+.article-body h1,
+.article-body h2,
+.article-body h3,
+.article-body h4,
+.md-content h1,
+.md-content h2,
+.md-content h3,
+.md-content h4 {
+  scroll-margin-top: 110px !important;
+}
+
+.md-content pre,
+.article-body pre {
+  border: 1px solid rgba(126, 238, 255, 0.16) !important;
+  background:
+    linear-gradient(180deg, rgba(56, 248, 255, 0.035), transparent 34%),
+    #050812 !important;
+}
+
+/* Phase 3: make route headers feel like open holographic bands, not boxed cards */
+.posts-page .page-header,
+.projects-page .page-header,
+.friends-page .page-header,
+.message-page .page-header,
+.about-page .page-header {
+  padding: clamp(20px, 4vw, 36px) 0 28px !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(126, 238, 255, 0.2) !important;
+  border-radius: 0 !important;
+  background:
+    radial-gradient(circle at 82% 16%, rgba(56, 248, 255, 0.13), transparent 28%),
+    linear-gradient(90deg, rgba(56, 248, 255, 0.08), transparent 60%) !important;
+  box-shadow: none !important;
+}
+
+.posts-page .page-header::before,
+.projects-page .page-header::before,
+.friends-page .page-header::before,
+.message-page .page-header::before,
+.about-page .page-header::before {
+  inset: auto 0 -1px 0 !important;
+  height: 1px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: linear-gradient(90deg, var(--accent), rgba(167, 139, 250, 0.35), transparent) !important;
+}
+
+.posts-page .page-header::after,
+.projects-page .page-header::after,
+.friends-page .page-header::after,
+.message-page .page-header::after,
+.about-page .page-header::after {
+  top: 12px !important;
+  right: 0 !important;
+  background: rgba(5, 8, 22, 0.22) !important;
+}
+
+@keyframes cyberPageIn {
+  from { opacity: 0; transform: translateY(18px) rotateX(2deg); filter: blur(6px); }
+  to { opacity: 1; transform: translateY(0) rotateX(0); filter: blur(0); }
+}
+
+@keyframes cardMatrixIn {
+  from { opacity: 0; transform: translateY(20px) rotateX(4deg); }
+  to { opacity: 1; transform: translateY(0) rotateX(0); }
+}
+
+@keyframes articleBoot {
+  from { opacity: 0; transform: translateY(20px); filter: blur(5px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes authBoot {
+  from { opacity: 0; transform: translateY(24px) scale(0.96) rotateX(5deg); filter: blur(8px); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotateX(0); filter: blur(0); }
+}
+
+@keyframes authGlyph {
+  0%, 100% { transform: rotate(0deg) scale(1); box-shadow: 0 0 18px rgba(56, 248, 255, 0.08); }
+  50% { transform: rotate(180deg) scale(1.06); box-shadow: 0 0 32px rgba(56, 248, 255, 0.22); }
+}
+
+@keyframes avatarOrbit {
+  from { transform: rotate(0deg) scale(1); }
+  to { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes avatarSignal {
+  0%, 100% { transform: translateY(0) scale(1); filter: saturate(1.02) contrast(1.02); }
+  50% { transform: translateY(-3px) scale(1.02); filter: saturate(1.14) contrast(1.08); }
+}
+
+@keyframes nodeOrbit {
+  from { transform: rotate(0deg); opacity: 0.38; }
+  to { transform: rotate(360deg); opacity: 0.38; }
+}
+
+@keyframes skillLoad {
+  from { transform: scaleX(0); transform-origin: left; }
+  to { transform: scaleX(1); transform-origin: left; }
+}
+
+@keyframes gridSlide {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(28px, 28px, 0); }
+}
+
+@media (max-width: 900px) {
+  .posts-container,
+  .projects-container,
+  .friends-container,
+  .message-container,
+  .about-container {
+    width: min(100% - 28px, 760px) !important;
+  }
+
+  .page-header {
+    padding: 24px !important;
+  }
+
+  .page-header::after {
+    position: relative !important;
+    display: inline-flex !important;
+    right: auto !important;
+    top: auto !important;
+    margin-top: 18px !important;
+  }
+
+  .header-stats {
+    overflow-x: auto !important;
+  }
+
+  .message-stream {
+    column-count: 1 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-title {
+    font-size: clamp(2.15rem, 12vw, 3.2rem) !important;
+  }
+
+  .project-cell,
+  .friend-node,
+  .auth-card {
+    border-radius: 8px !important;
+  }
+
+  .auth-card {
+    padding: 30px 22px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-header,
+  .article-card,
+  .article-main,
+  .auth-card,
+  .auth-card .ornament,
+  .sidebar-avatar::before,
+  .sidebar-avatar::after,
+  .avatar-frame img,
+  .avatar-placeholder,
+  .skill-bar,
+  .card-bg-fallback::after,
+  .friend-node .node-avatar::after {
+    animation: none !important;
+  }
+
+  .filter-panel::before,
+  .apply-panel::before,
+  .resume-panel::before,
+  .auth-card::before,
+  .article-main::before,
+  .aside-card::before,
+  .comment-form::before,
+  .article-attachments::before,
+  .project-cell::before,
+  .friend-node::before,
+  .article-card::before {
+    display: none !important;
   }
 }

@@ -7,9 +7,9 @@
 
         <!-- 面包屑 -->
         <div class="breadcrumb">
-          <router-link to="/">首页</router-link>
+          <router-link to="/">{{ ui.home }}</router-link>
           <span> / </span>
-          <router-link to="/posts">文章</router-link>
+          <router-link to="/posts">{{ ui.posts }}</router-link>
           <span> / </span>
           <span>{{ article.title }}</span>
         </div>
@@ -27,7 +27,7 @@
             <span class="meta-sep">·</span>
             <span class="meta-item">{{ formatDate(article.createTime) }}</span>
             <span class="meta-sep">·</span>
-            <span class="meta-item">{{ article.viewCount || 0 }} 阅读</span>
+            <span class="meta-item">{{ article.viewCount || 0 }} {{ ui.reads }}</span>
             <span class="meta-sep" v-if="article.categoryName">·</span>
             <router-link
               :to="`/category/${encodeURIComponent(article.categoryName)}`"
@@ -50,7 +50,7 @@
 
         <!-- 附件（修复下载） -->
         <div class="article-attachments" v-if="attachments.length > 0">
-          <p class="attach-title">附件</p>
+          <p class="attach-title">{{ ui.attachments }}</p>
           <div class="attach-list">
             <a
               v-for="(att, i) in attachments"
@@ -73,11 +73,11 @@
 
         <!-- 评论区 -->
         <section class="comments-section">
-          <h3 class="comments-title">评论</h3>
+          <h3 class="comments-title">{{ ui.comments }}</h3>
 
           <!-- Giscus 静态模式 -->
           <div v-if="isStaticMode" class="giscus-container">
-            <p class="giscus-hint">使用 GitHub 账号登录即可评论，留言会保存到仓库 Discussions 区。</p>
+            <p class="giscus-hint">{{ ui.giscusHint }}</p>
             <GiscusComments :term="`文章: ${article.title}`" mapping="specific" />
           </div>
 
@@ -85,20 +85,20 @@
           <template v-else>
             <!-- 发表评论 -->
             <div class="comment-form">
-              <h4 class="form-title">发布评论</h4>
+              <h4 class="form-title">{{ ui.publishComment }}</h4>
               <div class="form-row">
-                <input v-model="commentNickname" type="text" placeholder="昵称 *" class="form-input" maxlength="50" />
-                <input v-model="commentEmail" type="email" placeholder="邮箱 *" class="form-input" maxlength="100" />
+                <input v-model="commentNickname" type="text" :placeholder="ui.nickname" class="form-input" maxlength="50" />
+                <input v-model="commentEmail" type="email" :placeholder="ui.email" class="form-input" maxlength="100" />
               </div>
-              <input v-model="commentWebsite" type="url" placeholder="网站地址（选填）" class="form-input full-row" maxlength="200" />
-              <textarea v-model="commentContent" placeholder="说点什么...（需填写昵称和邮箱）" class="comment-textarea" rows="5"></textarea>
+              <input v-model="commentWebsite" type="url" :placeholder="ui.website" class="form-input full-row" maxlength="200" />
+              <textarea v-model="commentContent" :placeholder="ui.commentPlaceholder" class="comment-textarea" rows="5"></textarea>
               <div class="reply-notice" v-if="replyingTo">
-                回复 @{{ replyingTo }}
-                <button class="cancel-reply" @click="cancelReply">取消</button>
+                {{ ui.replying }} @{{ replyingTo }}
+                <button class="cancel-reply" @click="cancelReply">{{ ui.cancel }}</button>
               </div>
               <div class="form-footer">
                 <button class="btn-submit" @click="submitComment" :disabled="!canSubmit || submitting">
-                  {{ submitting ? '发送中...' : '发布评论' }}
+                  {{ submitting ? ui.submitting : ui.submitComment }}
                 </button>
               </div>
             </div>
@@ -116,7 +116,7 @@
             </div>
 
             <div class="no-comments" v-else>
-              <p>还没有评论，来抢沙发吧~</p>
+              <p>{{ ui.noComments }}</p>
             </div>
           </template>
         </section>
@@ -127,7 +127,7 @@
 
         <!-- 目录 -->
         <div class="aside-card toc-card" v-if="toc.length > 0">
-          <p class="aside-card-title">目录</p>
+          <p class="aside-card-title">{{ ui.toc }}</p>
           <nav class="toc-nav">
             <button
               v-for="item in toc"
@@ -142,7 +142,7 @@
 
         <!-- 关于 -->
         <div class="aside-card">
-          <p class="aside-card-title">关于我</p>
+          <p class="aside-card-title">{{ ui.aboutMe }}</p>
           <div class="about-brief">
             <div class="about-avatar">
               <div class="avatar-wrapper">
@@ -159,7 +159,7 @@
 
         <!-- 最新 -->
         <div class="aside-card">
-          <p class="aside-card-title">最新文章</p>
+          <p class="aside-card-title">{{ ui.recent }}</p>
           <div class="recent-list">
             <router-link
               v-for="a in recentArticles"
@@ -179,12 +179,12 @@
 
   <!-- 加载中 -->
   <div class="loading-page" v-else>
-    <span class="loading-text">加载中...</span>
+    <span class="loading-text">{{ ui.loading }}</span>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, inject, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getArticleDetail } from '../api/article'
 import { getCommentList, addComment, deleteComment as apiDeleteComment } from '../api/comment'
@@ -198,6 +198,73 @@ const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const isLoggedIn = computed(() => userStore.isLoggedIn)
+const siteLanguage = inject('siteLanguage', ref(localStorage.getItem('ethan-language') || 'zh'))
+
+const ui = computed(() => siteLanguage.value === 'en'
+  ? {
+      home: 'Home',
+      posts: 'Posts',
+      reads: 'reads',
+      attachments: 'Attachments',
+      comments: 'Comments',
+      giscusHint: 'Sign in with GitHub to comment. Messages are saved to the repository Discussions.',
+      publishComment: 'Post Comment',
+      nickname: 'Nickname *',
+      email: 'Email *',
+      website: 'Website (optional)',
+      commentPlaceholder: 'Say something... (nickname and email required)',
+      replying: 'Replying',
+      cancel: 'Cancel',
+      submitting: 'Sending...',
+      submitComment: 'Post Comment',
+      noComments: 'No comments yet. Be the first one.',
+      toc: 'Contents',
+      aboutMe: 'About Me',
+      recent: 'Recent Posts',
+      loading: 'Loading...',
+      invalidAttachment: 'Invalid attachment link',
+      nameEmailRequired: 'Please fill in nickname and email',
+      staticCommentSaved: 'Static deployment mode: the comment has been saved in this browser.',
+      commentSuccess: 'Comment posted.',
+      replySuccess: 'Reply posted.',
+      loginRequired: 'Commenting requires login. Go to login?',
+      commentFailed: 'Failed to post comment: ',
+      retry: 'please try again',
+      deleteConfirm: 'Delete this comment?',
+      deleteFailed: 'Failed to delete comment',
+    }
+  : {
+      home: '首页',
+      posts: '文章',
+      reads: '阅读',
+      attachments: '附件',
+      comments: '评论',
+      giscusHint: '使用 GitHub 账号登录即可评论，留言会保存到仓库 Discussions 区。',
+      publishComment: '发布评论',
+      nickname: '昵称 *',
+      email: '邮箱 *',
+      website: '网站地址（选填）',
+      commentPlaceholder: '说点什么...（需填写昵称和邮箱）',
+      replying: '回复',
+      cancel: '取消',
+      submitting: '发送中...',
+      submitComment: '发布评论',
+      noComments: '还没有评论，来抢沙发吧~',
+      toc: '目录',
+      aboutMe: '关于我',
+      recent: '最新文章',
+      loading: '加载中...',
+      invalidAttachment: '附件链接无效',
+      nameEmailRequired: '请填写昵称和邮箱',
+      staticCommentSaved: '当前是静态部署模式，评论已保存在本机浏览器。',
+      commentSuccess: '评论发表成功！',
+      replySuccess: '回复成功！',
+      loginRequired: '发表评论需要登录，是否前往登录？',
+      commentFailed: '发表评论失败：',
+      retry: '请重试',
+      deleteConfirm: '确定要删除这条评论吗？',
+      deleteFailed: '删除评论失败',
+    })
 
 // 文章数据
 const article = ref(null)
@@ -313,7 +380,7 @@ const downloadFile = async (attachment) => {
   try {
     const url = attachment.url
     if (!url) {
-      alert('附件链接无效')
+      alert(ui.value.invalidAttachment)
       return
     }
 
@@ -402,7 +469,7 @@ const countAll = (arr) => {
 
 const submitComment = async () => {
   if (!canSubmit.value) {
-    alert('请填写昵称和邮箱')
+    alert(ui.value.nameEmailRequired)
     return
   }
   
@@ -424,7 +491,7 @@ const submitComment = async () => {
     commentContent.value = ''
     useStaticComments()
     submitting.value = false
-    alert('当前是静态部署模式，评论已保存在本机浏览器。')
+    alert(ui.value.staticCommentSaved)
     return
   }
   try {
@@ -456,15 +523,15 @@ const submitComment = async () => {
     commentContent.value = '' // 提交后清空内容，避免重复发送
 
     await loadComments()
-    alert(parentId ? '回复成功！' : '评论发表成功！')
+    alert(parentId ? ui.value.replySuccess : ui.value.commentSuccess)
   } catch (e) {
     console.error('发表评论失败', e)
     if (e.response && e.response.status === 401) {
-      if (confirm('发表评论需要登录，是否前往登录？')) {
+      if (confirm(ui.value.loginRequired)) {
         router.push('/login')
       }
     } else {
-      alert('发表评论失败：' + (e.message || '请重试'))
+      alert(ui.value.commentFailed + (e.message || ui.value.retry))
     }
   } finally {
     submitting.value = false
@@ -472,14 +539,14 @@ const submitComment = async () => {
 }
 
 const deleteComment = async (id) => {
-  if (!confirm('确定要删除这条评论吗？')) return
+  if (!confirm(ui.value.deleteConfirm)) return
   
   try {
     await apiDeleteComment(id)
     await loadComments()
   } catch (e) {
     console.error('删除评论失败', e)
-    alert('删除评论失败')
+    alert(ui.value.deleteFailed)
   }
 }
 

@@ -7,35 +7,10 @@
     <div class="projects-container">
       <!-- 页面头部 -->
       <header class="page-header">
-        <div class="header-badge">PROJECTS</div>
-        <h1 class="page-title">项目矩阵</h1>
-        <p class="page-desc">产品 · 工具 · 实验 · 开源</p>
+        <div class="header-badge">{{ ui.badge }}</div>
+        <h1 class="page-title">{{ ui.title }}</h1>
+        <p class="page-desc">{{ ui.desc }}</p>
       </header>
-
-      <!-- 3D翻转项目卡片 -->
-      <section class="projects-3d-gallery">
-        <div class="project-card-3d" v-for="project in projects" :key="project.id">
-          <div class="card-inner">
-            <!-- 正面 -->
-            <div class="card-front">
-              <div class="project-icon">{{ project.icon || '◇' }}</div>
-              <h3 class="project-name">{{ project.name }}</h3>
-              <span class="project-status" :class="statusClass(project.status)">{{ project.status || 'PROJECT' }}</span>
-            </div>
-            <!-- 背面 -->
-            <div class="card-back">
-              <p class="project-desc">{{ project.description }}</p>
-              <div class="project-tech">
-                <span v-for="tech in project.techStack?.split(',')" :key="tech">{{ tech.trim() }}</span>
-              </div>
-              <div class="project-links">
-                <a v-if="project.url && project.url !== '#'" :href="project.url" target="_blank">访问项目</a>
-                <a v-if="project.githubUrl" :href="project.githubUrl" target="_blank">GitHub</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <!-- 项目矩阵 -->
       <main class="project-matrix">
@@ -71,24 +46,24 @@
             <div v-if="expandedId === (project.id || index)" class="cell-expanded">
               <div class="expanded-content">
                 <div class="expanded-section">
-                  <span class="section-label">概述</span>
+                  <span class="section-label">{{ ui.overview }}</span>
                   <p class="section-text">{{ project.description }}</p>
                 </div>
 
                 <div class="expanded-section" v-if="project.status">
-                  <span class="section-label">状态</span>
+                  <span class="section-label">{{ ui.status }}</span>
                   <span class="tech-tag" :class="{ 'status-active': project.status === '已上线' }">{{ project.status }}</span>
                 </div>
 
                 <div class="expanded-section" v-if="project.features?.length">
-                  <span class="section-label">核心功能</span>
+                  <span class="section-label">{{ ui.features }}</span>
                   <ul class="feature-list">
                     <li v-for="feature in project.features" :key="feature">{{ feature }}</li>
                   </ul>
                 </div>
 
                 <div class="expanded-section" v-if="project.techStack">
-                  <span class="section-label">技术栈</span>
+                  <span class="section-label">{{ ui.techStack }}</span>
                   <div class="tech-tags">
                     <span v-for="tech in project.techStack.split(', ')" :key="tech" class="tech-tag">{{ tech }}</span>
                   </div>
@@ -96,13 +71,13 @@
 
                 <div class="expanded-actions" v-if="project.url || project.githubUrl">
                   <a v-if="project.url && project.url !== '#'" :href="project.url" target="_blank" rel="noopener" class="action-btn primary">
-                    <span>访问项目</span>
+                    <span>{{ ui.visit }}</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M7 17l9.2-9.2M17 17V7H7"/>
                     </svg>
                   </a>
                   <a v-if="project.githubUrl" :href="project.githubUrl" target="_blank" rel="noopener" class="action-btn">
-                    <span>源代码</span>
+                    <span>{{ ui.source }}</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/>
                     </svg>
@@ -122,14 +97,14 @@
         <!-- 空状态 -->
         <div v-if="!loading && !projects.length" class="empty-state">
           <div class="empty-icon">◇</div>
-          <p>暂无项目</p>
-          <button v-if="userStore.isAdmin" class="add-project-btn" @click="openAdd">+ 添加项目</button>
+          <p>{{ ui.empty }}</p>
+          <button v-if="userStore.isAdmin" class="add-project-btn" @click="openAdd">+ {{ ui.addProject }}</button>
         </div>
       </main>
 
       <!-- 管理员添加按钮 -->
       <button v-if="userStore.isAdmin && !loading && projects.length" class="add-project-btn" @click="openAdd">
-        + 添加项目
+        + {{ ui.addProject }}
       </button>
 
       <!-- 表单弹窗 -->
@@ -171,12 +146,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, inject, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { getProjects, addProject, updateProject, deleteProject } from '../api/project'
 import { uploadImage } from '../api/upload'
 import CropDialog from '../components/CropDialog.vue'
+import { fallbackProjects } from '../config/site.config.js'
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/api\/?$/, '')
 const resolveUrl = (url) => {
@@ -197,6 +173,7 @@ const statusClass = (s) => {
 
 const route = useRoute()
 const userStore = useUserStore()
+const siteLanguage = inject('siteLanguage', ref(localStorage.getItem('ethan-language') || 'zh'))
 const expandedId = ref(null)
 const projects = ref([])
 const loading = ref(true)
@@ -206,6 +183,45 @@ const form = ref({ name: '', icon: '', color: '#38f8ff', tag: '', description: '
 const iconInput = ref(null)
 const showCrop = ref(false)
 const cropFile = ref(null)
+
+const ui = computed(() => siteLanguage.value === 'en'
+  ? {
+      badge: 'PROJECTS',
+      title: 'Project Matrix',
+      desc: 'Products · Tools · Experiments · Open Source',
+      overview: 'Overview',
+      status: 'Status',
+      features: 'Core Features',
+      techStack: 'Tech Stack',
+      visit: 'Visit Project',
+      source: 'Source Code',
+      empty: 'No projects yet',
+      addProject: 'Add Project',
+    }
+  : {
+      badge: 'PROJECTS',
+      title: '项目矩阵',
+      desc: '产品 · 工具 · 实验 · 开源',
+      overview: '概述',
+      status: '状态',
+      features: '核心功能',
+      techStack: '技术栈',
+      visit: '访问项目',
+      source: '源代码',
+      empty: '暂无项目',
+      addProject: '添加项目',
+    })
+
+const normalizeProjects = (list = []) => list.map(p => ({
+  ...p,
+  features: Array.isArray(p.features)
+    ? p.features
+    : (p.features ? String(p.features).split(/[,，]\s*/).filter(Boolean) : [])
+}))
+
+const useFallbackProjects = () => {
+  projects.value = normalizeProjects(fallbackProjects)
+}
 
 const triggerIconUpload = () => iconInput.value?.click()
 const onIconFilePicked = (e) => {
@@ -232,16 +248,13 @@ const loadProjects = async () => {
   try {
     const url = userStore.isAdmin ? '/project/all' : '/project/list'
     const res = await getProjects(url)
-    if (res.code === 200 || res.code === 0) {
-      projects.value = (res.data || []).map(p => ({
-        ...p,
-        features: p.features ? (typeof p.features === 'string' ? p.features.split(', ') : []) : []
-      }))
+    if ((res.code === 200 || res.code === 0) && res.data?.length) {
+      projects.value = normalizeProjects(res.data)
     } else {
-      projects.value = []
+      useFallbackProjects()
     }
   } catch (e) {
-    projects.value = []
+    useFallbackProjects()
   }
   loading.value = false
 }
@@ -480,9 +493,9 @@ onMounted(loadProjects)
 }
 
 .cell-status.status-live {
-  background: rgba(74, 222, 128, 0.15);
-  color: #4ade80;
-  border: 1px solid rgba(74, 222, 128, 0.3);
+  background: rgba(56, 189, 248, 0.14);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.32);
 }
 
 .cell-status.status-wip {
@@ -830,120 +843,5 @@ onMounted(loadProjects)
   .cell-collapsed {
     padding: 20px;
   }
-
-  .projects-3d-gallery {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* 3D翻转项目卡片 */
-.projects-3d-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-  margin-bottom: 60px;
-}
-
-.project-card-3d {
-  perspective: 1000px;
-  height: 280px;
-}
-
-.card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-}
-
-.project-card-3d:hover .card-inner {
-  transform: rotateY(180deg);
-}
-
-.card-front, .card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  border-radius: 16px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.card-front {
-  background: linear-gradient(135deg, rgba(12, 20, 35, 0.9), rgba(8, 12, 24, 0.95));
-  border: 1px solid rgba(56, 248, 255, 0.2);
-}
-
-.card-back {
-  background: linear-gradient(135deg, rgba(56, 248, 255, 0.1), rgba(155, 92, 255, 0.1));
-  border: 1px solid rgba(56, 248, 255, 0.3);
-  transform: rotateY(180deg);
-}
-
-.project-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.project-name {
-  font-size: 20px;
-  margin-bottom: 12px;
-  color: #fff;
-}
-
-.project-status {
-  font-size: 12px;
-  padding: 4px 12px;
-  border-radius: 12px;
-  background: rgba(56, 248, 255, 0.1);
-  color: #38f8ff;
-}
-
-.project-desc {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 16px;
-  text-align: center;
-}
-
-.project-tech {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-  justify-content: center;
-}
-
-.project-tech span {
-  font-size: 11px;
-  padding: 3px 8px;
-  background: rgba(56, 248, 255, 0.15);
-  border-radius: 4px;
-  color: #38f8ff;
-}
-
-.project-links {
-  display: flex;
-  gap: 12px;
-}
-
-.project-links a {
-  font-size: 13px;
-  padding: 6px 16px;
-  background: rgba(56, 248, 255, 0.2);
-  border-radius: 6px;
-  color: #38f8ff;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.project-links a:hover {
-  background: rgba(56, 248, 255, 0.4);
-  transform: translateY(-2px);
 }
 </style>

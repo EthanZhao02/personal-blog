@@ -10,12 +10,21 @@
         <!-- 编辑按钮 -->
         <button v-if="userStore.isAdmin" class="edit-resume-btn" @click="openEditor">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          编辑
+          {{ ui.edit }}
         </button>
 
         <!-- 左侧边栏：头像 + 基本信息 -->
         <aside class="resume-sidebar">
-          <div class="sidebar-avatar">
+          <div class="sidebar-avatar ai-core-avatar">
+            <span class="neural-ring neural-a" aria-hidden="true"></span>
+            <span class="neural-ring neural-b" aria-hidden="true"></span>
+            <span class="neural-ring neural-c" aria-hidden="true"></span>
+            <span class="avatar-laser laser-a" aria-hidden="true"></span>
+            <span class="avatar-laser laser-b" aria-hidden="true"></span>
+            <span class="avatar-laser laser-c" aria-hidden="true"></span>
+            <span class="neural-node node-a" aria-hidden="true"></span>
+            <span class="neural-node node-b" aria-hidden="true"></span>
+            <span class="neural-node node-c" aria-hidden="true"></span>
             <div class="avatar-frame">
               <img v-if="profile.avatar" :src="profile.avatar" :alt="profile.name" @error="onAvatarError" />
               <div v-else class="avatar-placeholder">{{ profile.name?.charAt(0) || '?' }}</div>
@@ -51,7 +60,7 @@
           <!-- Skills -->
           <section class="resume-block" v-if="skills.length">
             <div class="block-head">
-              <span class="block-tag">SKILLS</span>
+              <span class="block-tag">{{ ui.skills }}</span>
               <div class="block-line"></div>
             </div>
             <div class="block-body">
@@ -70,7 +79,7 @@
           <!-- Interests -->
           <section class="resume-block" v-if="interests.length">
             <div class="block-head">
-              <span class="block-tag">INTERESTS</span>
+              <span class="block-tag">{{ ui.interests }}</span>
               <div class="block-line"></div>
             </div>
             <div class="block-body">
@@ -83,7 +92,7 @@
           <!-- Hobbies -->
           <section class="resume-block" v-if="hobbies.length">
             <div class="block-head">
-              <span class="block-tag">HOBBIES</span>
+              <span class="block-tag">{{ ui.hobbies }}</span>
               <div class="block-line"></div>
             </div>
             <div class="block-body">
@@ -99,7 +108,7 @@
           <!-- Tools -->
           <section class="resume-block" v-if="tools.length">
             <div class="block-head">
-              <span class="block-tag">TOOLBELT</span>
+              <span class="block-tag">{{ ui.tools }}</span>
               <div class="block-line"></div>
             </div>
             <div class="block-body">
@@ -115,7 +124,7 @@
           <!-- Blog Story -->
           <section class="resume-block" v-if="profile.blogStory">
             <div class="block-head">
-              <span class="block-tag">BLOG STORY</span>
+              <span class="block-tag">{{ ui.blogStory }}</span>
               <div class="block-line"></div>
             </div>
             <div class="block-body">
@@ -126,7 +135,7 @@
           <!-- Name Origin -->
           <section class="resume-block" v-if="profile.nameOrigin">
             <div class="block-head">
-              <span class="block-tag">ABOUT THE NAME</span>
+              <span class="block-tag">{{ ui.nameOrigin }}</span>
               <div class="block-line"></div>
             </div>
             <div class="block-body">
@@ -137,7 +146,7 @@
           <!-- Connect -->
           <section class="resume-block" v-if="socials.length">
             <div class="block-head">
-              <span class="block-tag">CONNECT</span>
+              <span class="block-tag">{{ ui.connect }}</span>
               <div class="block-line"></div>
             </div>
             <div class="block-body">
@@ -227,7 +236,7 @@
           <button class="qr-close" @click="closeQRCode">×</button>
           <h4 class="qr-title">{{ currentQR?.name }}</h4>
           <img v-if="currentQR?.qrCodeUrl" :src="resolveAssetUrl(currentQR.qrCodeUrl)" :alt="currentQR?.name" class="qr-image" />
-          <p class="qr-tip">扫描二维码关注我</p>
+          <p class="qr-tip">{{ ui.qrTip }}</p>
         </div>
       </div>
     </div>
@@ -235,7 +244,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, inject, ref, onMounted } from 'vue'
 import siteConfig, { resolveAssetUrl } from '../config/site.config'
 import { useUserStore } from '../stores/user'
 import { getProfile, updateProfile } from '../api/profile'
@@ -247,6 +256,31 @@ const profile = ref({})
 const showEditor = ref(false)
 const saving = ref(false)
 const editForm = ref({})
+const siteLanguage = inject('siteLanguage', ref(localStorage.getItem('ethan-language') || 'zh'))
+
+const ui = computed(() => siteLanguage.value === 'en'
+  ? {
+      edit: 'Edit',
+      skills: 'SKILLS',
+      interests: 'INTERESTS',
+      hobbies: 'HOBBIES',
+      tools: 'TOOLBELT',
+      blogStory: 'BLOG STORY',
+      nameOrigin: 'ABOUT THE NAME',
+      connect: 'CONNECT',
+      qrTip: 'Scan the QR code to follow me',
+    }
+  : {
+      edit: '编辑',
+      skills: '技能矩阵',
+      interests: '兴趣方向',
+      hobbies: '生活爱好',
+      tools: '常用工具',
+      blogStory: '博客故事',
+      nameOrigin: '名字由来',
+      connect: '连接我',
+      qrTip: '扫描二维码关注我',
+    })
 
 const parseSkills = (raw) => {
   if (!raw) return []
@@ -441,18 +475,20 @@ const getSocialIcon = (icon) => {
   background-size: 60px 60px;
   mask-image: linear-gradient(to bottom, #000, transparent 80%);
 }
-.about-container { position: relative; z-index: 1; max-width: 920px; margin: 0 auto; }
+.about-container { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; }
 
 /* ======== 双栏简历面板 ======== */
 .resume-panel {
   position: relative;
   display: grid;
-  grid-template-columns: 280px 1fr;
-  background: linear-gradient(135deg, rgba(12, 20, 35, 0.88), rgba(8, 12, 24, 0.9));
+  grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
+  background:
+    linear-gradient(135deg, rgba(12, 20, 35, 0.88), rgba(8, 12, 24, 0.9)),
+    repeating-linear-gradient(90deg, rgba(125, 211, 252, 0.035) 0 1px, transparent 1px 96px);
   border: 1px solid rgba(56, 248, 255, 0.18);
-  border-radius: 16px;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.35), inset 0 0 90px rgba(56,248,255,0.035);
   animation: resumeIn 0.7s var(--ease-out) backwards;
 }
 
@@ -483,10 +519,29 @@ const getSocialIcon = (icon) => {
 .sidebar-avatar {
   position: relative; width: 90px; height: 90px; flex-shrink: 0;
 }
+.ai-core-avatar {
+  width: 154px;
+  height: 154px;
+  display: grid;
+  place-items: center;
+  margin: 10px 0 4px;
+  animation: coreLevitate 5.8s ease-in-out infinite;
+}
+.ai-core-avatar::before,
+.ai-core-avatar::after {
+  display: none !important;
+}
 .avatar-frame {
   width: 100%; height: 100%; border-radius: 18px; overflow: hidden;
   border: 2px solid rgba(56, 248, 255, 0.3);
   position: relative; z-index: 2;
+}
+.ai-core-avatar .avatar-frame {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border-color: rgba(125, 211, 252, 0.52);
+  box-shadow: 0 0 32px rgba(56, 248, 255, 0.16), inset 0 0 24px rgba(56, 248, 255, 0.08);
 }
 .avatar-frame img, .avatar-placeholder {
   width: 100%; height: 100%; object-fit: cover;
@@ -501,11 +556,77 @@ const getSocialIcon = (icon) => {
   background: conic-gradient(from 0deg, rgba(56,248,255,0) 0%, rgba(56,248,255,0.45) 25%, rgba(155,92,255,0.45) 75%, rgba(56,248,255,0) 100%);
   animation: glowSpin 6s linear infinite; opacity: 0.5;
 }
+.ai-core-avatar .avatar-glow {
+  inset: 23px;
+  border-radius: 50%;
+  opacity: 0.68;
+}
 .avatar-glow::before {
   content: ''; position: absolute; inset: 3px;
   background: rgba(8, 14, 27, 0.92); border-radius: 19px;
 }
+.ai-core-avatar .avatar-glow::before {
+  border-radius: 50%;
+}
+.neural-ring {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  border: 1px solid rgba(125, 211, 252, 0.28);
+}
+.neural-a {
+  inset: 0;
+  border-style: dashed;
+  animation: neuralSpin 12s linear infinite;
+}
+.neural-b {
+  inset: 14px;
+  border-color: rgba(167, 139, 250, 0.36);
+  animation: neuralSpin 8s linear infinite reverse;
+}
+.neural-c {
+  inset: 34px;
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 28px rgba(56, 248, 255, 0.08);
+  animation: corePulse 2.6s ease-in-out infinite;
+}
+.avatar-laser {
+  position: absolute;
+  width: 118px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.86), rgba(167, 139, 250, 0.72), transparent);
+  filter: drop-shadow(0 0 12px rgba(56, 248, 255, 0.52));
+  pointer-events: none;
+  transform-origin: center;
+}
+.laser-a { transform: rotate(15deg); animation: laserBreathe 3.8s ease-in-out infinite; }
+.laser-b { transform: rotate(101deg); animation: laserBreathe 4.6s ease-in-out 0.4s infinite reverse; }
+.laser-c { transform: rotate(-37deg); animation: laserBreathe 5.2s ease-in-out 0.8s infinite; }
+.neural-node {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #e0f7ff;
+  box-shadow: 0 0 16px rgba(56, 248, 255, 0.78);
+}
+.node-a { transform: translate(58px, -44px); }
+.node-b { transform: translate(-62px, 38px); background: #a78bfa; }
+.node-c { transform: translate(14px, 67px); background: #ffbd66; }
 @keyframes glowSpin { to { transform: rotate(360deg); } }
+@keyframes neuralSpin { to { transform: rotate(360deg); } }
+@keyframes corePulse {
+  0%, 100% { opacity: 0.42; transform: scale(0.94); }
+  50% { opacity: 0.86; transform: scale(1.04); }
+}
+@keyframes laserBreathe {
+  0%, 100% { opacity: 0.2; scale: 0.8 1; }
+  50% { opacity: 0.82; scale: 1.08 1; }
+}
+@keyframes coreLevitate {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
 
 .sidebar-name {
   font-size: 22px; font-weight: 700; color: #fff; margin: 0;
@@ -641,6 +762,15 @@ const getSocialIcon = (icon) => {
 .cc-handle { display: block; margin-top: 2px; font-size: 11px; color: rgba(255,255,255,0.35); }
 .cc-arrow { color: rgba(255,255,255,0.25); transition: color 0.2s; }
 .connect-card:hover .cc-arrow { color: var(--card-color, #38f8ff); }
+.qr-card::before {
+  content: 'SCAN';
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  color: rgba(226, 239, 255, 0.38);
+  font: 800 9px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.12em;
+}
 .placeholder-card { opacity: 0.45; cursor: default; }
 .placeholder-card:hover { transform: none; }
 
@@ -693,11 +823,20 @@ const getSocialIcon = (icon) => {
 
 /* ======== 二维码弹窗 ======== */
 .qr-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1001; }
-.qr-content { background: linear-gradient(135deg, rgba(17,27,49,0.95), rgba(8,14,27,0.95)); border: 1px solid rgba(56,248,255,0.3); border-radius: 16px; padding: 32px; text-align: center; position: relative; max-width: 320px; width: 100%; box-shadow: 0 0 40px rgba(56,248,255,0.2); }
+.qr-content { background: linear-gradient(135deg, rgba(17,27,49,0.95), rgba(8,14,27,0.95)); border: 1px solid rgba(56,248,255,0.3); border-radius: 10px; padding: 32px; text-align: center; position: relative; max-width: 360px; width: min(100%, 360px); box-shadow: 0 0 40px rgba(56,248,255,0.2); }
 .qr-close { position: absolute; top: 12px; right: 16px; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 24px; cursor: pointer; }
 .qr-close:hover { color: #fff; }
 .qr-title { font-size: 18px; font-weight: 600; color: #fff; margin: 0 0 20px; }
-.qr-image { width: 200px; height: 200px; border-radius: 8px; margin-bottom: 16px; }
+.qr-image {
+  width: min(260px, 74vw);
+  height: min(260px, 74vw);
+  object-fit: contain;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  padding: 10px;
+  background: #fff;
+  box-shadow: 0 18px 42px rgba(0,0,0,0.28);
+}
 .qr-tip { font-size: 14px; color: rgba(255,255,255,0.6); margin: 0; }
 
 /* ======== 响应式 ======== */

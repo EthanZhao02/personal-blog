@@ -38,17 +38,21 @@ const socials = [
   },
   {
     name: '抖音',
-    handle: 'ethan_zhao',
-    url: 'https://www.douyin.com/user/MS4wLjABAAAAx6yApvTwceHGRN1_mSCyc7PxcHwfO81IPbc39wWXJKFzUb5R19v4P9H7PLsEME6T?from_tab_name=main',
+    handle: '扫码关注',
+    url: '#douyin-qr',
     color: '#fe2c55',
     icon: 'douyin',
+    isQRCode: true,
+    qrCodeUrl: '/photos/douyin-qr.png',
   },
   {
     name: '小红书',
-    handle: 'Ethan Zhao',
-    url: 'https://www.xiaohongshu.com/user/profile/66effb0c000000001d032156',
+    handle: '扫码关注',
+    url: '#xiaohongshu-qr',
     color: '#ff2442',
     icon: 'xiaohongshu',
+    isQRCode: true,
+    qrCodeUrl: '/photos/xiaohongshu-qr.png',
   },
   {
     name: '稀土掘金',
@@ -93,7 +97,7 @@ const socials = [
     name: '邮箱',
     handle: 'ethan912yydegree@gmail.com',
     url: 'mailto:ethan912yydegree@gmail.com',
-    color: '#8df8c7',
+    color: '#7dd3fc',
     icon: 'email',
   },
   {
@@ -134,9 +138,9 @@ const tags = [
 const articles = [
   {
     id: 1,
-    title: 'Ethan Future Lab：把个人博客升级成作品集档案',
-    summary: '这次改版把首页从普通文章入口升级为面向复试、求职和长期成长记录的 Future Lab。',
-    content: `# Ethan Future Lab：把个人博客升级成作品集档案
+    title: 'Ethan Nexus：把个人博客升级成知识与项目档案',
+    summary: '这次改版把首页从普通文章入口升级为面向复试、求职和长期成长记录的个人技术枢纽。',
+    content: `# Ethan Nexus：把个人博客升级成知识与项目档案
 
 这个站点不只承担生活记录，更重要的是成为一个长期可访问的个人数字空间：展示项目、技术文章、学习路线、研究兴趣和成长时间线。
 
@@ -146,8 +150,8 @@ const articles = [
 
 ## 当前定位
 
-- AI / Web Developer / Knowledge System Builder
-- 关注智能学习工具、知识管理、Web 全栈实践
+- Web Developer / AI Learner / Knowledge System Builder
+- 关注 Web 全栈实践、智能学习工具和知识管理
 - 用项目和笔记记录持续成长
 
 ## 后续计划
@@ -226,8 +230,8 @@ database/init.sql 是初始化 MySQL 数据的脚本，包含默认管理员账�
 const projects = [
   {
     id: 1,
-    name: 'Ethan Future Lab',
-    description: '面向复试与求职展示的个人作品集博客，整合项目、文章、学习路线、研究兴趣和联系入口。',
+    name: 'Ethan Nexus',
+    description: '面向复试、求职和长期成长记录的个人技术博客，整合项目、文章、学习路线、研究兴趣和联系入口。',
     icon: '◇',
     tag: 'Portfolio',
     techStack: 'Vue3, Vite, Spring Boot, MySQL, GitHub Pages',
@@ -304,8 +308,8 @@ const researchInterests = [
 const timeline = [
   {
     time: '2026',
-    title: 'Future Lab 改版',
-    text: '把博客重构为作品集、学习档案与 AI 工程实践入口。',
+    title: 'Ethan Nexus 改版',
+    text: '把博客重构为作品集、学习档案与工程实践入口。',
   },
   {
     time: '2026',
@@ -354,8 +358,22 @@ const messages = [
     id: 1,
     nickname: 'Ethan',
     avatar,
-    content: '欢迎来到 Ethan Future Lab。静态部署模式下，留言区使用 GitHub Discussions 保存。',
+    content: '欢迎来到 Ethan Nexus。这里是一面便签墙，可以留下建议、问候或项目反馈。',
     createTime: '2026-07-03T10:00:00',
+  },
+  {
+    id: 2,
+    nickname: 'Future Visitor',
+    avatar: '',
+    content: '便签会像一张张小纸片贴在这里；后端在线时会进入真实留言数据。',
+    createTime: '2026-07-04T21:20:00',
+  },
+  {
+    id: 3,
+    nickname: 'AI Channel',
+    avatar: '',
+    content: '友链申请现在可以直接去友链页提交，不用再绕到留言板。',
+    createTime: '2026-07-05T09:30:00',
   },
 ]
 
@@ -378,9 +396,9 @@ export const siteConfig = {
   name: 'Ethan Zhao',
   shortName: 'Ethan',
   avatar,
-  role: 'AI / Web Developer / Knowledge System Builder',
-  subtitle: 'Building intelligent tools for learning, creation, and the future.',
-  positioning: '一个年轻开发者 / AI 学习者 / 技术创作者的数字空间',
+  role: 'Web Developer / AI Learner / Knowledge System Builder',
+  subtitle: 'Recording projects, notes, and learning routes in one personal archive.',
+  positioning: '一个记录 Web、AI 学习与长期成长的个人技术博客',
   photos,
   socials,
   projects,
@@ -389,8 +407,8 @@ export const siteConfig = {
   researchInterests,
   timeline,
   about: {
-    tagline: 'AI Learner · Web Developer · Knowledge System Builder',
-    bio: '我是 Ethan Zhao，正在把 AI、Web 开发、知识管理和学习系统结合起来，持续沉淀项目、文章、复盘和成长记录。这个站点既是个人表达空间，也是面向复试和求职展示的作品集入口。',
+    tagline: 'Web Developer · AI Learner · Knowledge Builder',
+    bio: '我是 Ethan Zhao，正在把 Web 开发、AI 学习、知识管理和学习系统结合起来，持续沉淀项目、文章、复盘和成长记录。这个站点既是个人表达空间，也是面向复试和求职展示的作品集入口。',
     skills: [
       { name: 'Java / Spring Boot', level: 78 },
       { name: 'Vue3 / Vite', level: 76 },
