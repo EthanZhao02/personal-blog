@@ -361,7 +361,11 @@ const normalizeSocialColor = (color) => {
     '#38bdf8': '#60a5fa',
     '#7dd3fc': '#93c5fd',
     '#00b96b': '#3b82f6',
+    '#10b981': '#3b82f6',
+    '#14b8a6': '#3b82f6',
     '#22c55e': '#60a5fa',
+    '#34d399': '#60a5fa',
+    '#8df8c7': '#8b5cf6',
   }
   return colorMap[normalized] || color || fallback
 }
