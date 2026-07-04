@@ -88,45 +88,33 @@
                 v-for="article in getArticlesByYear(year)"
                 :key="article.id"
                 class="article-card"
+                :class="{ 'has-cover': article.coverImage }"
               >
-                <div class="card-glow" aria-hidden="true"></div>
                 <router-link :to="`/article/${article.id}`" class="card-link">
-                  <div class="card-cover" v-if="article.coverImage">
+                  <div class="card-bg" v-if="article.coverImage">
                     <img :src="resolveImageUrl(article.coverImage)" :alt="article.title" loading="lazy" />
                   </div>
-                  <div class="card-content">
-                  <div class="card-header">
-                    <time class="article-date">
-                      <span class="date-day">{{ formatDay(article.createTime) }}</span>
-                      <span class="date-month">{{ formatMonth(article.createTime) }}</span>
-                    </time>
-                    <div class="article-category" v-if="getCategoryName(article.categoryId)">
-                      {{ getCategoryName(article.categoryId) }}
-                    </div>
+                  <div class="card-bg card-bg-fallback" v-else>
+                    <span class="fallback-icon">◇</span>
                   </div>
-                  
+                  <div class="card-overlay"></div>
                   <div class="card-body">
-                    <h3 class="article-title">{{ article.title }}</h3>
-                    <p class="article-summary" v-if="article.summary">
-                      {{ article.summary }}
-                    </p>
-                  </div>
-                  <div class="article-footer">
-                    <div class="article-tags" v-if="article.tags?.length">
-                      <span v-for="tag in article.tags.slice(0, 3)" :key="tag.id || tag.name" class="tag">
-                        {{ tag.name }}
+                    <div class="card-tag-row">
+                      <span class="card-category" v-if="getCategoryName(article.categoryId)">
+                        {{ getCategoryName(article.categoryId) }}
+                      </span>
+                      <span class="card-views">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        {{ article.viewCount || 0 }}
                       </span>
                     </div>
-                    <div class="article-tags empty" v-else>
-                      <span class="tag-placeholder">◈</span>
+                    <h3 class="card-title">{{ article.title }}</h3>
+                    <div class="card-meta">
+                      <time>{{ formatDate(article.createTime) }}</time>
+                      <span class="card-tags" v-if="article.tags?.length">
+                        <span v-for="tag in article.tags.slice(0, 3)" :key="tag.id || tag.name">#{{ tag.name }}</span>
+                      </span>
                     </div>
-                    <span class="read-more">
-                      阅读
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </span>
-                  </div>
                   </div>
                 </router-link>
               </article>
@@ -207,6 +195,12 @@ const formatMonth = (s) => {
   if (!s) return ''
   const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
   return months[new Date(s).getMonth()]
+}
+
+const formatDate = (s) => {
+  if (!s) return ''
+  const d = new Date(s)
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
 }
 
 const selectCategory = (id) => {
@@ -563,187 +557,146 @@ onMounted(() => {
 
 .article-card {
   position: relative;
-  background: rgba(12, 20, 35, 0.6);
-  border: 1px solid rgba(56, 248, 255, 0.1);
-  border-radius: 12px;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border: 1px solid rgba(56, 248, 255, 0.08);
+  border-radius: 10px;
   overflow: hidden;
   transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
+  min-height: 200px;
+}
+
+.article-card.has-cover {
+  background: #0c1423;
 }
 
 .article-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(56, 248, 255, 0.3);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
+  border-color: rgba(56, 248, 255, 0.25);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
-.card-glow {
+.card-bg {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(56, 248, 255, 0.1), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s;
 }
 
-.article-card:hover .card-glow {
-  opacity: 1;
+.card-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.article-card:hover .card-bg img {
+  transform: scale(1.06);
+}
+
+.card-bg-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(56, 248, 255, 0.05), rgba(155, 92, 255, 0.05));
+}
+
+.fallback-icon {
+  font-size: 48px;
+  color: rgba(56, 248, 255, 0.1);
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.05) 100%);
+  z-index: 1;
 }
 
 .card-link {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  padding: 0;
+  justify-content: flex-end;
   height: 100%;
+  min-height: 200px;
+  padding: 14px;
   text-decoration: none;
-  color: inherit;
+  color: #fff;
+}
+
+.card-body {
   position: relative;
   z-index: 1;
 }
 
-.card-cover {
-  width: 100%;
-  height: 160px;
-  overflow: hidden;
-  border-radius: 12px 12px 0 0;
-  flex-shrink: 0;
-}
-
-.card-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.article-card:hover .card-cover img {
-  transform: scale(1.05);
-}
-
-.card-content {
-  padding: 12px 16px 16px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.card-header {
+.card-tag-row {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  flex-shrink: 0;
-  margin-bottom: 10px;
-}
-
-.article-date {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 6px 10px;
-  background: rgba(56, 248, 255, 0.1);
-  border-radius: 6px;
-  border: 1px solid rgba(56, 248, 255, 0.2);
+  margin-bottom: 6px;
+  gap: 8px;
 }
 
-.date-day {
-  font-size: 16px;
-  font-weight: 700;
-  color: #38f8ff;
-  line-height: 1;
-}
-
-.date-month {
+.card-category {
   font-size: 10px;
   font-weight: 600;
-  color: rgba(56, 248, 255, 0.6);
-  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  background: rgba(56, 248, 255, 0.2);
+  border: 1px solid rgba(56, 248, 255, 0.3);
+  border-radius: 3px;
+  color: #38f8ff;
 }
 
-.article-category {
-  font-size: 11px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.05em;
-  padding: 4px 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-}
-
-.card-body {
-  flex: 1;
+.card-views {
   display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.article-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
-  margin: 0 0 6px 0;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.article-summary {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.45);
-  line-height: 1.4;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.article-footer {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-shrink: 0;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  margin-top: auto;
+  gap: 4px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
 }
 
-.article-tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.article-tags.empty {
+.card-views svg {
   opacity: 0.5;
 }
 
-.tag-placeholder {
-  font-size: 10px;
-  color: rgba(56, 248, 255, 0.3);
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 6px 0;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 
-.tag {
-  font-size: 11px;
-  color: rgba(56, 248, 255, 0.7);
-  padding: 4px 8px;
-  background: rgba(56, 248, 255, 0.1);
-  border-radius: 4px;
-}
-
-.read-more {
+.card-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #38f8ff;
-  transition: gap 0.2s;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.article-card:hover .read-more {
-  gap: 10px;
+.card-meta time {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.card-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.card-tags span {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 6px;
+  border-radius: 3px;
 }
 
 /* 加载状态 */
