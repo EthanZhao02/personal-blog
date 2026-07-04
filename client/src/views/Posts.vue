@@ -7,31 +7,6 @@
     </div>
 
     <div class="posts-container">
-      <!-- 页面头部 -->
-      <header class="page-header">
-        <div class="header-content">
-          <div class="header-badge">{{ ui.badge }}</div>
-          <h1 class="page-title">{{ ui.title }}</h1>
-          <p class="page-desc">{{ ui.desc }}</p>
-        </div>
-        <div class="header-stats">
-          <div class="stat-box">
-            <span class="stat-num">{{ totalCount }}</span>
-            <span class="stat-label">{{ ui.articleCount }}</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-box">
-            <span class="stat-num">{{ categories.length }}</span>
-            <span class="stat-label">{{ ui.categoryCount }}</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-box">
-            <span class="stat-num">{{ allTags.length }}</span>
-            <span class="stat-label">{{ ui.tagCount }}</span>
-          </div>
-        </div>
-      </header>
-
       <!-- 筛选栏 -->
       <div class="filter-panel">
         <div class="filter-section">
@@ -349,79 +324,6 @@ onMounted(() => {
   z-index: 1;
   max-width: 1200px;
   margin: 0 auto;
-}
-
-/* 页面头部 */
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 40px;
-  padding-bottom: 32px;
-  border-bottom: 1px solid rgba(96, 165, 250, 0.1);
-}
-
-.header-content {
-  flex: 1;
-}
-
-.header-badge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  color: #60a5fa;
-  padding: 6px 12px;
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  border-radius: 4px;
-  margin-bottom: 16px;
-}
-
-.page-title {
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 700;
-  color: #fff;
-  margin: 0 0 8px 0;
-  background: linear-gradient(135deg, #fff 0%, #60a5fa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.page-desc {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0;
-}
-
-.header-stats {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.stat-box {
-  text-align: center;
-}
-
-.stat-num {
-  display: block;
-  font-size: 32px;
-  font-weight: 700;
-  color: #60a5fa;
-  line-height: 1;
-}
-
-.stat-label {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.1em;
-}
-
-.stat-divider {
-  width: 1px;
-  height: 40px;
-  background: rgba(96, 165, 250, 0.2);
 }
 
 /* 筛选面板 */
@@ -805,17 +707,6 @@ onMounted(() => {
 
 /* 响应式 */
 @media (max-width: 900px) {
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 24px;
-  }
-  
-  .header-stats {
-    width: 100%;
-    justify-content: flex-start;
-  }
-  
   .timeline::before {
     left: 20px;
   }

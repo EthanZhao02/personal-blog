@@ -5,13 +5,6 @@
     </div>
 
     <div class="message-container">
-      <!-- 页面头部 -->
-      <header class="page-header">
-        <div class="header-badge">{{ ui.badge }}</div>
-        <h1 class="page-title">{{ ui.title }}</h1>
-        <p class="page-desc">{{ ui.desc }}</p>
-      </header>
-
       <!-- 便签墙 -->
       <section class="message-lab">
         <aside class="note-composer">

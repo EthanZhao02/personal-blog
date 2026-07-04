@@ -5,13 +5,6 @@
     </div>
 
     <div class="friends-container">
-      <!-- 页面头部 -->
-      <header class="page-header">
-        <div class="header-badge">{{ ui.badge }}</div>
-        <h1 class="page-title">{{ ui.title }}</h1>
-        <p class="page-desc">{{ ui.desc }}</p>
-      </header>
-
       <!-- 申请入口 -->
       <section v-if="!userStore.isAdmin" class="apply-panel apply-compact">
         <div class="apply-info">
@@ -483,39 +476,6 @@ onMounted(loadFriends)
   z-index: 1;
   max-width: 1200px;
   margin: 0 auto;
-}
-
-/* 页面头部 */
-.page-header {
-  margin-bottom: 40px;
-}
-
-.header-badge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  color: #60a5fa;
-  padding: 6px 12px;
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  border-radius: 4px;
-  margin-bottom: 16px;
-}
-
-.page-title {
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 700;
-  margin: 0 0 8px 0;
-  background: linear-gradient(135deg, #fff 0%, #60a5fa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.page-desc {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0;
 }
 
 /* 申请面板 */
