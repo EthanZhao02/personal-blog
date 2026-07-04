@@ -45,6 +45,20 @@ public class FriendLinkController {
         return Result.success("申请已提交，待管理员审核");
     }
 
+    /** 管理员直接添加友链（跳过审核） */
+    @PostMapping("/add")
+    public Result<Void> add(@RequestBody FriendLink link) {
+        if (link.getName() == null || link.getName().trim().isEmpty()) {
+            return Result.error("网站名称不能为空");
+        }
+        if (link.getUrl() == null || link.getUrl().trim().isEmpty()) {
+            return Result.error("网站地址不能为空");
+        }
+        link.setIsActive(1);
+        friendLinkService.addLink(link);
+        return Result.success();
+    }
+
     /** 审核友链（通过/拒绝） */
     @PutMapping("/approve/{id}")
     public Result<Void> approve(@PathVariable Long id, @RequestBody Map<String, Integer> body) {

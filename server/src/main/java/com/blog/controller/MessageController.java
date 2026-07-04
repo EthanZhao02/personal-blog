@@ -52,7 +52,9 @@ public class MessageController {
 
     /** 管理员回复留言 */
     @PostMapping("/reply/{id}")
-    public Result<Message> replyMessage(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public Result<Message> replyMessage(HttpServletRequest request, @PathVariable Long id, @RequestBody Map<String, String> body) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) return Result.error("请先登录");
         String reply = body.get("reply");
         if (reply == null || reply.trim().isEmpty()) {
             return Result.error("回复内容不能为空");

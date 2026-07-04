@@ -91,6 +91,10 @@
               >
                 <div class="card-glow" aria-hidden="true"></div>
                 <router-link :to="`/article/${article.id}`" class="card-link">
+                  <div class="card-cover" v-if="article.coverImage">
+                    <img :src="resolveImageUrl(article.coverImage)" :alt="article.title" loading="lazy" />
+                  </div>
+                  <div class="card-content">
                   <div class="card-header">
                     <time class="article-date">
                       <span class="date-day">{{ formatDay(article.createTime) }}</span>
@@ -123,6 +127,7 @@
                       </svg>
                     </span>
                   </div>
+                  </div>
                 </router-link>
               </article>
             </div>
@@ -139,6 +144,8 @@ import { getArticleList } from '../api/article'
 import { getTagList } from '../api/tag'
 import { getCategoryList } from '../api/category'
 import { fallbackArticles, fallbackCategories, fallbackTags, isStaticMode } from '../config/site.config'
+
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/api\/?$/, '')
 
 const articles = ref([])
 const categories = ref([])
@@ -220,10 +227,17 @@ const useFallbackCategories = () => {
 
 const loadArticles = async () => {
   loading.value = true
-  // 强制使用静态数据，避免API问题
-  useFallbackArticles()
+  try {
+    const res = await getArticleList(1, 100)
+    if (res.code === 200 && res.data?.records) {
+      articles.value = res.data.records
+    } else {
+      useFallbackArticles()
+    }
+  } catch (e) {
+    useFallbackArticles()
+  }
   loading.value = false
-  return
 }
 
 const loadTags = async () => {
@@ -260,6 +274,15 @@ const loadCategories = async () => {
     useFallbackCategories()
     if (import.meta.env.DEV) console.info('使用静态分类数据', e?.message || e)
   }
+}
+
+const resolveImageUrl = (url) => {
+  if (!url) return ''
+  if (/^https?:\/\//.test(url)) return url
+  if (url.startsWith('/upload/') || url.startsWith('/uploads/')) {
+    return `${apiBaseUrl}${url}`
+  }
+  return url
 }
 
 onMounted(() => {
@@ -570,12 +593,38 @@ onMounted(() => {
 .card-link {
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 0;
   height: 100%;
   text-decoration: none;
   color: inherit;
   position: relative;
   z-index: 1;
+}
+
+.card-cover {
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+  flex-shrink: 0;
+}
+
+.card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.article-card:hover .card-cover img {
+  transform: scale(1.05);
+}
+
+.card-content {
+  padding: 16px 20px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-header {

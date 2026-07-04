@@ -766,12 +766,6 @@ onMounted(async () => {
   display: flex;
   gap: 2px;
   flex-shrink: 0;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.article-item:hover .item-actions {
-  opacity: 1;
 }
 
 .item-btn {
