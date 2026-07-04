@@ -30,6 +30,7 @@ public class DatabaseInitializer implements CommandLineRunner {
     private static final String TAG_TABLE = "test.blog_tag";
     private static final String FRIENDLINK_TABLE = "test.blog_friend_link";
     private static final String PROJECT_TABLE = "test.blog_project";
+    private static final String PROFILE_TABLE = "test.blog_profile";
 
     @Override
     public void run(String... args) throws Exception {
@@ -45,6 +46,8 @@ public class DatabaseInitializer implements CommandLineRunner {
         ensureCategoryColumns();
         ensureCategoryData();
         ensureTagData();
+        ensureProfileTable();
+        ensureDefaultProfile();
         log.info("=== 数据库自检完成 ===");
     }
 
@@ -276,6 +279,36 @@ public class DatabaseInitializer implements CommandLineRunner {
             } catch (Exception e) {
                 log.error("✗ 检查/添加 {}.{} 字段失败", tableName, colName, e);
             }
+        }
+    }
+
+    private void ensureProfileTable() {
+        ensureColumns(PROFILE_TABLE, java.util.List.of(
+                java.util.Map.of("name", "name", "type", "VARCHAR(100)"),
+                java.util.Map.of("name", "tagline", "type", "VARCHAR(200)"),
+                java.util.Map.of("name", "bio", "type", "TEXT"),
+                java.util.Map.of("name", "location", "type", "VARCHAR(100)"),
+                java.util.Map.of("name", "status", "type", "VARCHAR(50)"),
+                java.util.Map.of("name", "avatar", "type", "VARCHAR(500)"),
+                java.util.Map.of("name", "skills", "type", "TEXT"),
+                java.util.Map.of("name", "socials", "type", "TEXT")
+        ));
+    }
+
+    private void ensureDefaultProfile() {
+        try {
+            Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM " + PROFILE_TABLE, Integer.class
+            );
+            if (count == null || count == 0) {
+                log.warn("个人资料表为空，正在初始化默认资料...");
+                String skillsJson = "[{\"name\":\"Vue.js\",\"level\":85},{\"name\":\"Java/Spring\",\"level\":80},{\"name\":\"AI/LLM\",\"level\":75},{\"name\":\"Python\",\"level\":70}]";
+                String socialsJson = "[{\"name\":\"GitHub\",\"icon\":\"github\",\"url\":\"https://github.com/EthanZhao02\",\"color\":\"#333\",\"handle\":\"@EthanZhao02\"}]";
+                jdbcTemplate.update("INSERT INTO " + PROFILE_TABLE + " (id, name, tagline, bio, location, status, skills, socials) VALUES (1, 'E森赵', 'AI & Web Developer', '正在探索AI与Web开发的交汇点，专注知识管理和学习系统。', 'Earth', 'Available', ?, ?)", skillsJson, socialsJson);
+                log.info("✓ 已初始化默认个人资料");
+            }
+        } catch (Exception e) {
+            log.error("✗ 初始化个人资料失败", e);
         }
     }
 }

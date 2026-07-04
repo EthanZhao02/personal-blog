@@ -9,31 +9,35 @@
       <section class="profile-panel">
         <!-- 顶部信息 -->
         <div class="profile-header">
+          <button v-if="userStore.isAdmin" class="edit-profile-btn" @click="openEditor">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            编辑
+          </button>
           <div class="avatar-section">
             <div class="avatar-wrapper">
               <div class="avatar-glow-ring" aria-hidden="true"></div>
               <div class="avatar-core">
                 <img
                   v-if="siteConfig.avatar"
-                  :src="siteConfig.avatar"
-                  :alt="siteConfig.name"
+                  :src="profile.avatar"
+                  :alt="profile.name"
                   @error="onAvatarError"
                 />
                 <div v-else class="avatar-placeholder">
-                  {{ siteConfig.name?.charAt(0) || '?' }}
+                  {{ profile.name?.charAt(0) || '?' }}
                 </div>
               </div>
             </div>
             <div class="profile-name">
-              <h1 class="name-text">{{ siteConfig.name }}</h1>
-              <span class="name-tag">{{ siteConfig.about?.tagline || 'Developer & Creator' }}</span>
+              <h1 class="name-text">{{ profile.name }}</h1>
+              <span class="name-tag">{{ profile.tagline }}</span>
             </div>
           </div>
 
           <div class="profile-meta">
             <div class="meta-item">
               <span class="meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-              <span class="meta-text">{{ siteConfig.about?.location || 'Earth' }}</span>
+              <span class="meta-text">{{ profile.location }}</span>
             </div>
             <div class="meta-item">
               <span class="meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
@@ -41,14 +45,14 @@
             </div>
             <div class="meta-item">
               <span class="meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/></svg></span>
-              <span class="meta-text">{{ siteConfig.about?.status || 'Available' }}</span>
+              <span class="meta-text">{{ profile.status }}</span>
             </div>
           </div>
         </div>
 
         <!-- 描述区 -->
-        <div class="profile-body" v-if="siteConfig.about?.bio">
-          <p class="profile-desc">{{ siteConfig.about?.bio }}</p>
+        <div class="profile-body" v-if="profile.bio">
+          <p class="profile-desc">{{ profile.bio }}</p>
         </div>
 
         <!-- 技能展示 -->
@@ -99,7 +103,7 @@
             <span class="section-line"></span>
           </div>
           <div class="contact-grid">
-            <template v-for="social in siteConfig.socials" :key="social.name">
+            <template v-for="social in socials" :key="social.name">
               <!-- 普通链接 -->
               <a
                 v-if="!social.isQRCode && !social.url?.startsWith('#')"
@@ -164,7 +168,7 @@
         <div class="profile-footer">
           <div class="footer-text">
             <span class="footer-bracket">[</span>
-            <span class="footer-content">{{ siteConfig.about?.footer || '保持热爱，奔赴山海' }}</span>
+            <span class="footer-content">{{ profile.footer }}</span>
             <span class="footer-bracket">]</span>
           </div>
         </div>
@@ -185,33 +189,126 @@
         <div class="corner bottom-left" aria-hidden="true"></div>
         <div class="corner bottom-right" aria-hidden="true"></div>
       </section>
+
+      <!-- 编辑资料弹窗 -->
+      <div v-if="showEditor" class="editor-overlay" @click.self="showEditor = false">
+        <div class="editor-panel">
+          <h3>编辑个人资料</h3>
+          <div class="editor-row"><label>姓名</label><input v-model="editForm.name" /></div>
+          <div class="editor-row"><label>标签</label><input v-model="editForm.tagline" placeholder="如：AI & Web Developer" /></div>
+          <div class="editor-row"><label>简介</label><textarea v-model="editForm.bio" rows="3" placeholder="一段话介绍自己" /></div>
+          <div class="editor-row"><label>位置</label><input v-model="editForm.location" placeholder="如：Beijing, China" /></div>
+          <div class="editor-row"><label>状态</label><input v-model="editForm.status" placeholder="如：Available / Busy" /></div>
+          <div class="editor-actions">
+            <button @click="showEditor = false" class="editor-cancel">取消</button>
+            <button @click="submitProfile" :disabled="saving" class="editor-save">{{ saving ? '保存中...' : '保存' }}</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import siteConfig from '../config/site.config'
 import { resolveAssetUrl } from '../config/site.config'
+import { useUserStore } from '../stores/user'
+import { getProfile, updateProfile } from '../api/profile'
 
+const userStore = useUserStore()
 const showQR = ref(false)
 const currentQR = ref(null)
+const profile = ref({})
+const showEditor = ref(false)
+const saving = ref(false)
+const editForm = ref({})
 
-const showQRCode = (social) => {
-  currentQR.value = social
-  showQR.value = true
+// 解析技能（支持字符串和对象数组）
+const parseSkills = (raw) => {
+  if (!raw) return []
+  const arr = typeof raw === 'string' ? JSON.parse(raw) : raw
+  return arr.map(s => typeof s === 'string' ? { name: s, level: 70 + Math.floor(Math.random() * 25) } : s)
 }
 
-const closeQRCode = () => {
-  showQR.value = false
-  currentQR.value = null
+// 加载资料
+const loadProfile = async () => {
+  try {
+    const res = await getProfile()
+    if (res.code === 200 && res.data) {
+      const p = res.data
+      profile.value = {
+        name: p.name || siteConfig.name,
+        tagline: p.tagline || siteConfig.about?.tagline,
+        bio: p.bio || siteConfig.about?.bio,
+        location: p.location || siteConfig.about?.location,
+        status: p.status || siteConfig.about?.status,
+        avatar: p.avatar || siteConfig.avatar,
+        footer: siteConfig.about?.footer || '保持热爱，奔赴山海'
+      }
+      profile.value._skills = parseSkills(p.skills || siteConfig.about?.skills)
+      profile.value._socials = parseSocials(p.socials)
+      return
+    }
+  } catch (e) { /* fallback to siteConfig */ }
+  // 默认
+  profile.value = {
+    name: siteConfig.name,
+    tagline: siteConfig.about?.tagline || 'Developer & Creator',
+    bio: siteConfig.about?.bio || '',
+    location: siteConfig.about?.location || 'Earth',
+    status: siteConfig.about?.status || 'Available',
+    avatar: siteConfig.avatar || '',
+    footer: siteConfig.about?.footer || '保持热爱，奔赴山海',
+    _skills: parseSkills(siteConfig.about?.skills),
+    _socials: siteConfig.socials || []
+  }
 }
 
-const skills = computed(() => {
-  const raw = siteConfig.about?.skills || []
-  // Support both string array and object array formats
-  return raw.map(s => typeof s === 'string' ? { name: s, level: 70 + Math.floor(Math.random() * 25) } : s)
-})
+const parseSocials = (raw) => {
+  if (!raw) return siteConfig.socials || []
+  const arr = typeof raw === 'string' ? JSON.parse(raw) : raw
+  return arr
+}
+
+const openEditor = () => {
+  editForm.value = {
+    name: profile.value.name || '',
+    tagline: profile.value.tagline || '',
+    bio: profile.value.bio || '',
+    location: profile.value.location || '',
+    status: profile.value.status || ''
+  }
+  showEditor.value = true
+}
+
+const submitProfile = async () => {
+  saving.value = true
+  try {
+    const res = await updateProfile(editForm.value)
+    if (res.code === 200) {
+      showEditor.value = false
+      await loadProfile()
+    } else {
+      alert(res.message || '保存失败')
+    }
+  } catch (e) {
+    alert('保存失败')
+  }
+  saving.value = false
+}
+
+onMounted(loadProfile)
+
+const skills = computed(() => profile.value._skills || [])
+const interests = computed(() => siteConfig.about?.interests || [])
+const socials = computed(() => profile.value._socials || [])
+
+const showQRCode = (social) => { currentQR.value = social; showQR.value = true }
+const closeQRCode = () => { showQR.value = false; currentQR.value = null }
+const onAvatarError = (e) => { e.target.style.display = 'none' }
+
+const currentTimezone = computed(() => {
 const interests = computed(() => siteConfig.about?.interests || [])
 
 const currentTimezone = computed(() => {
@@ -763,5 +860,109 @@ const getSocialIcon = (icon) => {
 
 .placeholder-link:hover {
   transform: none;
+}
+
+/* 编辑按钮 */
+.edit-profile-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: rgba(56, 248, 255, 0.1);
+  border: 1px solid rgba(56, 248, 255, 0.3);
+  border-radius: 6px;
+  color: #38f8ff;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+}
+.edit-profile-btn:hover {
+  background: rgba(56, 248, 255, 0.2);
+}
+
+/* 编辑弹窗 */
+.editor-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+.editor-panel {
+  background: rgba(12, 20, 35, 0.98);
+  border: 1px solid rgba(56, 248, 255, 0.2);
+  border-radius: 14px;
+  padding: 24px;
+  width: 90%;
+  max-width: 440px;
+}
+.editor-panel h3 {
+  font-size: 16px;
+  color: #fff;
+  margin: 0 0 16px;
+}
+.editor-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.editor-row label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.editor-row input,
+.editor-row textarea {
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+}
+.editor-row input:focus,
+.editor-row textarea:focus {
+  border-color: rgba(56, 248, 255, 0.4);
+}
+.editor-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.editor-cancel {
+  padding: 6px 16px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+}
+.editor-save {
+  padding: 6px 20px;
+  background: #38f8ff;
+  border: none;
+  border-radius: 6px;
+  color: #0c1423;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.editor-save:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 </style>
