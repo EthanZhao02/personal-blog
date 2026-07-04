@@ -29,7 +29,10 @@
               </div>
               <div class="cell-info">
                 <h3 class="cell-title">{{ project.name }}</h3>
-                <span class="cell-tag">{{ project.tag || project.category || 'PROJECT' }}</span>
+                <div class="cell-meta-row">
+                  <span class="cell-tag">{{ project.tag || project.category || 'PROJECT' }}</span>
+                  <span class="cell-status" v-if="project.status" :class="statusClass(project.status)">{{ project.status }}</span>
+                </div>
               </div>
             </div>
             <p class="cell-summary">{{ project.description }}</p>
@@ -158,6 +161,14 @@ const resolveUrl = (url) => {
   return url
 }
 const isImageUrl = (url) => /\.(png|jpg|jpeg|gif|webp|svg)(\?.*)?$/i.test(url) || url?.startsWith('http') && /\.(png|jpg|jpeg|gif|webp|svg)/i.test(url?.split('?')[0])
+
+const statusClass = (s) => {
+  if (!s) return ''
+  if (s.includes('已上线') || s.includes('Live') || s.includes('online')) return 'status-live'
+  if (s.includes('开发') || s.includes('WIP') || s.includes('Dev')) return 'status-wip'
+  if (s.includes('开源') || s.includes('Open')) return 'status-oss'
+  return ''
+}
 
 const route = useRoute()
 const userStore = useUserStore()
@@ -426,6 +437,44 @@ onMounted(loadProjects)
   font-weight: 600;
   color: rgba(255, 255, 255, 0.4);
   letter-spacing: 0.1em;
+}
+
+.cell-meta-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.cell-status {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+}
+
+.cell-status.status-live {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.cell-status.status-wip {
+  background: rgba(250, 204, 21, 0.15);
+  color: #facc15;
+  border: 1px solid rgba(250, 204, 21, 0.3);
+}
+
+.cell-status.status-oss {
+  background: rgba(56, 248, 255, 0.1);
+  color: #38f8ff;
+  border: 1px solid rgba(56, 248, 255, 0.2);
+}
+
+.project-cell:hover .cell-icon {
+  transform: scale(1.08);
+  transition: transform 0.3s;
 }
 
 .cell-summary {

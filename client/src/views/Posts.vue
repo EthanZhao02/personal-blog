@@ -116,6 +116,7 @@
                       </span>
                     </div>
                   </div>
+                  <span class="card-read">阅读 →</span>
                 </router-link>
               </article>
             </div>
@@ -621,6 +622,40 @@ onMounted(() => {
   padding: 14px;
   text-decoration: none;
   color: #fff;
+}
+
+.card-read {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #38f8ff;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: all 0.3s ease;
+  z-index: 3;
+}
+
+.article-card:hover .card-read {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.article-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: inset 0 0 0 1px rgba(56, 248, 255, 0.3);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.article-card:hover::after {
+  opacity: 1;
 }
 
 .card-body {
