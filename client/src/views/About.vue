@@ -306,7 +306,6 @@ const socials = computed(() => profile.value._socials || [])
 
 const showQRCode = (social) => { currentQR.value = social; showQR.value = true }
 const closeQRCode = () => { showQR.value = false; currentQR.value = null }
-const onAvatarError = (e) => { e.target.style.display = 'none' }
 
 const currentTimezone = computed(() => {
   const offset = -new Date().getTimezoneOffset() / 60
