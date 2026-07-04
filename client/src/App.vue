@@ -25,7 +25,7 @@
           <span class="portal-node node-b"></span>
           <span class="portal-node node-c"></span>
         </div>
-        <div class="welcome-copy">
+        <div class="welcome-copy" :data-language="language">
           <span class="welcome-code">{{ welcomeCopy.code }}</span>
           <h1>{{ welcomeCopy.title }}</h1>
           <p>{{ welcomeCopy.desc }}</p>
@@ -538,7 +538,8 @@ onUnmounted(() => {
 .welcome-copy {
   position: relative;
   z-index: 1;
-  width: min(680px, 100%);
+  width: min(920px, 100%);
+  max-width: calc(100vw - 56px);
   text-align: center;
   padding: clamp(28px, 5vw, 48px);
 }
@@ -557,12 +558,17 @@ onUnmounted(() => {
   background: linear-gradient(90deg, #ffffff, #60a5fa 42%, #a78bfa 82%);
   -webkit-background-clip: text;
   background-clip: text;
-  font-size: clamp(2.35rem, 7.2vw, 5.9rem);
-  line-height: 0.98;
+  font-size: clamp(2.35rem, 6vw, 5.1rem);
+  line-height: 1.04;
   font-weight: 950;
-  word-break: keep-all;
   overflow-wrap: normal;
+  text-wrap: balance;
   text-shadow: 0 0 34px rgba(96, 165, 250, 0.1);
+}
+
+.welcome-copy[data-language="zh"] h1 {
+  font-size: clamp(2.25rem, 5.5vw, 5rem);
+  white-space: nowrap;
 }
 
 .welcome-copy p {
@@ -1393,6 +1399,11 @@ onUnmounted(() => {
 
   .welcome-copy {
     padding: 24px 10px;
+  }
+
+  .welcome-copy[data-language="zh"] h1 {
+    font-size: clamp(2rem, 9.4vw, 3.6rem);
+    white-space: normal;
   }
 
   .time-gate-panel {
