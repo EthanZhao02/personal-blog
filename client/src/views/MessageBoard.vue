@@ -63,15 +63,26 @@
                   <span class="bubble-name">{{ msg.nickname || '匿名用户' }}</span>
                   <div class="bubble-header-right">
                     <span class="bubble-time">{{ formatTime(msg.createTime) }}</span>
-                    <button
-                      v-if="userStore.isAdmin"
-                      class="del-msg-btn"
-                      @click.stop="handleDelete(msg.id)"
-                      title="删除"
-                    >×</button>
+                    <template v-if="userStore.isAdmin">
+                      <button class="msg-btn reply-btn" @click.stop="toggleReply(msg)">回复</button>
+                      <button class="msg-btn del-msg-btn" @click.stop="handleDelete(msg.id)">删除</button>
+                    </template>
                   </div>
                 </div>
                 <div class="bubble-content">{{ msg.content }}</div>
+                <div class="sub-replies" v-if="msg.children && msg.children.length">
+                  <div v-for="sub in msg.children" :key="sub.id" class="sub-reply-bubble">
+                    <span class="sub-reply-name">{{ sub.nickname }}：</span>
+                    <span class="sub-reply-content">{{ sub.content }}</span>
+                  </div>
+                </div>
+                <div class="reply-form" v-if="showReplyInput === msg.id">
+                  <textarea v-model="replyText" placeholder="输入回复内容..." class="reply-input" maxlength="300" rows="2"></textarea>
+                  <div class="reply-actions">
+                    <button class="reply-cancel" @click="cancelReply">取消</button>
+                    <button class="reply-submit" @click="submitReply(msg.id)">发送</button>
+                  </div>
+                </div>
                 <div class="bubble-footer" v-if="msg.location || msg.browser">
                   <span v-if="msg.location" class="bubble-meta">{{ msg.location }}</span>
                   <span v-if="msg.browser" class="bubble-meta">{{ msg.browser }}</span>
@@ -135,12 +146,15 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import { getMessageList, addMessage, deleteMessage } from '../api/message'
+import { getMessageList, addMessage, deleteMessage, replyMessage } from '../api/message'
 import { isStaticMode } from '../config/site.config'
 import { useUserStore } from '../stores/user'
 import GiscusComments from '../components/GiscusComments.vue'
 
 const userStore = useUserStore()
+const replyTarget = ref(null)
+const replyText = ref('')
+const showReplyInput = ref(null)
 const messages = ref([])
 const loading = ref(true)
 const sending = ref(false)
@@ -215,7 +229,9 @@ const scrollToBottom = () => {
 
 const formatTime = (s) => {
   if (!s) return ''
-  const d = new Date(s)
+  // 后端返回 LocalDateTime 无时区信息，需按本地时间解析
+  const d = new Date(s + '+08:00')
+  if (isNaN(d.getTime())) return s
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
@@ -230,6 +246,40 @@ const handleDelete = async (id) => {
     }
   } catch (e) {
     alert('删除失败：' + (e?.message || '网络错误'))
+  }
+}
+
+const toggleReply = (msg) => {
+  if (showReplyInput.value === msg.id) {
+    showReplyInput.value = null
+    replyText.value = ''
+  } else {
+    showReplyInput.value = msg.id
+    replyText.value = ''
+  }
+}
+
+const cancelReply = () => {
+  showReplyInput.value = null
+  replyText.value = ''
+}
+
+const submitReply = async (id) => {
+  if (!replyText.value.trim()) {
+    alert('回复内容不能为空')
+    return
+  }
+  try {
+    const res = await replyMessage(id, replyText.value.trim())
+    if (res.code === 200 || res.code === 0) {
+      showReplyInput.value = null
+      replyText.value = ''
+      loadMessages() // 重新加载列表
+    } else {
+      alert('回复失败：' + (res.message || '未知错误'))
+    }
+  } catch (e) {
+    alert('回复失败：' + (e?.message || '网络错误'))
   }
 }
 
@@ -456,24 +506,124 @@ onMounted(loadMessages)
   font-family: 'SF Mono', monospace;
 }
 
-.del-msg-btn {
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 100, 100, 0.15);
-  border: 1px solid rgba(255, 100, 100, 0.3);
+.msg-btn {
+  padding: 2px 8px;
+  font-size: 11px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 4px;
-  color: #ff8a8a;
-  font-size: 14px;
-  line-height: 1;
+  color: #888;
   cursor: pointer;
   transition: all 0.2s;
 }
 
+.msg-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.reply-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.del-msg-btn {
+  border-color: rgba(255, 100, 100, 0.3);
+  color: #ff8a8a;
+}
+
 .del-msg-btn:hover {
-  background: rgba(255, 100, 100, 0.3);
+  background: rgba(255, 100, 100, 0.15);
+  border-color: rgba(255, 100, 100, 0.5);
+}
+
+.sub-replies {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: rgba(56, 248, 255, 0.04);
+  border: 1px solid rgba(56, 248, 255, 0.12);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sub-reply-bubble {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: baseline;
+}
+
+.sub-reply-name {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sub-reply-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.sub-reply-time {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+}
+
+.reply-form {
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(10, 15, 30, 0.6);
+  border: 1px solid rgba(56, 248, 255, 0.2);
+  border-radius: 8px;
+}
+
+.reply-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-size: 13px;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.reply-input:focus {
+  border-color: var(--accent);
+}
+
+.reply-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+
+.reply-submit {
+  padding: 4px 14px;
+  background: var(--accent);
+  border: none;
+  border-radius: 4px;
+  color: var(--bg);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.reply-cancel {
+  padding: 4px 14px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
 }
 
 .bubble-content {
