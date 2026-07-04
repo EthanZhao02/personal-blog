@@ -12,6 +12,31 @@
         <p class="page-desc">产品 · 工具 · 实验 · 开源</p>
       </header>
 
+      <!-- 3D翻转项目卡片 -->
+      <section class="projects-3d-gallery">
+        <div class="project-card-3d" v-for="project in projects" :key="project.id">
+          <div class="card-inner">
+            <!-- 正面 -->
+            <div class="card-front">
+              <div class="project-icon">{{ project.icon || '◇' }}</div>
+              <h3 class="project-name">{{ project.name }}</h3>
+              <span class="project-status" :class="statusClass(project.status)">{{ project.status || 'PROJECT' }}</span>
+            </div>
+            <!-- 背面 -->
+            <div class="card-back">
+              <p class="project-desc">{{ project.description }}</p>
+              <div class="project-tech">
+                <span v-for="tech in project.techStack?.split(',')" :key="tech">{{ tech.trim() }}</span>
+              </div>
+              <div class="project-links">
+                <a v-if="project.url && project.url !== '#'" :href="project.url" target="_blank">访问项目</a>
+                <a v-if="project.githubUrl" :href="project.githubUrl" target="_blank">GitHub</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- 项目矩阵 -->
       <main class="project-matrix">
         <div
@@ -793,17 +818,132 @@ onMounted(loadProjects)
   .projects-page {
     padding: 72px 16px 80px;
   }
-  
+
   .project-matrix {
     grid-template-columns: 1fr;
   }
-  
+
   .expanded-content {
     grid-template-columns: 1fr;
   }
-  
+
   .cell-collapsed {
     padding: 20px;
   }
+
+  .projects-3d-gallery {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* 3D翻转项目卡片 */
+.projects-3d-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 60px;
+}
+
+.project-card-3d {
+  perspective: 1000px;
+  height: 280px;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.project-card-3d:hover .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-front {
+  background: linear-gradient(135deg, rgba(12, 20, 35, 0.9), rgba(8, 12, 24, 0.95));
+  border: 1px solid rgba(56, 248, 255, 0.2);
+}
+
+.card-back {
+  background: linear-gradient(135deg, rgba(56, 248, 255, 0.1), rgba(155, 92, 255, 0.1));
+  border: 1px solid rgba(56, 248, 255, 0.3);
+  transform: rotateY(180deg);
+}
+
+.project-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.project-name {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.project-status {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: rgba(56, 248, 255, 0.1);
+  color: #38f8ff;
+}
+
+.project-desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.project-tech {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  justify-content: center;
+}
+
+.project-tech span {
+  font-size: 11px;
+  padding: 3px 8px;
+  background: rgba(56, 248, 255, 0.15);
+  border-radius: 4px;
+  color: #38f8ff;
+}
+
+.project-links {
+  display: flex;
+  gap: 12px;
+}
+
+.project-links a {
+  font-size: 13px;
+  padding: 6px 16px;
+  background: rgba(56, 248, 255, 0.2);
+  border-radius: 6px;
+  color: #38f8ff;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.project-links a:hover {
+  background: rgba(56, 248, 255, 0.4);
+  transform: translateY(-2px);
 }
 </style>

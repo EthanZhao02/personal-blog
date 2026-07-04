@@ -227,6 +227,7 @@ const scrollToBottom = () => {
   }
 }
 
+
 const formatTime = (s) => {
   if (!s) return ''
   // 后端返回 LocalDateTime 无时区信息，需按本地时间解析
@@ -891,14 +892,37 @@ onMounted(loadMessages)
   .message-page {
     padding: 72px 16px 80px;
   }
-  
+
   .message-bubble {
     max-width: 95%;
   }
-  
+
   .bubble-footer {
     flex-direction: column;
     gap: 4px;
   }
+
+  .message-stream {
+    column-count: 1 !important;
+  }
+}
+
+/* 瀑布流布局 */
+.message-stream {
+  column-count: 2;
+  column-gap: 16px;
+  align-items: stretch;
+}
+
+.message-bubble {
+  break-inside: avoid;
+  margin-bottom: 16px;
+  max-width: 100%;
+}
+
+.message-bubble:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(56, 248, 255, 0.08);
+  border-color: rgba(56, 248, 255, 0.2);
 }
 </style>

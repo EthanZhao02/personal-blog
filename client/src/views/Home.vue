@@ -1,5 +1,13 @@
 <template>
   <div class="home-page">
+    <!-- 全屏视频背景 -->
+    <div class="hero-video-bg" aria-hidden="true">
+      <video autoplay muted loop playsinline>
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-futuristic-devices-99786-large.mp4" type="video/mp4">
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+
     <div class="tech-field" aria-hidden="true">
       <span
         v-for="dot in particleDots"
@@ -49,6 +57,26 @@
           <button class="visual-next" type="button" @click="nextPhoto" aria-label="Switch visual">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
           </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 人生历程时间线 -->
+    <section class="timeline-section">
+      <h2 class="timeline-title">生命轨迹 Timeline</h2>
+      <div class="timeline-track">
+        <div class="timeline-item" v-for="(item, idx) in timelineItems" :key="idx" :class="{ 'item-right': idx % 2 === 1 }">
+          <div class="timeline-node">
+            <span class="node-year">{{ item.year }}</span>
+            <div class="node-dot"></div>
+          </div>
+          <div class="timeline-content">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+            <div class="timeline-tags" v-if="item.tags">
+              <span v-for="tag in item.tags" :key="tag" class="tag">{{ tag }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -217,6 +245,15 @@ const particleDots = [
   { id: 10, left: '33%', top: '82%', delay: '1.2s' },
 ]
 
+const timelineItems = [
+  { year: '2019', title: '踏入编程世界', description: '第一次接触编程，从Hello World开始探索数字世界', tags: ['C语言', '入门'] },
+  { year: '2020', title: '前端启蒙', description: '学习HTML/CSS/JavaScript，构建第一个网页', tags: ['Web', 'Vue'] },
+  { year: '2021', title: '后端探索', description: '深入学习Java与Spring Boot，理解全栈开发', tags: ['Java', 'Spring'] },
+  { year: '2022', title: 'AI 浪潮', description: '开始接触机器学习与NLP，参与AI项目实践', tags: ['AI', 'NLP'] },
+  { year: '2023', title: '项目沉淀', description: '完成多个实战项目，建立个人知识体系', tags: ['工程化', '知识管理'] },
+  { year: '2024', title: '未来实验室', description: '打造Ethan Future Lab，持续成长与创造', tags: ['Portfolio', '长期主义'] },
+]
+
 const projectsCount = ref(siteConfig.projects?.length || 0)
 const projectsData = ref([])
 
@@ -315,6 +352,33 @@ onUnmounted(() => {
   min-height: 100vh;
   padding: 86px 24px 100px;
   overflow: hidden;
+}
+
+/* 全屏视频背景 */
+.hero-video-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-video-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.35;
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 12, 24, 0.3) 0%,
+    rgba(8, 12, 24, 0.7) 50%,
+    rgba(8, 12, 24, 0.95) 100%
+  );
+  pointer-events: none;
 }
 
 .tech-field {
@@ -1021,6 +1085,187 @@ onUnmounted(() => {
   .hero-btn,
   .visual-next {
     transition: none !important;
+  }
+}
+
+/* 时间线样式 */
+.timeline-section {
+  position: relative;
+  z-index: 1;
+  width: min(1000px, 100%);
+  margin: 80px auto;
+  padding: 40px 24px;
+}
+
+.timeline-title {
+  text-align: center;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  margin-bottom: 60px;
+  background: linear-gradient(135deg, #fff, #38f8ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.timeline-track {
+  position: relative;
+  padding-left: 50%;
+}
+
+.timeline-track::before {
+  content: '';
+  position: absolute;
+  left: calc(50% - 1px);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(56, 248, 255, 0.1), rgba(56, 248, 255, 0.5), rgba(155, 92, 255, 0.5), rgba(56, 248, 255, 0.1));
+}
+
+.timeline-item {
+  position: relative;
+  width: 50%;
+  padding: 20px 40px;
+  margin-bottom: 40px;
+  animation: slideIn 0.6s var(--ease-out) backwards;
+}
+
+.timeline-item:nth-child(odd) {
+  padding-right: 40px;
+  padding-left: 0;
+  text-align: right;
+}
+
+.timeline-item:nth-child(even) {
+  margin-left: 50%;
+  padding-left: 40px;
+  padding-right: 0;
+}
+
+.timeline-item:nth-child(1) { animation-delay: 0.1s; }
+.timeline-item:nth-child(2) { animation-delay: 0.2s; }
+.timeline-item:nth-child(3) { animation-delay: 0.3s; }
+.timeline-item:nth-child(4) { animation-delay: 0.4s; }
+.timeline-item:nth-child(5) { animation-delay: 0.5s; }
+.timeline-item:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.timeline-item:nth-child(even) {
+  animation-name: slideInRight;
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.timeline-node {
+  position: absolute;
+  left: calc(50% - 8px);
+  top: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timeline-item:nth-child(odd) .timeline-node {
+  right: -8px;
+  left: auto;
+}
+
+.timeline-item:nth-child(even) .timeline-node {
+  left: -8px;
+}
+
+.node-year {
+  font-size: 11px;
+  font-weight: 700;
+  color: #38f8ff;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.node-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0c1423;
+  border: 2px solid #38f8ff;
+  box-shadow: 0 0 12px rgba(56, 248, 255, 0.4);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(56, 248, 255, 0.4); }
+  50% { box-shadow: 0 0 24px rgba(56, 248, 255, 0.8); }
+}
+
+.timeline-content {
+  background: rgba(12, 20, 35, 0.6);
+  border: 1px solid rgba(56, 248, 255, 0.15);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s;
+}
+
+.timeline-content:hover {
+  border-color: rgba(56, 248, 255, 0.4);
+  box-shadow: 0 8px 24px rgba(56, 248, 255, 0.1);
+  transform: translateY(-3px);
+}
+
+.timeline-content h3 {
+  font-size: 16px;
+  margin: 0 0 8px;
+  color: #fff;
+}
+
+.timeline-content p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 12px;
+  line-height: 1.6;
+}
+
+.timeline-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.timeline-tags .tag {
+  font-size: 11px;
+  padding: 4px 10px;
+  background: rgba(56, 248, 255, 0.1);
+  border: 1px solid rgba(56, 248, 255, 0.2);
+  border-radius: 12px;
+  color: #38f8ff;
+}
+
+/* 移动端响应式 */
+@media (max-width: 768px) {
+  .timeline-track {
+    padding-left: 0;
+  }
+
+  .timeline-track::before {
+    left: 20px;
+  }
+
+  .timeline-item {
+    width: 100%;
+    padding-left: 60px !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    text-align: left !important;
+  }
+
+  .timeline-node {
+    left: 12px !important;
+    right: auto !important;
   }
 }
 </style>
