@@ -309,9 +309,6 @@ const closeQRCode = () => { showQR.value = false; currentQR.value = null }
 const onAvatarError = (e) => { e.target.style.display = 'none' }
 
 const currentTimezone = computed(() => {
-const interests = computed(() => siteConfig.about?.interests || [])
-
-const currentTimezone = computed(() => {
   const offset = -new Date().getTimezoneOffset() / 60
   const sign = offset >= 0 ? '+' : ''
   return `UTC${sign}${offset}`
