@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Site configuration and static fallback content.
  *
  * GitHub Pages can only serve static files, so the public-facing pages use
@@ -39,14 +39,14 @@ const socials = [
   {
     name: '抖音',
     handle: 'ethan_zhao',
-    url: '#douyin',
+    url: 'https://www.douyin.com/user/MS4wLjABAAAAx6yApvTwceHGRN1_mSCyc7PxcHwfO81IPbc39wWXJKFzUb5R19v4P9H7PLsEME6T?from_tab_name=main',
     color: '#fe2c55',
     icon: 'douyin',
   },
   {
     name: '小红书',
     handle: 'Ethan Zhao',
-    url: '#xiaohongshu',
+    url: 'https://www.xiaohongshu.com/user/profile/66effb0c000000001d032156',
     color: '#ff2442',
     icon: 'xiaohongshu',
   },
@@ -78,7 +78,7 @@ const socials = [
     color: '#22c55e',
     icon: 'wechat',
     isQRCode: true,
-    qrCodeUrl: '/photos/wechat-qr.jpg',
+    qrCodeUrl: '/photos/wechat-qr.png',
   },
   {
     name: 'QQ',
@@ -87,7 +87,7 @@ const socials = [
     color: '#22d3ee',
     icon: 'qq',
     isQRCode: true,
-    qrCodeUrl: '/photos/qq-qr.jpg',
+    qrCodeUrl: '/photos/qq-qr.png',
   },
   {
     name: '邮箱',
