@@ -145,6 +145,10 @@
         <button type="button" @click="openTimeGate('future')">{{ railCopy.future }}</button>
         <a :href="rssUrl" target="_blank" rel="noopener">{{ railCopy.rss }}</a>
       </div>
+      <div class="site-telemetry" :title="statsCopy.title">
+        <span>{{ statsCopy.pv }} <strong>{{ formatStat(siteStats.pageViews) }}</strong></span>
+        <span>{{ statsCopy.uv }} <strong>{{ formatStat(siteStats.uniqueVisitors) }}</strong></span>
+      </div>
     </footer>
   </div>
 </template>
@@ -155,6 +159,7 @@ import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router'
 import { useUserStore } from './stores/user'
 import { isStaticMode } from './config/site.config'
+import { getSiteStats, recordSiteVisit } from './api/siteStats'
 
 const route = useRoute()
 const router = useRouter()
@@ -165,7 +170,9 @@ const themeMode = ref(localStorage.getItem('ethan-theme') || 'dark')
 const showWelcome = ref(false)
 const showTimeGate = ref(false)
 const timeGateMode = ref('future')
+const siteStats = ref({ pageViews: null, uniqueVisitors: null })
 let welcomeTimer = null
+let lastTrackedPath = ''
 
 provide('siteLanguage', language)
 
@@ -219,6 +226,10 @@ const welcomeCopy = computed(() => language.value === 'zh'
 const railCopy = computed(() => language.value === 'zh'
   ? { past: '开往过去', future: '开往未来', rss: 'RSS 订阅' }
   : { past: 'Past Gate', future: 'Future Gate', rss: 'RSS' })
+
+const statsCopy = computed(() => language.value === 'zh'
+  ? { pv: '访问', uv: '访客', title: '站点访问统计：访问次数 / 独立访客' }
+  : { pv: 'PV', uv: 'UV', title: 'Site traffic: page views / unique visitors' })
 
 const timeGateCopy = computed(() => {
   const isPast = timeGateMode.value === 'past'
@@ -326,6 +337,50 @@ const enterTimeGate = () => {
   router.push(target)
 }
 
+const formatStat = (value) => {
+  if (value === null || value === undefined || value === '') return '--'
+  const number = Number(value)
+  return Number.isFinite(number) ? number.toLocaleString('en-US') : '--'
+}
+
+const getVisitorId = () => {
+  const key = 'ethan-visitor-id'
+  const existing = localStorage.getItem(key)
+  if (existing) return existing
+  const next = window.crypto?.randomUUID
+    ? window.crypto.randomUUID()
+    : `visitor-${Date.now()}-${Math.random().toString(16).slice(2)}`
+  localStorage.setItem(key, next)
+  return next
+}
+
+const updateSiteStats = (res) => {
+  if (res?.code === 200 && res.data) {
+    siteStats.value = {
+      pageViews: res.data.pageViews,
+      uniqueVisitors: res.data.uniqueVisitors,
+    }
+  }
+}
+
+const refreshSiteStats = async () => {
+  updateSiteStats(await getSiteStats())
+}
+
+const trackSiteVisit = async (path) => {
+  if (isStaticMode || lastTrackedPath === path) return
+  lastTrackedPath = path
+  const res = await recordSiteVisit({
+    visitorId: getVisitorId(),
+    path,
+  })
+  if (res) {
+    updateSiteStats(res)
+  } else {
+    await refreshSiteStats()
+  }
+}
+
 const dropCandy = (e) => {
   // 排除导航、按钮、链接、输入框等交互元素
   const excludeSelectors = [
@@ -392,6 +447,7 @@ const startWelcomeIfHome = () => {
 onMounted(async () => {
   applyTheme()
   await router.isReady()
+  trackSiteVisit(route.fullPath)
   startWelcomeIfHome()
 
   setTimeout(() => {
@@ -416,6 +472,10 @@ watch(() => route.path, (path) => {
   if (path !== '/' && showWelcome.value) {
     enterWelcome()
   }
+})
+
+watch(() => route.fullPath, (path) => {
+  trackSiteVisit(path)
 })
 
 onUnmounted(() => {
@@ -1242,6 +1302,33 @@ onUnmounted(() => {
   align-items: center;
   gap: 10px;
   font-size: 12px;
+}
+
+.site-telemetry {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 28px;
+  padding: 0 12px;
+  border: 1px solid rgba(96, 165, 250, 0.18);
+  border-radius: 999px;
+  color: rgba(226, 239, 255, 0.56);
+  background: rgba(6, 12, 26, 0.42);
+  box-shadow: inset 0 0 14px rgba(96, 165, 250, 0.05);
+  font: 700 11px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.02em;
+}
+
+.site-telemetry span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.site-telemetry strong {
+  color: #93c5fd;
+  font-weight: 800;
 }
 
 .future-rail-links a,

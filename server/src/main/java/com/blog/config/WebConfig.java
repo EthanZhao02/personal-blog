@@ -69,6 +69,9 @@ public class WebConfig implements WebMvcConfigurer {
                         // 项目相关 - 公开
                         "/project/list",
                         "/project/all",
+                        // 站点访问统计 - 公开
+                        "/site/stats",
+                        "/site/stats/**",
                         // 个人资料 - 公开读取，写由 Controller 层鉴权
                         "/profile",
                         "/profile/**",

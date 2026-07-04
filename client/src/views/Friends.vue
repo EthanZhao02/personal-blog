@@ -84,13 +84,15 @@
           v-for="friend in friends"
           :key="friend.id || friend.url"
           class="friend-node"
-          :class="{ 'friend-pending': friend.isActive === 0 }"
+          :class="{ 'friend-pending': friend.isActive === 0, 'friend-invalid': !friend.isValidUrl }"
         >
-          <a
-            :href="friend.url"
+          <component
+            :is="friend.isValidUrl ? 'a' : 'div'"
+            :href="friend.isValidUrl ? friend.url : undefined"
             target="_blank"
             rel="noopener noreferrer"
             class="node-link"
+            :class="{ 'node-link-disabled': !friend.isValidUrl }"
           >
             <div class="node-connector" aria-hidden="true"></div>
             <div class="node-avatar">
@@ -110,9 +112,21 @@
               <span class="status-dot" :class="{ 'status-pending': friend.isActive === 0 }"></span>
               <span class="status-text">{{ friend.isActive === 0 ? 'PENDING' : 'ONLINE' }}</span>
             </div>
-          </a>
+            <p v-if="userStore.isAdmin && !friend.isValidUrl" class="node-warning">链接需要补成 https://... 后才能公开展示</p>
+          </component>
           <!-- 管理员按钮 -->
           <div class="node-admin-actions" v-if="userStore.isAdmin && !friend.isFallback">
+            <button
+              v-if="friend.isActive === 0"
+              @click="handleApprove(friend)"
+              class="admin-btn approve-btn"
+              :disabled="!friend.isValidUrl"
+            >通过</button>
+            <button
+              v-else
+              @click="handleDeactivate(friend)"
+              class="admin-btn offline-btn"
+            >下架</button>
             <button @click="openEdit(friend)" class="admin-btn edit-btn">编辑</button>
             <button @click="handleDelete(friend.id)" class="admin-btn del-btn">删除</button>
           </div>
@@ -174,7 +188,7 @@
 <script setup>
 import { computed, inject, ref, onMounted } from 'vue'
 import { useUserStore } from '../stores/user'
-import { getFriendLinks, addFriendLink, applyFriendLink, updateFriendLink, deleteFriendLink } from '../api/friend'
+import { getFriendLinks, addFriendLink, applyFriendLink, approveFriendLink, updateFriendLink, deleteFriendLink } from '../api/friend'
 import { uploadImage } from '../api/upload'
 import CropDialog from '../components/CropDialog.vue'
 import { fallbackFriends } from '../config/site.config.js'
@@ -257,10 +271,24 @@ const ui = computed(() => siteLanguage.value === 'en'
       emptyHint: '成为第一个连接的节点',
     })
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/api\/?$/, '')
+
+const cleanText = (value) => String(value || '').trim()
+const compactUrl = (value) => cleanText(value).replace(/\s+/g, '')
+const isHttpUrl = (url) => /^https?:\/\//i.test(cleanText(url))
+const normalizeSubmittedUrl = (value) => {
+  const url = compactUrl(value)
+  if (!url) return ''
+  if (isHttpUrl(url)) return url
+  if (/^[\w.-]+\.[a-z]{2,}(\/.*)?$/i.test(url)) return `https://${url}`
+  return url
+}
+
 const useFallbackFriends = () => {
   friends.value = fallbackFriends.map(friend => ({
     ...friend,
     avatar: resolveUploadUrl(friend.avatar),
+    isValidUrl: isHttpUrl(friend.url),
     isFallback: true,
   }))
 }
@@ -268,22 +296,27 @@ const useFallbackFriends = () => {
 const backendTestNames = new Set(['嘀咕嘀咕', 'vDVD', 'VS VS v', '放松放松'])
 const backendTestUrls = new Set(['的DVD', 'VS VS', '三十分'])
 
-const isValidFriend = (friend) => {
-  const name = String(friend?.name || '').trim()
-  const url = String(friend?.url || '').trim()
-  if (!name || !/^https?:\/\//i.test(url)) return false
+const isValidFriend = (friend, includeIncomplete = false) => {
+  const name = cleanText(friend?.name)
+  const url = cleanText(friend?.url)
+  if (!name) return false
+  if (!includeIncomplete && !isHttpUrl(url)) return false
   if (backendTestNames.has(name) || backendTestUrls.has(url)) return false
   return true
 }
 
-const normalizeFriends = (list = []) => list
+const normalizeFriends = (list = [], includeIncomplete = false) => list
   .map(friend => ({
     ...friend,
-    name: String(friend.name || '').trim(),
-    url: String(friend.url || '').trim(),
+    name: cleanText(friend.name),
+    url: compactUrl(friend.url),
     avatar: resolveUploadUrl(friend.avatar),
+    description: cleanText(friend.description),
+    category: cleanText(friend.category),
+    email: cleanText(friend.email),
+    isValidUrl: isHttpUrl(friend.url),
   }))
-  .filter(isValidFriend)
+  .filter(friend => isValidFriend(friend, includeIncomplete))
 
 const loadFriends = async () => {
   loading.value = true
@@ -291,7 +324,7 @@ const loadFriends = async () => {
     const url = userStore.isAdmin ? '/friend/link/all' : '/friend/link/list'
     const res = await getFriendLinks(url)
     if ((res.code === 200 || res.code === 0) && res.data?.length) {
-      const normalizedFriends = normalizeFriends(res.data)
+      const normalizedFriends = normalizeFriends(res.data, userStore.isAdmin)
       if (normalizedFriends.length) {
         friends.value = normalizedFriends
       } else {
@@ -312,6 +345,7 @@ const appendPendingFriend = (payload) => {
     id: `pending-${Date.now()}`,
     avatar: resolveUploadUrl(payload.avatar),
     isActive: 0,
+    isValidUrl: isHttpUrl(payload.url),
   }
   friends.value = [pending, ...friends.value.filter(item => item.url !== payload.url)]
 }
@@ -331,15 +365,14 @@ const onAvatarError = (e) => {
   e.target.style.display = 'none'
 }
 
-const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/api\/?$/, '')
-
 const resolveUploadUrl = (url) => {
-  if (!url) return ''
-  if (/^https?:\/\//.test(url)) return url
-  if (url.startsWith('/upload/') || url.startsWith('/uploads/')) {
-    return `${apiBaseUrl}${url}`
+  const cleaned = compactUrl(url)
+  if (!cleaned) return ''
+  if (/^https?:\/\//.test(cleaned)) return cleaned
+  if (cleaned.startsWith('/upload/') || cleaned.startsWith('/uploads/')) {
+    return `${apiBaseUrl}${cleaned}`
   }
-  return url
+  return cleaned
 }
 
 const handleAvatarUpload = async (e) => {
@@ -389,8 +422,22 @@ const closeApplyForm = () => {
 }
 
 const submitApplication = async () => {
-  if (!applyForm.value.name || !applyForm.value.url) {
+  const payload = {
+    ...applyForm.value,
+    name: cleanText(applyForm.value.name),
+    url: normalizeSubmittedUrl(applyForm.value.url),
+    avatar: compactUrl(applyForm.value.avatar),
+    description: cleanText(applyForm.value.description),
+    category: cleanText(applyForm.value.category),
+    email: cleanText(applyForm.value.email),
+  }
+  if (!payload.name || !payload.url) {
     applyMsg.value = ui.value.required
+    applyOk.value = false
+    return
+  }
+  if (!isHttpUrl(payload.url)) {
+    applyMsg.value = '请填写正确的网址，例如 https://example.com'
     applyOk.value = false
     return
   }
@@ -398,7 +445,6 @@ const submitApplication = async () => {
   applying.value = true
   applyMsg.value = ''
   applyOk.value = false
-  const payload = { ...applyForm.value }
 
   try {
     const res = await applyFriendLink(payload)
@@ -422,17 +468,50 @@ const submitApplication = async () => {
 }
 
 const submitForm = async () => {
-  if (!form.value.name || !form.value.url) { alert('名称和链接必填'); return }
+  const payload = {
+    ...form.value,
+    name: cleanText(form.value.name),
+    url: normalizeSubmittedUrl(form.value.url),
+    avatar: compactUrl(form.value.avatar),
+    description: cleanText(form.value.description),
+    category: cleanText(form.value.category),
+    email: cleanText(form.value.email),
+  }
+  if (!payload.name || !payload.url) { alert('名称和链接必填'); return }
+  if (!isHttpUrl(payload.url)) { alert('链接需要填写完整网址，例如 https://example.com'); return }
   try {
     if (editingId.value) {
-      await updateFriendLink(editingId.value, form.value)
+      await updateFriendLink(editingId.value, payload)
     } else {
-      await addFriendLink(form.value)
+      await addFriendLink(payload)
     }
     showForm.value = false
     loadFriends()
   } catch (e) {
     alert('操作失败：' + (e?.message || '网络错误'))
+  }
+}
+
+const handleApprove = async (friend) => {
+  if (!friend.isValidUrl) {
+    alert('请先编辑并补全正确的网址，再通过审核')
+    return
+  }
+  try {
+    await approveFriendLink(friend.id, 1)
+    loadFriends()
+  } catch (e) {
+    alert('审核失败：' + (e?.message || '网络错误'))
+  }
+}
+
+const handleDeactivate = async (friend) => {
+  if (!confirm('确定要把这条友链转回待审核/下架状态吗？')) return
+  try {
+    await approveFriendLink(friend.id, 0)
+    loadFriends()
+  } catch (e) {
+    alert('下架失败：' + (e?.message || '网络错误'))
   }
 }
 
@@ -738,6 +817,10 @@ onMounted(loadFriends)
   opacity: 0.6;
 }
 
+.friend-invalid {
+  border-color: rgba(255, 189, 102, 0.22);
+}
+
 .node-link {
   display: flex;
   flex-direction: column;
@@ -746,6 +829,10 @@ onMounted(loadFriends)
   padding: 14px 10px;
   text-decoration: none;
   color: inherit;
+}
+
+.node-link-disabled {
+  cursor: default;
 }
 
 /* 连接线装饰 */
@@ -841,6 +928,18 @@ onMounted(loadFriends)
   color: #ffbd66;
 }
 
+.node-warning {
+  width: 100%;
+  margin: 2px 0 0;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: #ffcf8f;
+  background: rgba(255, 189, 102, 0.08);
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: center;
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
@@ -905,6 +1004,21 @@ onMounted(loadFriends)
   color: #888;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+.admin-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.approve-btn {
+  color: #93c5fd;
+  border-color: rgba(96, 165, 250, 0.35);
+}
+
+.offline-btn {
+  color: #ffbd66;
+  border-color: rgba(255, 189, 102, 0.3);
 }
 
 .edit-btn:hover {

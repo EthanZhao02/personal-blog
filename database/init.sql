@@ -133,7 +133,22 @@ CREATE TABLE friend_link (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='友情链接表';
 
 -- ============================================
--- 9. 项目展示表
+-- 9. 站点访问统计表
+-- ============================================
+DROP TABLE IF EXISTS site_visit;
+CREATE TABLE site_visit (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '访问ID',
+  visitor_id VARCHAR(80) NOT NULL COMMENT '访客标识',
+  path VARCHAR(500) DEFAULT '' COMMENT '访问路径',
+  user_agent VARCHAR(500) DEFAULT '' COMMENT '浏览器信息',
+  ip_address VARCHAR(100) DEFAULT '' COMMENT '访问IP',
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '访问时间',
+  KEY idx_visitor_id (visitor_id),
+  KEY idx_create_time (create_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='站点访问统计表';
+
+-- ============================================
+-- 10. 项目展示表
 -- ============================================
 DROP TABLE IF EXISTS project;
 CREATE TABLE project (

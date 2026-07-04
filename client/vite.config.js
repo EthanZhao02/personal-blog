@@ -19,7 +19,8 @@ export default defineConfig({
         server.middlewares.use((req, res, next) => {
           if (req.url.startsWith('/api') || req.url.startsWith('/comment') ||
               req.url.startsWith('/friend') || req.url.startsWith('/upload') ||
-              req.url.startsWith('/uploads') || req.url.startsWith('/@')) {
+              req.url.startsWith('/uploads') || req.url.startsWith('/site') ||
+              req.url.startsWith('/@')) {
             return next()
           }
           history({ index: '/index.html' })(req, res, next)
@@ -57,6 +58,10 @@ export default defineConfig({
         changeOrigin: true
       },
       '/friend/all': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/site/stats': {
         target: 'http://localhost:8080',
         changeOrigin: true
       },

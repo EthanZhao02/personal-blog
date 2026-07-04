@@ -37,6 +37,7 @@ public class DatabaseInitializer implements CommandLineRunner {
     private static final String FRIENDLINK_TABLE = "test.blog_friend_link";
     private static final String PROJECT_TABLE = "test.blog_project";
     private static final String PROFILE_TABLE = "test.blog_profile";
+    private static final String SITE_VISIT_TABLE = "test.blog_site_visit";
 
     @Override
     public void run(String... args) throws Exception {
@@ -55,6 +56,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         ensureTagData();
         ensureProfileTable();
         ensureDefaultProfile();
+        ensureSiteVisitTable();
         log.info("=== 数据库自检完成 ===");
     }
 
@@ -452,6 +454,42 @@ public class DatabaseInitializer implements CommandLineRunner {
             log.info("✓ 已补齐 profile 新字段默认值");
         } catch (Exception e) {
             log.error("✗ 补齐 profile 新字段失败", e);
+        }
+    }
+
+    private void ensureSiteVisitTable() {
+        String dbName = "test";
+        String rawTable = SITE_VISIT_TABLE.replace("test.", "");
+        try {
+            Integer tableCount = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?",
+                Integer.class, dbName, rawTable
+            );
+            if (tableCount == null || tableCount == 0) {
+                log.warn("blog_site_visit 表不存在，正在创建...");
+                jdbcTemplate.execute("CREATE TABLE " + SITE_VISIT_TABLE + " (" +
+                    "id BIGINT PRIMARY KEY AUTO_INCREMENT," +
+                    "visitor_id VARCHAR(80) NOT NULL," +
+                    "path VARCHAR(500)," +
+                    "user_agent VARCHAR(500)," +
+                    "ip_address VARCHAR(100)," +
+                    "create_time DATETIME DEFAULT CURRENT_TIMESTAMP," +
+                    "KEY idx_visitor_id (visitor_id)," +
+                    "KEY idx_create_time (create_time)" +
+                ")");
+                log.info("✓ blog_site_visit 表创建成功");
+            } else {
+                ensureColumns(SITE_VISIT_TABLE, java.util.List.of(
+                    java.util.Map.of("name", "visitor_id", "type", "VARCHAR(80)"),
+                    java.util.Map.of("name", "path", "type", "VARCHAR(500)"),
+                    java.util.Map.of("name", "user_agent", "type", "VARCHAR(500)"),
+                    java.util.Map.of("name", "ip_address", "type", "VARCHAR(100)"),
+                    java.util.Map.of("name", "create_time", "type", "DATETIME")
+                ));
+                log.info("✓ blog_site_visit 表已存在");
+            }
+        } catch (Exception e) {
+            log.error("✗ 创建 blog_site_visit 表失败", e);
         }
     }
 }
