@@ -30,6 +30,27 @@ const socials = [
     icon: 'github',
   },
   {
+    name: 'B站',
+    handle: '1671173639',
+    url: 'https://space.bilibili.com/1671173639?spm_id_from=333.1007.0.0',
+    color: '#00a1d6',
+    icon: 'bilibili',
+  },
+  {
+    name: '抖音',
+    handle: 'ethan_zhao',
+    url: '#douyin',
+    color: '#fe2c55',
+    icon: 'douyin',
+  },
+  {
+    name: '小红书',
+    handle: 'Ethan Zhao',
+    url: '#xiaohongshu',
+    color: '#ff2442',
+    icon: 'xiaohongshu',
+  },
+  {
     name: '稀土掘金',
     handle: '2355568709733891',
     url: 'https://juejin.cn/user/2355568709733891',
@@ -74,13 +95,6 @@ const socials = [
     url: 'mailto:ethan912yydegree@gmail.com',
     color: '#8df8c7',
     icon: 'email',
-  },
-  {
-    name: 'B站',
-    handle: '1671173639',
-    url: 'https://space.bilibili.com/1671173639?spm_id_from=333.1007.0.0',
-    color: '#00a1d6',
-    icon: 'bilibili',
   },
   {
     name: 'CSDN',

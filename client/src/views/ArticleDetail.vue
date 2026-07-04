@@ -189,7 +189,12 @@
           <p class="aside-card-title">关于我</p>
           <div class="about-brief">
             <div class="about-avatar">
-              <img :src="siteConfig.avatar" :alt="siteConfig.name" />
+              <div class="avatar-wrapper">
+                <div class="avatar-core">
+                  <img :src="siteConfig.avatar" :alt="siteConfig.name" />
+                </div>
+                <div class="avatar-glow-ring" aria-hidden="true"></div>
+              </div>
             </div>
             <p class="about-name">{{ siteConfig.name }}</p>
             <p class="about-bio">{{ siteConfig.subtitle }}</p>
@@ -1274,17 +1279,51 @@ watch(() => route.params.id, () => {
   text-align: center;
 }
 .about-avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  overflow: hidden;
   margin-bottom: 10px;
-  border: 2px solid var(--border);
 }
-.about-avatar img {
+.about-avatar .avatar-wrapper {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+}
+.about-avatar .avatar-core {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  animation: coreFloat 4s ease-in-out infinite;
+}
+.about-avatar .avatar-core img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 16px;
+  border: 2px solid rgba(56, 248, 255, 0.3);
+}
+.about-avatar .avatar-glow-ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 20px;
+  background: conic-gradient(from 0deg, transparent 0%, rgba(56, 248, 255, 0.25) 30%, rgba(155, 92, 255, 0.25) 70%, transparent 100%);
+  animation: ringRotate 10s linear infinite;
+  opacity: 0.5;
+}
+.about-avatar .avatar-glow-ring::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: rgba(8, 14, 27, 0.95);
+  border-radius: 18px;
+}
+@keyframes ringRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes coreFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
 }
 .about-name {
   font-size: 15px;
