@@ -65,11 +65,6 @@
         </div>
       </main>
 
-      <!-- 管理员添加按钮 -->
-      <button v-if="userStore.isAdmin && !loading" class="add-friend-btn" @click="openAdd">
-        + 添加友链
-      </button>
-
       <!-- 加载中 -->
       <div v-if="loading" class="loading-state">
         <div class="loading-spinner"></div>
