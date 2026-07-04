@@ -60,6 +60,9 @@ public class WebConfig implements WebMvcConfigurer {
                         // 项目相关 - 公开
                         "/project/list",
                         "/project/all",
+                        // 个人资料 - 公开读取，写由 Controller 层鉴权
+                        "/profile",
+                        "/profile/**",
                         // 上传文件 - 公开
                         "/upload/**",
                         "/uploads/**",
