@@ -368,7 +368,7 @@ const refreshSiteStats = async () => {
 }
 
 const trackSiteVisit = async (path) => {
-  if (isStaticMode || lastTrackedPath === path) return
+  if (lastTrackedPath === path) return
   lastTrackedPath = path
   const res = await recordSiteVisit({
     visitorId: getVisitorId(),
