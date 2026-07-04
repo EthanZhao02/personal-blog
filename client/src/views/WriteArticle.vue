@@ -83,6 +83,18 @@
                 :class="{ active: selectedTagIds.includes(tag.id) }"
                 @click="toggleTag(tag.id)"
               >{{ tag.name }}</button>
+              <input
+                v-if="showNewTagInput"
+                v-model="newTagName"
+                type="text"
+                class="new-tag-input"
+                placeholder="输入新标签"
+                maxlength="20"
+                @keydown.enter.prevent="confirmNewTag"
+                @blur="confirmNewTag"
+                ref="newTagInputRef"
+              />
+              <button v-else class="tag-btn add-tag" @click="startNewTag">+ 新建</button>
             </div>
           </div>
         </div>
@@ -182,7 +194,7 @@ import { useRoute } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { getArticleList, getArticleDetail, createArticle, updateArticle, deleteArticle, getMyArticles } from '../api/article'
 import { getCategoryList } from '../api/category'
-import { getTagList } from '../api/tag'
+import { getTagList, addTag } from '../api/tag'
 import { uploadImage, uploadAttachment } from '../api/upload'
 
 const route = useRoute()
@@ -261,11 +273,25 @@ const categories = ref([])
 const tags = ref([])
 const saving = ref(false)
 const editingId = ref(null)
+const showNewTagInput = ref(false)
+const newTagName = ref('')
 
 const coverInput = ref(null)
 const imageInput = ref(null)
 const attachmentInput = ref(null)
 const contentTextarea = ref(null)
+const newTagInputRef = ref(null)
+
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/api\/?$/, '')
+
+const resolveUploadUrl = (url) => {
+  if (!url) return ''
+  if (/^https?:\/\//.test(url)) return url
+  if (url.startsWith('/upload/') || url.startsWith('/uploads/')) {
+    return `${apiBaseUrl}${url}`
+  }
+  return url
+}
 
 const isEdit = computed(() => !!editingId.value)
 
@@ -281,8 +307,11 @@ const renderedContent = computed(() => {
     .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
     // 行内代码
     .replace(/`([^`]+)`/g, '<code>$1</code>')
-    // 图片（![]... 的 src 用 /uploads 路径，直接显示）
-    .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width:100%;border-radius:4px;margin:8px 0" />')
+    // 图片（![]... 的 src 用完整 URL）
+    .replace(/!\[(.*?)\]\((.*?)\)/g, (_, alt, src) => {
+      const url = resolveUploadUrl(src)
+      return `<img src="${url}" alt="${alt}" style="max-width:100%;border-radius:4px;margin:8px 0" />`
+    })
     // 链接
     .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
     // 标题
@@ -323,7 +352,7 @@ const handleCoverUpload = async (e) => {
   try {
     const res = await uploadImage(file)
     if (res.code === 200 && res.data) {
-      article.value.cover = res.data
+      article.value.cover = resolveUploadUrl(res.data)
     } else {
       alert('封面上传失败: ' + (res.message || '未知错误'))
     }
@@ -339,7 +368,7 @@ const handleImageUpload = async (e) => {
   try {
     const res = await uploadImage(file)
     if (res.code === 200 && res.data) {
-      const markdown = `![${file.name}](${res.data})`
+      const markdown = `![${file.name}](${resolveUploadUrl(res.data)})`
       insertAtCursor(markdown)
     } else {
       alert('图片上传失败: ' + (res.message || '未知错误'))
@@ -359,7 +388,7 @@ const handleAttachmentUpload = async (e) => {
         attachments.value.push({
           name: file.name,
           size: file.size,
-          url: res.data
+          url: resolveUploadUrl(res.data)
         })
       } else {
         alert(`附件「${file.name}」上传失败: ` + (res.message || '未知错误'))
@@ -417,6 +446,38 @@ const toggleTag = (id) => {
     selectedTagIds.value.splice(idx, 1)
   } else {
     selectedTagIds.value.push(id)
+  }
+}
+
+const startNewTag = () => {
+  showNewTagInput.value = true
+  newTagName.value = ''
+  setTimeout(() => newTagInputRef.value?.focus(), 0)
+}
+
+const confirmNewTag = async () => {
+  const name = newTagName.value.trim()
+  showNewTagInput.value = false
+  if (!name) return
+  const exist = tags.value.find(t => t.name === name)
+  if (exist) {
+    if (!selectedTagIds.value.includes(exist.id)) {
+      selectedTagIds.value.push(exist.id)
+    }
+    return
+  }
+  try {
+    const res = await addTag({ name })
+    if (res.code === 200 || res.code === 0) {
+      const newTag = res.data || { id: Date.now(), name }
+      tags.value.push(newTag)
+      selectedTagIds.value.push(newTag.id)
+    } else {
+      alert('创建标签失败：' + (res.message || '未知错误'))
+    }
+  } catch (e) {
+    console.error('创建标签失败:', e)
+    alert('创建标签失败：' + (e?.message || '网络错误'))
   }
 }
 
@@ -909,6 +970,22 @@ onMounted(async () => {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--bg);
+}
+
+.tag-btn.add-tag {
+  border-style: dashed;
+  opacity: 0.8;
+}
+
+.new-tag-input {
+  padding: 6px 10px;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: 20px;
+  color: var(--text);
+  font-size: 12px;
+  outline: none;
+  width: 100px;
 }
 
 /* 工具栏 */

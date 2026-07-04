@@ -2,7 +2,10 @@ package com.blog.controller;
 
 import com.blog.common.Result;
 import com.blog.entity.Message;
+import com.blog.entity.User;
 import com.blog.service.MessageService;
+import com.blog.service.UserService;
+import com.blog.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +19,12 @@ public class MessageController {
 
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/list")
     public Result<List<Message>> getList() {
@@ -55,9 +64,30 @@ public class MessageController {
 
     /** 删除留言（管理员） */
     @DeleteMapping("/delete/{id}")
-    public Result<Void> delete(@PathVariable Long id) {
+    public Result<Void> delete(HttpServletRequest request, @PathVariable Long id) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.error("请先登录");
+        }
+        User user = userService.getById(userId);
+        if (user == null || !"admin".equals(user.getUsername())) {
+            return Result.error("无权删除");
+        }
         boolean ok = messageService.deleteMessage(id);
         return ok ? Result.success() : Result.error("删除失败");
+    }
+
+    private Long getUserIdFromRequest(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        if (token == null || token.isBlank()) return null;
+        try {
+            return jwtUtil.getUserId(token);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private String getClientIp(HttpServletRequest request) {

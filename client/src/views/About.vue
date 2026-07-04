@@ -11,6 +11,7 @@
         <div class="profile-header">
           <div class="avatar-section">
             <div class="avatar-wrapper">
+              <div class="avatar-glow-ring" aria-hidden="true"></div>
               <div class="avatar-core">
                 <img
                   v-if="siteConfig.avatar"
@@ -22,7 +23,6 @@
                   {{ siteConfig.name?.charAt(0) || '?' }}
                 </div>
               </div>
-              <div class="avatar-glow-ring" aria-hidden="true"></div>
             </div>
             <div class="profile-name">
               <h1 class="name-text">{{ siteConfig.name }}</h1>
@@ -362,6 +362,7 @@ const getSocialIcon = (icon) => {
 
 .avatar-core {
   position: relative;
+  z-index: 2;
   width: 100%;
   height: 100%;
   border-radius: 16px;
@@ -376,16 +377,17 @@ const getSocialIcon = (icon) => {
   border-radius: 16px;
   object-fit: cover;
   border: 2px solid rgba(56, 248, 255, 0.3);
+  background: rgba(8, 14, 27, 0.92);
 }
 
 .avatar-glow-ring {
   position: absolute;
-  inset: -8px;
-  border-radius: 24px;
-  background: conic-gradient(from 0deg, transparent 0%, rgba(56, 248, 255, 0.7) 30%, rgba(155, 92, 255, 0.7) 70%, transparent 100%);
-  animation: ringRotate 4s linear infinite;
-  opacity: 0.85;
-  filter: drop-shadow(0 0 8px rgba(56, 248, 255, 0.45));
+  z-index: 1;
+  inset: -5px;
+  border-radius: 21px;
+  background: conic-gradient(from 0deg, rgba(56, 248, 255, 0) 0%, rgba(56, 248, 255, 0.55) 25%, rgba(155, 92, 255, 0.55) 75%, rgba(56, 248, 255, 0) 100%);
+  animation: ringRotate 6s linear infinite;
+  opacity: 0.55;
 }
 
 .avatar-glow-ring::before {
@@ -393,7 +395,7 @@ const getSocialIcon = (icon) => {
   position: absolute;
   inset: 3px;
   background: rgba(8, 14, 27, 0.92);
-  border-radius: 21px;
+  border-radius: 18px;
 }
 
 @keyframes ringRotate {

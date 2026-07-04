@@ -61,7 +61,15 @@
               >
                 <div class="bubble-header">
                   <span class="bubble-name">{{ msg.nickname || '匿名用户' }}</span>
-                  <span class="bubble-time">{{ formatTime(msg.createTime) }}</span>
+                  <div class="bubble-header-right">
+                    <span class="bubble-time">{{ formatTime(msg.createTime) }}</span>
+                    <button
+                      v-if="userStore.isAdmin"
+                      class="del-msg-btn"
+                      @click.stop="handleDelete(msg.id)"
+                      title="删除"
+                    >×</button>
+                  </div>
                 </div>
                 <div class="bubble-content">{{ msg.content }}</div>
                 <div class="bubble-footer" v-if="msg.location || msg.browser">
@@ -127,10 +135,12 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import { getMessageList, addMessage } from '../api/message'
+import { getMessageList, addMessage, deleteMessage } from '../api/message'
 import { isStaticMode } from '../config/site.config'
+import { useUserStore } from '../stores/user'
 import GiscusComments from '../components/GiscusComments.vue'
 
+const userStore = useUserStore()
 const messages = ref([])
 const loading = ref(true)
 const sending = ref(false)
@@ -207,6 +217,20 @@ const formatTime = (s) => {
   if (!s) return ''
   const d = new Date(s)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+}
+
+const handleDelete = async (id) => {
+  if (!confirm('确定删除这条留言吗？')) return
+  try {
+    const res = await deleteMessage(id)
+    if (res.code === 200 || res.code === 0) {
+      messages.value = messages.value.filter(m => m.id !== id)
+    } else {
+      alert('删除失败：' + (res.message || '未知错误'))
+    }
+  } catch (e) {
+    alert('删除失败：' + (e?.message || '网络错误'))
+  }
 }
 
 onMounted(loadMessages)
@@ -414,6 +438,12 @@ onMounted(loadMessages)
   gap: 12px;
 }
 
+.bubble-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .bubble-name {
   font-size: 13px;
   font-weight: 600;
@@ -424,6 +454,26 @@ onMounted(loadMessages)
   font-size: 11px;
   color: rgba(255, 255, 255, 0.3);
   font-family: 'SF Mono', monospace;
+}
+
+.del-msg-btn {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 100, 100, 0.15);
+  border: 1px solid rgba(255, 100, 100, 0.3);
+  border-radius: 4px;
+  color: #ff8a8a;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.del-msg-btn:hover {
+  background: rgba(255, 100, 100, 0.3);
 }
 
 .bubble-content {

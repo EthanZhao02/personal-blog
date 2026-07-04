@@ -105,58 +105,14 @@
 
             <!-- 评论列表 -->
             <div class="comment-list" v-if="comments.length > 0">
-              <div
+              <CommentNode
                 v-for="comment in comments"
                 :key="comment.id"
-                class="comment-item"
-              >
-                <div class="comment-avatar">
-                  <img v-if="comment.userAvatar" :src="comment.userAvatar" :alt="comment.nickname || comment.username" @error="handleAvatarError" />
-                  <span v-else class="avatar-letter">{{ getInitial(comment.nickname || comment.username) }}</span>
-                </div>
-                <div class="comment-body">
-                  <div class="comment-meta">
-                    <a v-if="comment.website" :href="comment.website" target="_blank" rel="noopener" class="comment-author linked">{{ comment.nickname || comment.username || '匿名用户' }}</a>
-                    <span v-else class="comment-author">{{ comment.nickname || comment.username || '匿名用户' }}</span>
-                    <span class="comment-badge" v-if="comment.isAdmin">博主</span>
-                    <span class="comment-time">{{ formatDate(comment.createTime) }}</span>
-                    <span v-if="comment.email && isLoggedIn" class="comment-email">{{ comment.email }}</span>
-                  </div>
-                  <div class="comment-text">{{ comment.content }}</div>
-                  <div class="comment-actions">
-                    <button class="action-btn" @click="replyTo(comment)">回复</button>
-                    <button v-if="canDeleteComment(comment)" class="action-btn del-btn" @click="deleteComment(comment.id)">删除</button>
-                  </div>
-
-                  <!-- 子评论 -->
-                  <div class="sub-comments" v-if="comment.children?.length">
-                    <div
-                      v-for="sub in comment.children"
-                      :key="sub.id"
-                      class="sub-comment-item"
-                    >
-                      <div class="sub-comment-avatar">
-                        <img v-if="sub.userAvatar" :src="sub.userAvatar" :alt="sub.nickname || sub.username" @error="handleAvatarError" />
-                        <span v-else class="avatar-letter">{{ getInitial(sub.nickname || sub.username) }}</span>
-                      </div>
-                      <div class="sub-comment-body">
-                        <div class="sub-comment-meta">
-                          <a v-if="sub.website" :href="sub.website" target="_blank" rel="noopener" class="sub-author linked">{{ sub.nickname || sub.username || '匿名用户' }}</a>
-                          <span v-else class="sub-author">{{ sub.nickname || sub.username || '匿名用户' }}</span>
-                          <span class="comment-badge" v-if="sub.isAdmin">博主</span>
-                          <span class="sub-time">{{ formatDate(sub.createTime) }}</span>
-                          <span v-if="sub.email && isLoggedIn" class="comment-email">{{ sub.email }}</span>
-                        </div>
-                        <div class="sub-text">{{ sub.content }}</div>
-                        <div class="comment-actions">
-                          <button class="action-btn" @click="replyTo(sub)">回复</button>
-                          <button v-if="canDeleteComment(sub)" class="action-btn del-btn" @click="deleteComment(sub.id)">删除</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                :comment="comment"
+                :depth="0"
+                @reply="replyTo"
+                @delete="deleteComment"
+              />
             </div>
 
             <div class="no-comments" v-else>
@@ -190,10 +146,10 @@
           <div class="about-brief">
             <div class="about-avatar">
               <div class="avatar-wrapper">
+                <div class="avatar-glow-ring" aria-hidden="true"></div>
                 <div class="avatar-core">
                   <img :src="siteConfig.avatar" :alt="siteConfig.name" />
                 </div>
-                <div class="avatar-glow-ring" aria-hidden="true"></div>
               </div>
             </div>
             <p class="about-name">{{ siteConfig.name }}</p>
@@ -236,6 +192,7 @@ import { getArticleList } from '../api/article'
 import { useUserStore } from '../stores/user'
 import siteConfig, { fallbackArticles, fallbackComments, isStaticMode, resolveAssetUrl } from '../config/site.config.js'
 import GiscusComments from '../components/GiscusComments.vue'
+import CommentNode from '../components/CommentNode.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -1029,171 +986,11 @@ watch(() => route.params.id, () => {
   cursor: not-allowed;
 }
 
-/* 评论列表 - 与留言板一致 */
+/* 评论列表 */
 .comment-list {
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-.comment-item {
-  display: flex;
-  gap: 14px;
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: rgba(8, 14, 27, 0.56);
-  animation: fadeUp 0.35s both;
-}
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.comment-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.comment-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.avatar-letter {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--accent);
-  font-family: 'Noto Serif SC', serif;
-}
-.comment-body {
-  flex: 1;
-  min-width: 0;
-}
-.comment-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  flex-wrap: wrap;
-}
-.comment-author {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-.comment-author.linked {
-  color: var(--accent-dark);
-  text-decoration: none;
-}
-.comment-author.linked:hover {
-  text-decoration: underline;
-}
-.comment-badge {
-  font-size: 11px;
-  padding: 1px 8px;
-  background: rgba(56, 248, 255, 0.1);
-  color: var(--accent);
-  border-radius: 10px;
-  font-weight: 600;
-}
-.comment-time {
-  font-size: 12px;
-  color: var(--text-lighter);
-}
-.comment-email {
-  font-size: 11px;
-  color: var(--text-lighter);
-}
-.comment-text {
-  font-size: 14px;
-  color: var(--text);
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-.comment-actions {
-  margin-top: 6px;
-}
-.action-btn {
-  font-size: 12px;
-  color: #c0c0c0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  margin-right: 10px;
-  transition: color 0.2s;
-}
-.action-btn:hover { color: var(--accent); }
-.action-btn.del-btn:hover { color: #f56c6c; }
-
-.sub-comments {
-  margin-top: 12px;
-  margin-left: 54px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.sub-comment-item {
-  display: flex;
-  gap: 10px;
-}
-.sub-comment-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-.sub-comment-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.sub-comment-body {
-  flex: 1;
-  min-width: 0;
-}
-.sub-comment-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-  flex-wrap: wrap;
-}
-.sub-author {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-}
-.sub-author.linked {
-  color: var(--accent-dark);
-  text-decoration: none;
-}
-.sub-author.linked:hover {
-  text-decoration: underline;
-}
-.sub-time {
-  font-size: 11px;
-  color: var(--text-lighter);
-}
-.sub-text {
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-break: break-word;
 }
 .no-comments {
   text-align: center;
@@ -1289,6 +1086,7 @@ watch(() => route.params.id, () => {
 }
 .about-avatar .avatar-core {
   position: relative;
+  z-index: 2;
   width: 100%;
   height: 100%;
   border-radius: 16px;
@@ -1301,22 +1099,23 @@ watch(() => route.params.id, () => {
   object-fit: cover;
   border-radius: 16px;
   border: 2px solid rgba(56, 248, 255, 0.3);
+  background: rgba(8, 14, 27, 0.92);
 }
 .about-avatar .avatar-glow-ring {
   position: absolute;
-  inset: -7px;
-  border-radius: 22px;
-  background: conic-gradient(from 0deg, transparent 0%, rgba(56, 248, 255, 0.7) 30%, rgba(155, 92, 255, 0.7) 70%, transparent 100%);
-  animation: ringRotate 4s linear infinite;
-  opacity: 0.85;
-  filter: drop-shadow(0 0 6px rgba(56, 248, 255, 0.45));
+  z-index: 1;
+  inset: -4px;
+  border-radius: 20px;
+  background: conic-gradient(from 0deg, rgba(56, 248, 255, 0) 0%, rgba(56, 248, 255, 0.55) 25%, rgba(155, 92, 255, 0.55) 75%, rgba(56, 248, 255, 0) 100%);
+  animation: ringRotate 6s linear infinite;
+  opacity: 0.55;
 }
 .about-avatar .avatar-glow-ring::before {
   content: '';
   position: absolute;
-  inset: 2px;
+  inset: 3px;
   background: rgba(8, 14, 27, 0.92);
-  border-radius: 20px;
+  border-radius: 17px;
 }
 @keyframes ringRotate {
   from { transform: rotate(0deg); }
