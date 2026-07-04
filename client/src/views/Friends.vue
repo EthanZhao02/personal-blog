@@ -341,23 +341,24 @@ onMounted(loadFriends)
 /* 友链网格 */
 .friends-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
 }
 
 .friend-node {
   position: relative;
   background: rgba(12, 20, 35, 0.6);
-  border: 1px solid rgba(56, 248, 255, 0.1);
-  border-radius: 12px;
+  border: 1px solid rgba(56, 248, 255, 0.08);
+  border-radius: 10px;
   transition: all 0.3s ease;
-  overflow: visible;
+  overflow: hidden;
+  text-align: center;
 }
 
 .friend-node:hover {
-  border-color: rgba(56, 248, 255, 0.3);
-  transform: translateY(-4px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  border-color: rgba(56, 248, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .friend-pending {
@@ -366,9 +367,10 @@ onMounted(loadFriends)
 
 .node-link {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 20px;
+  gap: 8px;
+  padding: 14px 10px;
   text-decoration: none;
   color: inherit;
 }
@@ -389,9 +391,9 @@ onMounted(loadFriends)
 
 /* 头像 */
 .node-avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
   background: rgba(56, 248, 255, 0.1);
@@ -408,7 +410,7 @@ onMounted(loadFriends)
 }
 
 .avatar-placeholder {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
   color: #38f8ff;
 }
@@ -420,19 +422,21 @@ onMounted(loadFriends)
 }
 
 .node-name {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   color: #fff;
-  margin: 0 0 4px 0;
+  margin: 0;
+  line-height: 1.3;
 }
 
 .node-desc {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;
 }
 
 /* 状态指示 */
@@ -505,8 +509,9 @@ onMounted(loadFriends)
 /* 管理员按钮 */
 .node-admin-actions {
   display: flex;
-  gap: 6px;
-  padding: 0 20px 12px;
+  gap: 4px;
+  justify-content: center;
+  padding: 0 10px 10px;
 }
 
 .admin-btn {
