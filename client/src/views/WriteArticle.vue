@@ -197,7 +197,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { getArticleList, getArticleDetail, createArticle, updateArticle, deleteArticle, getMyArticles } from '../api/article'
@@ -205,6 +205,9 @@ import { getCategoryList } from '../api/category'
 import { getTagList, addTag } from '../api/tag'
 import { uploadImage, uploadAttachment } from '../api/upload'
 import CropDialog from '../components/CropDialog.vue'
+import { marked } from 'marked'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github-dark.css'
 
 const route = useRoute()
 const userStore = useUserStore()
@@ -341,49 +344,23 @@ const resolveUploadUrl = (url) => {
 const isEdit = computed(() => !!editingId.value)
 
 // 简单的 Markdown → HTML 渲染（支持标题、粗斜体、图片、代码块、列表、链接）
+// 配置 marked + highlight.js
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+  highlight: (code, lang) => {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(code, { language: lang }).value
+      } catch {}
+    }
+    return hljs.highlightAuto(code).value
+  }
+})
+
 const renderedContent = computed(() => {
   if (!article.value.content) return '<p style="color:var(--text-lighter);font-style:italic">预览区域</p>'
-  let html = article.value.content
-    // 转义 HTML
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    // 代码块
-    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-    // 行内代码
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    // 图片（![]... 的 src 用完整 URL）
-    .replace(/!\[(.*?)\]\((.*?)\)/g, (_, alt, src) => {
-      const url = resolveUploadUrl(src)
-      return `<img src="${url}" alt="${alt}" style="max-width:100%;border-radius:4px;margin:8px 0" />`
-    })
-    // 链接
-    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
-    // 标题
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    // 粗体斜体
-    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // 引用
-    .replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>')
-    // 分割线
-    .replace(/^---$/gm, '<hr>')
-    // 列表
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
-    // 段落
-    .split('\n\n')
-    .map(p => p.trim())
-    .filter(p => p)
-    .map(p => {
-      if (/^<(h[1-6]|pre|blockquote|ul|ol|li|img|hr)/.test(p)) return p
-      return `<p>${p.replace(/\n/g, '<br>')}</p>`
-    })
-    .join('\n')
-  return html
+  return marked.parse(article.value.content)
 })
 
 // 上传相关
@@ -709,6 +686,7 @@ const doSave = async (isPublish) => {
         editingId.value = res.data.id
       }
       await loadMyArticles()
+      clearDraft()
       alert(editingId.value ? '保存成功' : '发布成功')
     } else {
       alert('操作失败：' + (res.message || `错误码 ${res.code}`))
@@ -722,13 +700,73 @@ const doSave = async (isPublish) => {
   }
 }
 
+// Ctrl+S 快捷键
+const handleKeydown = (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault()
+    saveDraft()
+  }
+}
+
+// 自动保存草稿到 localStorage
+const AUTO_DRAFT_KEY = 'blog_write_draft'
+let draftTimer = null
+
+const autoSaveDraft = () => {
+  clearTimeout(draftTimer)
+  draftTimer = setTimeout(() => {
+    const draft = {
+      title: article.value.title,
+      content: article.value.content,
+      summary: article.value.summary,
+      cover: article.value.cover,
+      categoryId: article.value.categoryId,
+      selectedTagIds: selectedTagIds.value,
+      timestamp: Date.now()
+    }
+    localStorage.setItem(AUTO_DRAFT_KEY, JSON.stringify(draft))
+  }, 1500)
+}
+
+watch(() => article.value.content, autoSaveDraft)
+watch(() => article.value.title, autoSaveDraft)
+
+const clearDraft = () => localStorage.removeItem(AUTO_DRAFT_KEY)
+
 onMounted(async () => {
   await Promise.all([loadCategories(), loadTags(), loadMyArticles()])
   const id = route.params.id
   if (id) {
     editingId.value = Number(id)
     await loadArticleDetail(Number(id))
+  } else {
+    // 尝试恢复草稿
+    try {
+      const saved = localStorage.getItem(AUTO_DRAFT_KEY)
+      if (saved) {
+        const draft = JSON.parse(saved)
+        if (draft.timestamp && Date.now() - draft.timestamp < 86400000) {
+          if (draft.title || draft.content) {
+            if (confirm('检测到未保存的草稿（' + new Date(draft.timestamp).toLocaleString() + '），是否恢复？')) {
+              article.value.title = draft.title || ''
+              article.value.content = draft.content || ''
+              article.value.summary = draft.summary || ''
+              article.value.cover = draft.cover || ''
+              article.value.categoryId = draft.categoryId || null
+              selectedTagIds.value = draft.selectedTagIds || []
+            } else {
+              clearDraft()
+            }
+          }
+        }
+      }
+    } catch {}
   }
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
@@ -1147,19 +1185,17 @@ onMounted(async () => {
 }
 
 .preview-content :deep(pre) {
-  background: rgba(0,0,0,0.06);
-  padding: 12px 16px;
-  border-radius: 4px;
+  background: #0d1117;
+  padding: 16px;
+  border-radius: 6px;
   overflow-x: auto;
   margin: 12px 0;
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 .preview-content :deep(code) {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
   font-size: 13px;
-  background: rgba(0,0,0,0.06);
-  padding: 2px 6px;
-  border-radius: 3px;
 }
 
 .preview-content :deep(pre code) {

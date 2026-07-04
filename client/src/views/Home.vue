@@ -634,7 +634,6 @@ onUnmounted(() => {
   height: 100%;
   object-fit: cover;
 }
-}
 
 .project-focus h2 {
   margin: 0 0 8px;
