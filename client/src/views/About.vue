@@ -260,9 +260,10 @@ const submitProfile = async () => {
   saving.value = true
   try {
     const payload = { ...editForm.value }
-    try { payload.skills = JSON.parse(editForm.value.skillsText || '[]') } catch { alert('Skills JSON 格式不正确'); saving.value = false; return }
-    try { payload.interests = JSON.parse(editForm.value.interestsText || '[]') } catch { alert('Interests JSON 格式不正确'); saving.value = false; return }
-    try { payload.socials = JSON.parse(editForm.value.socialsText || '[]') } catch { alert('Connect JSON 格式不正确'); saving.value = false; return }
+    // 后端 skills/interests/socials 是 String 类型，需要 stringify
+    try { payload.skills = JSON.stringify(JSON.parse(editForm.value.skillsText || '[]')) } catch { alert('Skills JSON 格式不正确'); saving.value = false; return }
+    try { payload.interests = JSON.stringify(JSON.parse(editForm.value.interestsText || '[]')) } catch { alert('Interests JSON 格式不正确'); saving.value = false; return }
+    try { payload.socials = JSON.stringify(JSON.parse(editForm.value.socialsText || '[]')) } catch { alert('Connect JSON 格式不正确'); saving.value = false; return }
     delete payload.skillsText; delete payload.interestsText; delete payload.socialsText
     const res = await updateProfile(payload)
     if (res.code === 200) { showEditor.value = false; await loadProfile() }
