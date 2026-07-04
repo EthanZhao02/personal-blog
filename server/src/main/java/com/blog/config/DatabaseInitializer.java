@@ -164,6 +164,8 @@ public class DatabaseInitializer implements CommandLineRunner {
      */
     private void ensureFriendLinkColumns() {
         ensureColumns(FRIENDLINK_TABLE, List.of(
+                Map.of("name", "category", "type", "VARCHAR(50)"),
+                Map.of("name", "email", "type", "VARCHAR(100)"),
                 Map.of("name", "is_active", "type", "TINYINT(1)"),
                 Map.of("name", "sort_order", "type", "INT"),
                 Map.of("name", "update_time", "type", "DATETIME")
