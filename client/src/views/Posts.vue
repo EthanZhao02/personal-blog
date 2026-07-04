@@ -112,7 +112,7 @@
                     <div class="card-meta">
                       <time>{{ formatDate(article.createTime) }}</time>
                       <span class="card-tags" v-if="article.tags?.length">
-                        <span v-for="tag in article.tags.slice(0, 3)" :key="tag.id || tag.name">#{{ tag.name }}</span>
+                        <span v-for="tag in article.tags.slice(0, 3)" :key="tag.id || tag.name">{{ tag.name }}</span>
                       </span>
                     </div>
                   </div>

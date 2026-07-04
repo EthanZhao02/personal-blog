@@ -2,11 +2,14 @@ package com.blog.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +23,9 @@ public class DatabaseInitializer implements CommandLineRunner {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Value("${admin.default-password:}")
+    private String adminPassword;
 
     // TiDB Cloud 中所有表都带 test. 前缀
     private static final String USER_TABLE = "test.blog_user";
@@ -87,18 +93,27 @@ public class DatabaseInitializer implements CommandLineRunner {
             );
             if (count == null || count == 0) {
                 log.warn("未找到 admin 用户，正在自动创建默认管理员...");
-                // MD5("123456") = e10adc3949ba59abbe56e057f20f883e
+                // 密码从环境变量 ADMIN_DEFAULT_PASSWORD 读取，不设则跳过创建
+                String pwd = adminPassword;
+                if (pwd == null || pwd.isBlank()) {
+                    pwd = System.getenv("ADMIN_DEFAULT_PASSWORD");
+                }
+                if (pwd == null || pwd.isBlank()) {
+                    log.warn("未设置 ADMIN_DEFAULT_PASSWORD 环境变量，跳过自动创建 admin 用户");
+                    return;
+                }
+                String hash = DigestUtils.md5DigestAsHex(pwd.getBytes(StandardCharsets.UTF_8));
                 jdbcTemplate.update(
                     "INSERT INTO " + USER_TABLE + " (username, password, nickname, email, is_admin, create_time, update_time) " +
                     "VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
-                    "admin", "e10adc3949ba59abbe56e057f20f883e", "Admin", "admin@blog.local", 1
+                    "admin", hash, "Admin", "admin@blog.local", 1
                 );
-                log.info("✓ 已创建默认管理员账号 admin / 123456");
+                log.info("✓ 已创建默认管理员账号");
             } else {
                 log.info("✓ admin 用户已存在");
             }
         } catch (Exception e) {
-            log.error("✗ 创建 admin 用户失败（可能表不存在，请先执行 init.sql）", e);
+            log.error("✗ 创建 admin 用户失败", e);
         }
     }
 
