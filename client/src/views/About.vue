@@ -155,7 +155,7 @@
                   <a v-if="!social.isQRCode && social.url && !social.url.startsWith('#')"
                     :href="social.url" target="_blank" rel="noopener"
                     class="connect-card"
-                    :style="{ '--card-color': social.color || '#60a5fa' }">
+                    :style="{ '--card-color': normalizeSocialColor(social.color) }">
                     <span class="cc-icon" v-html="getSocialIcon(social.icon)"></span>
                     <div class="cc-info">
                       <span class="cc-name">{{ social.name }}</span>
@@ -164,7 +164,7 @@
                     <svg class="cc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
                   </a>
                   <div v-else-if="social.isQRCode"
-                    class="connect-card qr-card" @click="showQRCode(social)" :style="{ '--card-color': social.color || '#60a5fa' }">
+                    class="connect-card qr-card" @click="showQRCode(social)" :style="{ '--card-color': normalizeSocialColor(social.color) }">
                     <span class="cc-icon" v-html="getSocialIcon(social.icon)"></span>
                     <div class="cc-info">
                       <span class="cc-name">{{ social.name }}</span>
@@ -172,7 +172,7 @@
                     </div>
                     <svg class="cc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
                   </div>
-                  <div v-else class="connect-card placeholder-card" :style="{ '--card-color': social.color || '#60a5fa' }">
+                  <div v-else class="connect-card placeholder-card" :style="{ '--card-color': normalizeSocialColor(social.color) }">
                     <span class="cc-icon" v-html="getSocialIcon(social.icon)"></span>
                     <div class="cc-info">
                       <span class="cc-name">{{ social.name }}</span>
@@ -353,6 +353,18 @@ const interests = computed(() => profile.value._interests || [])
 const socials = computed(() => profile.value._socials || [])
 const hobbies = computed(() => profile.value._hobbies || [])
 const tools = computed(() => profile.value._tools || [])
+const normalizeSocialColor = (color) => {
+  const fallback = '#60a5fa'
+  const normalized = String(color || fallback).trim().toLowerCase()
+  const colorMap = {
+    '#38f8ff': '#60a5fa',
+    '#38bdf8': '#60a5fa',
+    '#7dd3fc': '#93c5fd',
+    '#00b96b': '#3b82f6',
+    '#22c55e': '#60a5fa',
+  }
+  return colorMap[normalized] || color || fallback
+}
 
 const openEditor = () => {
   const skillsRaw = profile.value._skills?.map(s => ({ name: s.name, level: s.level })) || []
