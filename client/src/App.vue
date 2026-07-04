@@ -45,31 +45,6 @@
           <span class="nav-icon" aria-hidden="true">{{ link.icon }}</span>
           <span>{{ link.name }}</span>
         </router-link>
-
-        <router-link
-          v-if="!userStore.isLoggedIn"
-          to="/login"
-          class="nav-item nav-login"
-          :class="{ active: isActive('/login') }"
-        >
-          <span class="nav-icon" aria-hidden="true">↳</span>
-          <span>{{ authNavLabel }}</span>
-        </router-link>
-
-        <!-- 已登录显示写文章入口 -->
-        <router-link
-          v-if="userStore.isLoggedIn"
-          to="/write"
-          class="nav-item nav-write"
-          :class="{ active: isActive('/write') }"
-        >写文章</router-link>
-
-        <!-- 退出登录（仅已登录显示） -->
-        <span
-          v-if="userStore.isLoggedIn"
-          class="nav-item nav-logout"
-          @click="handleLogout"
-        >退出</span>
       </nav>
     </header>
 
@@ -85,6 +60,21 @@
     <!-- 页脚 -->
     <footer class="souta-footer">
       <p>Copyright © 2019-2026 Ethan All Rights Reserved.</p>
+      <!-- 隐藏管理入口：访客几乎不会注意到，博主自己用 -->
+      <div class="souta-footer-admin">
+        <template v-if="userStore.isLoggedIn">
+          <router-link to="/write" class="footer-admin-link">
+            <span>✎</span> 写文章
+          </router-link>
+          <span class="footer-admin-sep">·</span>
+          <span class="footer-admin-link" @click="handleLogout">退出</span>
+        </template>
+        <template v-else>
+          <router-link to="/login" class="footer-admin-link footer-admin-login" :title="authNavLabel">
+            <span>⚙</span>
+          </router-link>
+        </template>
+      </div>
     </footer>
   </div>
 </template>
@@ -446,16 +436,7 @@ onMounted(() => {
   background: rgba(231, 76, 60, 0.06);
 }
 
-/* 登录按钮 */
-.nav-login {
-  color: var(--accent-dark, #d97706);
-  font-weight: 500;
-}
-
-.nav-login:hover {
-  color: var(--accent);
-  background: var(--accent-dim);
-}
+/* 登录按钮已迁移到页脚 */
 
 /* ================================================
    主内容区 & 页脚
@@ -481,6 +462,54 @@ onMounted(() => {
 
 .souta-footer p {
   letter-spacing: 0.3px;
+}
+
+/* 页脚管理入口：低调隐藏 */
+.souta-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.souta-footer-admin {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.35;
+  transition: opacity 0.3s;
+  font-size: 12px;
+}
+
+.souta-footer-admin:hover {
+  opacity: 1;
+}
+
+.footer-admin-link {
+  color: var(--text-lighter, #999);
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.footer-admin-link:hover {
+  color: var(--accent);
+  background: rgba(56, 248, 255, 0.08);
+}
+
+.footer-admin-login {
+  font-size: 13px;
+}
+
+.footer-admin-sep {
+  color: var(--text-lighter, #999);
+  opacity: 0.5;
 }
 
 /* 页面过渡动画 */
