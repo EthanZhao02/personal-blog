@@ -366,8 +366,24 @@ public class DatabaseInitializer implements CommandLineRunner {
                 jdbcTemplate.update("INSERT INTO " + PROFILE_TABLE + " (id, name, tagline, bio, location, status, skills, interests, socials, hobbies, tools, blog_story, name_origin) VALUES (1, 'E森赵', 'AI & Web Developer', '正在探索AI与Web开发的交汇点，专注知识管理和学习系统。', 'Earth', 'Available', ?, ?, ?, ?, ?, ?, ?)", skillsJson, interestsJson, socialsJson, hobbiesJson, toolsJson, blogStory, nameOrigin);
                 log.info("✓ 已初始化默认个人资料");
             }
+            // 补齐已有记录中空的新字段
+            ensureDefaultProfileFields();
         } catch (Exception e) {
             log.error("✗ 初始化个人资料失败", e);
+        }
+    }
+
+    /** 补齐已有 profile 记录中空的新字段 */
+    private void ensureDefaultProfileFields() {
+        try {
+            String hobbiesJson = "[\"阅读科幻小说\",\"摄影\",\"桌游\",\"咖啡探店\"]";
+            String toolsJson = "[{\"name\":\"VS Code\",\"category\":\"编辑器\"},{\"name\":\"Cursor\",\"category\":\"AI编程\"},{\"name\":\"Obsidian\",\"category\":\"知识管理\"},{\"name\":\"Figma\",\"category\":\"设计\"},{\"name\":\"Docker\",\"category\":\"部署\"},{\"name\":\"Git\",\"category\":\"版本控制\"}]";
+            String blogStory = "这个博客始于2024年，起初只是想有一个属于自己的角落记录学习和思考。慢慢地，它变成了我的数字花园——种下想法，等待它们生长。在这里你会看到技术探索、项目复盘、读书笔记，还有一些深夜的胡思乱想。";
+            String nameOrigin = "Ethan Zhao ——Ethan取自希伯来语，意为坚定、持久；Zhao是姓氏。合在一起，希望自己能做一个坚定的创造者。";
+            jdbcTemplate.update("UPDATE " + PROFILE_TABLE + " SET hobbies = COALESCE(NULLIF(hobbies, ''), ?), tools = COALESCE(NULLIF(tools, ''), ?), blog_story = COALESCE(NULLIF(blog_story, ''), ?), name_origin = COALESCE(NULLIF(name_origin, ''), ?) WHERE id = 1", hobbiesJson, toolsJson, blogStory, nameOrigin);
+            log.info("✓ 已补齐 profile 新字段默认值");
+        } catch (Exception e) {
+            log.error("✗ 补齐 profile 新字段失败", e);
         }
     }
 }
