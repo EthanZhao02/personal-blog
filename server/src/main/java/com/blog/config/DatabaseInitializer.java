@@ -298,17 +298,47 @@ public class DatabaseInitializer implements CommandLineRunner {
     }
 
     private void ensureProfileTable() {
-        ensureColumns(PROFILE_TABLE, java.util.List.of(
-                java.util.Map.of("name", "name", "type", "VARCHAR(100)"),
-                java.util.Map.of("name", "tagline", "type", "VARCHAR(200)"),
-                java.util.Map.of("name", "bio", "type", "TEXT"),
-                java.util.Map.of("name", "location", "type", "VARCHAR(100)"),
-                java.util.Map.of("name", "status", "type", "VARCHAR(50)"),
-                java.util.Map.of("name", "avatar", "type", "VARCHAR(500)"),
-                java.util.Map.of("name", "skills", "type", "TEXT"),
-                java.util.Map.of("name", "interests", "type", "TEXT"),
-                java.util.Map.of("name", "socials", "type", "TEXT")
-        ));
+        String dbName = "test";
+        String rawTable = PROFILE_TABLE.replace("test.", "");
+        try {
+            // 先检查表是否存在，不存在则建表
+            Integer tableCount = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?",
+                Integer.class, dbName, rawTable
+            );
+            if (tableCount == null || tableCount == 0) {
+                log.warn("blog_profile 表不存在，正在创建...");
+                jdbcTemplate.execute("CREATE TABLE " + PROFILE_TABLE + " (" +
+                    "id BIGINT PRIMARY KEY," +
+                    "name VARCHAR(100)," +
+                    "tagline VARCHAR(200)," +
+                    "bio TEXT," +
+                    "location VARCHAR(100)," +
+                    "status VARCHAR(50)," +
+                    "avatar VARCHAR(500)," +
+                    "skills TEXT," +
+                    "interests TEXT," +
+                    "socials TEXT" +
+                ")");
+                log.info("✓ blog_profile 表创建成功");
+            } else {
+                log.info("✓ blog_profile 表已存在");
+                // 表已有则补齐可能遗漏的字段
+                ensureColumns(PROFILE_TABLE, java.util.List.of(
+                    java.util.Map.of("name", "name", "type", "VARCHAR(100)"),
+                    java.util.Map.of("name", "tagline", "type", "VARCHAR(200)"),
+                    java.util.Map.of("name", "bio", "type", "TEXT"),
+                    java.util.Map.of("name", "location", "type", "VARCHAR(100)"),
+                    java.util.Map.of("name", "status", "type", "VARCHAR(50)"),
+                    java.util.Map.of("name", "avatar", "type", "VARCHAR(500)"),
+                    java.util.Map.of("name", "skills", "type", "TEXT"),
+                    java.util.Map.of("name", "interests", "type", "TEXT"),
+                    java.util.Map.of("name", "socials", "type", "TEXT")
+                ));
+            }
+        } catch (Exception e) {
+            log.error("✗ 创建 blog_profile 表失败", e);
+        }
     }
 
     private void ensureDefaultProfile() {
