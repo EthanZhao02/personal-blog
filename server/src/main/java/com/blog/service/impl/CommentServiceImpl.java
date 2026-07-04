@@ -42,17 +42,14 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             return Result.success(Collections.emptyList());
         }
 
-        // 2. 查出所有顶级评论的 id
-        List<Long> rootIds = roots.stream().map(Comment::getId).collect(Collectors.toList());
-
-        // 3. 一次性查出所有子评论（不限层级）
+        // 2. 一次性查出所有子评论（不限深度）
         LambdaQueryWrapper<Comment> childWrapper = new LambdaQueryWrapper<>();
         childWrapper.eq(Comment::getArticleId, articleId);
-        childWrapper.in(Comment::getParentId, rootIds);
+        childWrapper.isNotNull(Comment::getParentId).ne(Comment::getParentId, 0L);
         childWrapper.orderByAsc(Comment::getCreateTime);
         List<Comment> allChildren = this.list(childWrapper);
 
-        // 4. 构建树：{ parentId -> children }
+        // 3. 构建树：{ parentId -> children }
         Map<Long, List<Comment>> childMap = new HashMap<>();
         for (Comment child : allChildren) {
             Long pid = child.getParentId();
@@ -60,7 +57,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             childMap.computeIfAbsent(pid, k -> new ArrayList<>()).add(child);
         }
 
-        // 5. 填充 children 并填充用户信息
+        // 4. 填充 children 并填充用户信息
         fillUserInfo(roots);
         fillUserInfo(allChildren);
 
