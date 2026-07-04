@@ -130,26 +130,46 @@
 
       <article id="connect" class="bento-card connect-card reveal-up" style="animation-delay: 300ms">
         <div class="card-heading">
-          <span>Connect</span>
-          <router-link to="/message">Message</router-link>
+          <span>Quick Links</span>
+          <router-link to="/about">More →</router-link>
         </div>
-        <div class="social-list">
-          <a
-            v-for="social in visibleSocials.slice(0, 6)"
-            :key="social.name"
-            :href="social.url"
-            :style="{ '--social-color': social.color }"
-            class="social-link"
-            target="_blank"
-            rel="noopener noreferrer"
-            :title="`${social.name}: ${social.handle || social.url}`"
-          >
-            <span v-html="getSocialIcon(social.icon)"></span>
-            <span>
-              <strong>{{ social.name }}</strong>
-              <small>{{ social.handle }}</small>
+        <div class="quick-nav">
+          <router-link to="/posts" class="quick-link">
+            <span class="quick-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             </span>
-          </a>
+            <span>
+              <strong>阅读文章</strong>
+              <small>查看技术笔记与思考</small>
+            </span>
+          </router-link>
+          <router-link to="/projects" class="quick-link">
+            <span class="quick-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </span>
+            <span>
+              <strong>浏览项目</strong>
+              <small>作品集与实验代码</small>
+            </span>
+          </router-link>
+          <router-link to="/friends" class="quick-link">
+            <span class="quick-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
+            <span>
+              <strong>友情链接</strong>
+              <small>优秀博主与社区</small>
+            </span>
+          </router-link>
+          <router-link to="/message" class="quick-link">
+            <span class="quick-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </span>
+            <span>
+              <strong>留言交流</strong>
+              <small>留下你的想法</small>
+            </span>
+          </router-link>
         </div>
       </article>
     </section>
@@ -704,53 +724,54 @@ onUnmounted(() => {
   color: #f8fbff;
 }
 
-.social-list {
+.quick-nav {
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 8px;
 }
 
-.social-link {
-  display: grid;
-  grid-template-columns: 36px 1fr;
-  gap: 12px;
+.quick-link {
+  display: flex;
   align-items: center;
-  min-height: 52px;
-  padding: 8px;
+  gap: 12px;
+  padding: 14px;
   border: 1px solid rgba(148, 226, 255, 0.13);
   border-radius: 8px;
   background: rgba(5, 8, 22, 0.32);
+  text-decoration: none;
+  transition: all 0.2s;
 }
 
-.social-link > span:first-child {
+.quick-link:hover {
+  border-color: rgba(56, 248, 255, 0.4);
+  background: rgba(56, 248, 255, 0.06);
+  transform: translateY(-1px);
+}
+
+.quick-icon {
   width: 36px;
   height: 36px;
   display: grid;
   place-items: center;
   border-radius: 8px;
-  color: var(--social-color, #38bdf8);
-  background: rgba(255, 255, 255, 0.045);
+  color: #38f8ff;
+  background: rgba(56, 248, 255, 0.1);
+  flex-shrink: 0;
 }
 
-.social-link svg {
-  width: 18px;
-  height: 18px;
-}
-
-.social-link strong,
-.social-link small {
+.quick-link strong {
   display: block;
-}
-
-.social-link strong {
   color: #f8fbff;
-  font-size: 0.9rem;
+  font-size: 14px;
+  font-weight: 600;
 }
 
-.social-link small {
+.quick-link small {
+  display: block;
   margin-top: 2px;
-  color: rgba(226, 239, 255, 0.48);
-  font-size: 0.76rem;
-  overflow-wrap: anywhere;
+  color: rgba(226, 239, 255, 0.5);
+  font-size: 12px;
 }
 
 @keyframes driftDot {
