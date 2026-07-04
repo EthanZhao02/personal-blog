@@ -24,7 +24,8 @@
           <div class="cell-collapsed" @click="toggleExpand(project.id || index)">
             <div class="cell-header">
               <div class="cell-icon" :style="{ '--icon-color': project.color || '#38f8ff' }">
-                {{ project.icon || '◇' }}
+                <img v-if="isImageUrl(project.icon)" :src="resolveUrl(project.icon)" :alt="project.name" />
+                <span v-else>{{ project.icon || '◇' }}</span>
               </div>
               <div class="cell-info">
                 <h3 class="cell-title">{{ project.name }}</h3>
@@ -108,7 +109,13 @@
         <div class="form-panel">
           <h3 class="form-title">{{ editingId ? '编辑项目' : '添加项目' }}</h3>
           <div class="form-row"><label>名称 *</label><input v-model="form.name" placeholder="项目名称" /></div>
-          <div class="form-row"><label>图标</label><input v-model="form.icon" placeholder="如：◇ / 🚀 / 🔧" /></div>
+          <div class="form-row"><label>图标</label>
+            <div class="icon-input-row">
+              <input v-model="form.icon" placeholder="文字或粘贴URL" style="flex:1" />
+              <button class="icon-upload-btn" @click="triggerIconUpload" type="button">上传</button>
+              <input ref="iconInput" type="file" accept="image/*" hidden @change="handleIconUpload" />
+            </div>
+          </div>
           <div class="form-row"><label>主题色</label><input v-model="form.color" type="color" /></div>
           <div class="form-row"><label>标签</label><input v-model="form.tag" placeholder="如：TOOL / OPEN-SOURCE" /></div>
           <div class="form-row"><label>描述</label><input v-model="form.description" placeholder="一句话描述" /></div>
@@ -132,6 +139,16 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { getProjects, addProject, updateProject, deleteProject } from '../api/project'
+import { uploadImage } from '../api/upload'
+
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/api\/?$/, '')
+const resolveUrl = (url) => {
+  if (!url) return ''
+  if (/^https?:\/\//.test(url)) return url
+  if (url.startsWith('/upload/')) return apiBaseUrl + url
+  return url
+}
+const isImageUrl = (url) => /\.(png|jpg|jpeg|gif|webp|svg)(\?.*)?$/i.test(url) || url?.startsWith('http') && /\.(png|jpg|jpeg|gif|webp|svg)/i.test(url?.split('?')[0])
 
 const route = useRoute()
 const userStore = useUserStore()
@@ -141,6 +158,21 @@ const loading = ref(true)
 const showForm = ref(false)
 const editingId = ref(null)
 const form = ref({ name: '', icon: '', color: '#38f8ff', tag: '', description: '', status: '', techStack: '', features: '', url: '', githubUrl: '' })
+const iconInput = ref(null)
+
+const triggerIconUpload = () => iconInput.value?.click()
+const handleIconUpload = async (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  try {
+    const res = await uploadImage(file)
+    if (res.code === 200 && res.data) {
+      form.value.icon = resolveUrl(res.data)
+    }
+  } catch (err) {
+    console.error('图标上传失败', err)
+  }
+}
 
 const loadProjects = async () => {
   loading.value = true
@@ -335,6 +367,29 @@ onMounted(loadProjects)
   border: 1px solid rgba(56, 248, 255, 0.2);
   border-radius: 12px;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.cell-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.icon-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-upload-btn {
+  padding: 8px 14px;
+  background: rgba(56, 248, 255, 0.1);
+  border: 1px solid rgba(56, 248, 255, 0.3);
+  border-radius: 6px;
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .cell-info {
