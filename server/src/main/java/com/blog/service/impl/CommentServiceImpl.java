@@ -42,7 +42,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             return Result.success(Collections.emptyList());
         }
 
-        // 2. 一次性查出所有子评论（不限深度）
+        // 2. 查询所有非根评论（不限嵌套深度）
         LambdaQueryWrapper<Comment> childWrapper = new LambdaQueryWrapper<>();
         childWrapper.eq(Comment::getArticleId, articleId);
         childWrapper.isNotNull(Comment::getParentId).ne(Comment::getParentId, 0L);

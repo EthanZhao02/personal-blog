@@ -32,24 +32,20 @@ public class DatabaseInitializer implements CommandLineRunner {
     private static final String PROJECT_TABLE = "test.blog_project";
 
     @Override
-    public void run(String... args) {
-        try {
-            log.info("=== 开始数据库自检与修复 ===");
-            ensureUserIsAdminColumn();
-            ensureAdminUserExists();
-            ensureUserIsAdminValue();
-            ensureMessageColumns();
-            ensureCommentColumns();
-            ensureArticleColumns();
-            ensureFriendLinkColumns();
-            ensureProjectColumns();
-            ensureCategoryColumns();
-            ensureCategoryData();
-            ensureTagData();
-            log.info("=== 数据库自检完成 ===");
-        } catch (Exception e) {
-            log.error("数据库自检失败，但不影响应用启动", e);
-        }
+    public void run(String... args) throws Exception {
+        log.info("=== 开始数据库自检与修复 ===");
+        ensureUserIsAdminColumn();
+        ensureAdminUserExists();
+        ensureUserIsAdminValue();
+        ensureMessageColumns();
+        ensureCommentColumns();
+        ensureArticleColumns();
+        ensureFriendLinkColumns();
+        ensureProjectColumns();
+        ensureCategoryColumns();
+        ensureCategoryData();
+        ensureTagData();
+        log.info("=== 数据库自检完成 ===");
     }
 
     /**
@@ -256,22 +252,27 @@ public class DatabaseInitializer implements CommandLineRunner {
     }
 
     /**
-     * 通用字段补齐方法 - 先尝试 ALTER，忽略重复列错误
+     * 通用字段补齐方法
      */
     private void ensureColumns(String tableName, List<Map<String, String>> columns) {
+        String dbName = "test";
+        String rawTable = tableName.replace("test.", "");
         for (Map<String, String> col : columns) {
             String colName = col.get("name");
             String colType = col.get("type");
             try {
-                jdbcTemplate.execute("ALTER TABLE " + tableName + " ADD COLUMN " + colName + " " + colType);
-                log.info("✓ 成功添加 {}.{} 字段", tableName, colName);
-            } catch (Exception e) {
-                String msg = e.getMessage();
-                if (msg != null && (msg.contains("Duplicate column") || msg.contains("already exists") || msg.contains("Duplicate"))) {
-                    log.info("✓ {}.{} 字段已存在，跳过", tableName, colName);
-                } else {
-                    log.warn("✗ 检查/添加 {}.{} 字段: {}", tableName, colName, msg);
+                Integer count = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS " +
+                    "WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = ?",
+                    Integer.class, dbName, rawTable, colName
+                );
+                if (count == null || count == 0) {
+                    log.warn("{} 表缺少 {} 字段，正在自动添加...", tableName, colName);
+                    jdbcTemplate.execute("ALTER TABLE " + tableName + " ADD COLUMN " + colName + " " + colType);
+                    log.info("✓ 成功添加 {} 字段", colName);
                 }
+            } catch (Exception e) {
+                log.error("✗ 检查/添加 {}.{} 字段失败", tableName, colName, e);
             }
         }
     }
