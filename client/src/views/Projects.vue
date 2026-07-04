@@ -113,7 +113,7 @@
             <div class="icon-input-row">
               <input v-model="form.icon" placeholder="文字或粘贴URL" style="flex:1" />
               <button class="icon-upload-btn" @click="triggerIconUpload" type="button">上传</button>
-              <input ref="iconInput" type="file" accept="image/*" hidden @change="handleIconUpload" />
+              <input ref="iconInput" type="file" accept="image/*" hidden @change="onIconFilePicked" />
             </div>
           </div>
           <div class="form-row"><label>主题色</label><input v-model="form.color" type="color" /></div>
@@ -131,6 +131,14 @@
         </div>
       </div>
     </div>
+    <!-- 裁剪对话框 -->
+    <CropDialog
+      v-if="showCrop"
+      :imageFile="cropFile"
+      :aspectRatio="1"
+      @crop="onIconCropDone"
+      @cancel="showCrop = false"
+    />
   </div>
 </template>
 
@@ -140,6 +148,7 @@ import { useRoute } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { getProjects, addProject, updateProject, deleteProject } from '../api/project'
 import { uploadImage } from '../api/upload'
+import CropDialog from '../components/CropDialog.vue'
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/api\/?$/, '')
 const resolveUrl = (url) => {
@@ -159,13 +168,21 @@ const showForm = ref(false)
 const editingId = ref(null)
 const form = ref({ name: '', icon: '', color: '#38f8ff', tag: '', description: '', status: '', techStack: '', features: '', url: '', githubUrl: '' })
 const iconInput = ref(null)
+const showCrop = ref(false)
+const cropFile = ref(null)
 
 const triggerIconUpload = () => iconInput.value?.click()
-const handleIconUpload = async (e) => {
+const onIconFilePicked = (e) => {
   const file = e.target.files[0]
   if (!file) return
+  cropFile.value = file
+  showCrop.value = true
+  e.target.value = ''
+}
+const onIconCropDone = async (croppedFile) => {
+  showCrop.value = false
   try {
-    const res = await uploadImage(file)
+    const res = await uploadImage(croppedFile)
     if (res.code === 200 && res.data) {
       form.value.icon = resolveUrl(res.data)
     }

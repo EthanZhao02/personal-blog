@@ -95,7 +95,7 @@
             <div class="avatar-upload-row">
               <input v-model="form.avatar" placeholder="输入链接或上传图片" />
               <input ref="avatarFileInput" type="file" accept="image/*" hidden @change="handleAvatarUpload" />
-              <button type="button" class="avatar-upload-btn" @click="$refs.avatarFileInput.click()">上传</button>
+              <button type="button" class="avatar-upload-btn" @click="() => avatarFileInput?.click()">上传</button>
             </div>
             <div class="avatar-preview" v-if="form.avatar">
               <img :src="form.avatar" @error="form.avatar = ''" />
@@ -111,6 +111,14 @@
         </div>
       </div>
     </div>
+    <!-- 裁剪对话框 -->
+    <CropDialog
+      v-if="showCrop"
+      :imageFile="cropFile"
+      :aspectRatio="1"
+      @crop="onAvatarCropDone"
+      @cancel="showCrop = false"
+    />
   </div>
 </template>
 
@@ -119,6 +127,7 @@ import { ref, onMounted } from 'vue'
 import { useUserStore } from '../stores/user'
 import { getFriendLinks, addFriendLink, updateFriendLink, deleteFriendLink } from '../api/friend'
 import { uploadImage } from '../api/upload'
+import CropDialog from '../components/CropDialog.vue'
 
 const userStore = useUserStore()
 const friends = ref([])
@@ -126,6 +135,7 @@ const loading = ref(true)
 const showForm = ref(false)
 const editingId = ref(null)
 const form = ref({ name: '', url: '', avatar: '', description: '', category: '', email: '' })
+const avatarFileInput = ref(null)
 
 const loadFriends = async () => {
   loading.value = true
@@ -161,16 +171,23 @@ const resolveUploadUrl = (url) => {
 const handleAvatarUpload = async (e) => {
   const file = e.target.files[0]
   if (!file) return
+  cropFile.value = file
+  showCrop.value = true
+  e.target.value = ''
+}
+
+const showCrop = ref(false)
+const cropFile = ref(null)
+
+const onAvatarCropDone = async (croppedFile) => {
+  showCrop.value = false
   try {
-    const res = await uploadImage(file)
+    const res = await uploadImage(croppedFile)
     if (res.code === 200 && res.data) {
       form.value.avatar = resolveUploadUrl(res.data)
-    } else {
-      alert('头像上传失败: ' + (res.message || '未知错误'))
     }
   } catch (err) {
     console.error('头像上传失败:', err)
-    alert('头像上传失败，请重试')
   }
 }
 

@@ -53,7 +53,7 @@
             </svg>
             <span>{{ t('addCover') }}</span>
           </div>
-          <input ref="coverInput" type="file" accept="image/*" hidden @change="handleCoverUpload" />
+          <input ref="coverInput" type="file" accept="image/*" hidden @change="(e) => onFilePicked(e, 16/9)" />
         </div>
 
         <!-- 标题 -->
@@ -127,7 +127,7 @@
           <button class="tool-btn" @click="insertFormat('\n```\n', '\n```\n')" title="Code Block">
             { }
           </button>
-          <input ref="imageInput" type="file" accept="image/*" hidden @change="handleImageUpload" />
+          <input ref="imageInput" type="file" accept="image/*" hidden @change="(e) => onFilePicked(e, 0)" />
         </div>
 
         <!-- 内容编辑：左编辑右预览 -->
@@ -185,6 +185,14 @@
         </div>
       </div>
     </div>
+    <!-- 裁剪对话框 -->
+    <CropDialog
+      v-if="showCrop"
+      :imageFile="cropFile"
+      :aspectRatio="cropAspect || undefined"
+      @crop="onCropDone"
+      @cancel="showCrop = false"
+    />
   </div>
 </template>
 
@@ -196,6 +204,7 @@ import { getArticleList, getArticleDetail, createArticle, updateArticle, deleteA
 import { getCategoryList } from '../api/category'
 import { getTagList, addTag } from '../api/tag'
 import { uploadImage, uploadAttachment } from '../api/upload'
+import CropDialog from '../components/CropDialog.vue'
 
 const route = useRoute()
 const userStore = useUserStore()
@@ -281,6 +290,42 @@ const imageInput = ref(null)
 const attachmentInput = ref(null)
 const contentTextarea = ref(null)
 const newTagInputRef = ref(null)
+
+// 裁剪对话框
+const showCrop = ref(false)
+const cropFile = ref(null)
+const cropAspect = ref(16/9) // cover=16:9, inline=free
+
+const onFilePicked = (e, aspect = 16/9) => {
+  const file = e.target.files[0]
+  if (!file) return
+  cropFile.value = file
+  cropAspect.value = aspect
+  showCrop.value = true
+  e.target.value = '' // reset input
+}
+
+const onCropDone = async (croppedFile) => {
+  showCrop.value = false
+  try {
+    const res = await uploadImage(croppedFile)
+    if (res.code === 200 && res.data) {
+      if (cropAspect.value === 16/9) {
+        // 封面
+        article.value.cover = resolveUploadUrl(res.data)
+      } else {
+        // 正文图片
+        const markdown = `![${croppedFile.name}](${resolveUploadUrl(res.data)})`
+        insertAtCursor(markdown)
+      }
+    } else {
+      alert('上传失败: ' + (res.message || '未知错误'))
+    }
+  } catch (err) {
+    console.error('上传失败:', err)
+    alert('上传失败，请重试')
+  }
+}
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/api\/?$/, '')
 
