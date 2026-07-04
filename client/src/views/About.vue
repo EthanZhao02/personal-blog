@@ -97,8 +97,8 @@
             </div>
             <div class="block-body">
               <div class="hobby-grid">
-                <div v-for="item in hobbies" :key="item" class="hobby-card">
-                  <span class="hobby-icon">{{ getHobbyIcon(item) }}</span>
+                <div v-for="(item, index) in hobbies" :key="item" class="hobby-card">
+                  <span class="hobby-icon">{{ getHobbyCode(index) }}</span>
                   <span class="hobby-name">{{ item }}</span>
                 </div>
               </div>
@@ -412,19 +412,7 @@ const currentTimezone = computed(() => {
   return `UTC${offset >= 0 ? '+' : ''}${offset}`
 })
 const onAvatarError = (e) => { e.target.style.display = 'none' }
-const getHobbyIcon = (name) => {
-  const map = {
-    '阅读': '📚', '读书': '📚', '科幻': '🚀', '小说': '📖',
-    '摄影': '📷', '旅行': '✈️', '旅游': '✈️',
-    '桌游': '🎲', '游戏': '🎮', '咖啡': '☕', '探店': '☕',
-    '音乐': '🎵', '吉他': '🎸', '钢琴': '🎹',
-    '电影': '🎬', '运动': '⚽', '跑步': '🏃', '健身': '💪',
-    '烹饪': '🍳', '美食': '🍜', '画画': '🎨', '绘画': '🎨',
-    '代码': '💻', '编程': '💻', '写作': '✍️',
-    '茶': '🍵', '手工': '🔨', '回附': '🔧'
-  }
-  return map[name] || '01'
-}
+const getHobbyCode = (index) => String(index + 1).padStart(2, '0')
 const showQRCode = (s) => { currentQR.value = s; showQR.value = true }
 const closeQRCode = () => { showQR.value = false; currentQR.value = null }
 
@@ -725,7 +713,14 @@ const getSocialIcon = (icon) => {
 .hobby-card:hover {
   background: rgba(96,165,250,0.06); border-color: rgba(96,165,250,0.2); transform: translateY(-2px);
 }
-.hobby-icon { font-size: 20px; line-height: 1; }
+.hobby-icon {
+  flex: 0 0 32px;
+  width: 32px;
+  color: #e5f1ff;
+  font: 800 16px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0;
+  text-align: center;
+}
 .hobby-name { font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 500; }
 
 /* Tools */
