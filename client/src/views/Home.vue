@@ -180,6 +180,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import siteConfig from '../config/site.config.js'
 import { getArticleList } from '../api/article'
+import { getProjects } from '../api/project'
 
 const currentPhoto = ref(0)
 const currentTime = ref('')
@@ -195,15 +196,18 @@ const particleDots = [
   { id: 6, left: '92%', top: '54%', delay: '2.7s' },
 ]
 
+const projectsCount = ref(siteConfig.projects?.length || 0)
+const projectsData = ref([])
+
 const heroStats = computed(() => [
   { value: totalArticles.value, label: 'Articles' },
-  { value: siteConfig.projects?.length || 0, label: 'Projects' },
+  { value: projectsCount.value, label: 'Projects' },
   { value: siteConfig.learningTracks?.length || 0, label: 'Tracks' },
   { value: siteConfig.researchInterests?.length || 0, label: 'Interests' },
 ])
 
 const activePhoto = computed(() => siteConfig.photos[currentPhoto.value] || siteConfig.photos[0] || '')
-const featuredProject = computed(() => siteConfig.projects?.[0] || {})
+const featuredProject = computed(() => projectsData.value[0] || siteConfig.projects?.[0] || {})
 const articles = ref([])
 const latestArticles = computed(() => articles.value.slice(0, 3))
 const totalArticles = computed(() => articles.value.length || siteConfig.content.articles?.length || 0)
@@ -245,6 +249,16 @@ onMounted(async () => {
     if (siteConfig.content.articles?.length) {
       articles.value = siteConfig.content.articles
     }
+  }
+  // 加载项目
+  try {
+    const projRes = await getProjects('/project/list')
+    if ((projRes.code === 200 || projRes.code === 0) && projRes.data) {
+      projectsData.value = projRes.data
+      projectsCount.value = projRes.data.length
+    }
+  } catch (e) {
+    // 失败时保持 siteConfig 默认值
   }
 })
 
