@@ -179,6 +179,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import siteConfig from '../config/site.config.js'
+import { getArticleList } from '../api/article'
 
 const currentPhoto = ref(0)
 const currentTime = ref('')
@@ -195,7 +196,7 @@ const particleDots = [
 ]
 
 const heroStats = computed(() => [
-  { value: siteConfig.content.articles?.length || 0, label: 'Articles' },
+  { value: totalArticles.value, label: 'Articles' },
   { value: siteConfig.projects?.length || 0, label: 'Projects' },
   { value: siteConfig.learningTracks?.length || 0, label: 'Tracks' },
   { value: siteConfig.researchInterests?.length || 0, label: 'Interests' },
@@ -203,7 +204,9 @@ const heroStats = computed(() => [
 
 const activePhoto = computed(() => siteConfig.photos[currentPhoto.value] || siteConfig.photos[0] || '')
 const featuredProject = computed(() => siteConfig.projects?.[0] || {})
-const latestArticles = computed(() => (siteConfig.content.articles || []).slice(0, 3))
+const articles = ref([])
+const latestArticles = computed(() => articles.value.slice(0, 3))
+const totalArticles = computed(() => articles.value.length || siteConfig.content.articles?.length || 0)
 const projectTech = computed(() => featuredProject.value.techStack?.split(', ').slice(0, 5) || [])
 
 const updateTime = () => {
@@ -227,10 +230,22 @@ const formatDate = (value) => {
   return `${d.getMonth() + 1}.${String(d.getDate()).padStart(2, '0')}`
 }
 
-onMounted(() => {
+onMounted(async () => {
   updateTime()
   timeTimer = setInterval(updateTime, 1000)
   carouselTimer = setInterval(nextPhoto, 5200)
+  // 从API加载最新文章
+  try {
+    const res = await getArticleList(1, 3)
+    if (res.code === 200 && res.data?.records) {
+      articles.value = res.data.records
+    }
+  } catch (e) {
+    // API失败时使用静态数据
+    if (siteConfig.content.articles?.length) {
+      articles.value = siteConfig.content.articles
+    }
+  }
 })
 
 onUnmounted(() => {
