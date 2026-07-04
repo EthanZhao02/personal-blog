@@ -621,7 +621,7 @@ onMounted(() => {
 }
 
 .card-content {
-  padding: 16px 20px 20px;
+  padding: 12px 16px 16px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -632,21 +632,21 @@ onMounted(() => {
   justify-content: space-between;
   align-items: flex-start;
   flex-shrink: 0;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .article-date {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px 12px;
+  padding: 6px 10px;
   background: rgba(56, 248, 255, 0.1);
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid rgba(56, 248, 255, 0.2);
 }
 
 .date-day {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
   color: #38f8ff;
   line-height: 1;
@@ -677,11 +677,11 @@ onMounted(() => {
 }
 
 .article-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: #fff;
-  margin: 0 0 10px 0;
-  line-height: 1.5;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -690,14 +690,13 @@ onMounted(() => {
 
 .article-summary {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.4;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  flex: 1;
 }
 
 .article-footer {
