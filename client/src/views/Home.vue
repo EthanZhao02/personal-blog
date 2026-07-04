@@ -222,7 +222,8 @@ const nextPhoto = () => {
 
 const formatDate = (value) => {
   if (!value) return ''
-  const d = new Date(value)
+  const d = new Date(value + '+08:00')
+  if (isNaN(d.getTime())) return value
   return `${d.getMonth() + 1}.${String(d.getDate()).padStart(2, '0')}`
 }
 
