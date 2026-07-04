@@ -769,21 +769,33 @@ onMounted(async () => {
 }
 
 .item-btn {
-  background: none;
-  border: none;
+  background: var(--bg);
+  border: 1px solid var(--border);
   cursor: pointer;
-  font-size: 12px;
-  padding: 2px 4px;
-  border-radius: 3px;
-  transition: background 0.15s;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: var(--text);
+  transition: all 0.15s;
+  white-space: nowrap;
 }
 
 .item-btn:hover {
-  background: var(--border);
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.item-btn-danger {
+  color: #e74c3c;
+  border-color: #e74c3c33;
+  background: #e74c3c0a;
 }
 
 .item-btn-danger:hover {
-  background: #fdecea;
+  background: #e74c3c;
+  color: #fff;
+  border-color: #e74c3c;
 }
 
 .item-status {
