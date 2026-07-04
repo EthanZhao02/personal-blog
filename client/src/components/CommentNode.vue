@@ -70,7 +70,8 @@ const handleAvatarError = (e) => {
 
 const formatDate = (s) => {
   if (!s) return ''
-  const d = new Date(s)
+  const d = new Date(s + '+08:00')
+  if (isNaN(d.getTime())) return s
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
 }
 </script>

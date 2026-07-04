@@ -24,6 +24,11 @@
         <router-link to="/message" class="apply-btn">前往留言板</router-link>
       </div>
 
+      <!-- 管理员添加按钮(有友链时) -->
+      <button v-if="userStore.isAdmin && !loading && friends.length" class="add-friend-btn" @click="openAdd">
+        + 添加友链
+      </button>
+
       <!-- 友链网格 -->
       <main class="friends-grid" v-if="!loading && friends.length">
         <div
@@ -85,7 +90,17 @@
           <h3 class="form-title">{{ editingId ? '编辑友链' : '添加友链' }}</h3>
           <div class="form-row"><label>名称 *</label><input v-model="form.name" placeholder="网站名称" /></div>
           <div class="form-row"><label>链接 *</label><input v-model="form.url" placeholder="https://..." /></div>
-          <div class="form-row"><label>头像</label><input v-model="form.avatar" placeholder="https://..." /></div>
+          <div class="form-row">
+            <label>头像</label>
+            <div class="avatar-upload-row">
+              <input v-model="form.avatar" placeholder="输入链接或上传图片" />
+              <input ref="avatarFileInput" type="file" accept="image/*" hidden @change="handleAvatarUpload" />
+              <button type="button" class="avatar-upload-btn" @click="$refs.avatarFileInput.click()">上传</button>
+            </div>
+            <div class="avatar-preview" v-if="form.avatar">
+              <img :src="form.avatar" @error="form.avatar = ''" />
+            </div>
+          </div>
           <div class="form-row"><label>简介</label><input v-model="form.description" placeholder="一句话介绍" /></div>
           <div class="form-row"><label>分类</label><input v-model="form.category" placeholder="如：技术博客" /></div>
           <div class="form-row"><label>邮箱</label><input v-model="form.email" placeholder="contact@..." /></div>
@@ -103,6 +118,7 @@
 import { ref, onMounted } from 'vue'
 import { useUserStore } from '../stores/user'
 import { getFriendLinks, addFriendLink, updateFriendLink, deleteFriendLink } from '../api/friend'
+import { uploadImage } from '../api/upload'
 
 const userStore = useUserStore()
 const friends = ref([])
@@ -129,6 +145,33 @@ const loadFriends = async () => {
 
 const onAvatarError = (e) => {
   e.target.style.display = 'none'
+}
+
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/api\/?$/, '')
+
+const resolveUploadUrl = (url) => {
+  if (!url) return ''
+  if (/^https?:\/\//.test(url)) return url
+  if (url.startsWith('/upload/') || url.startsWith('/uploads/')) {
+    return `${apiBaseUrl}${url}`
+  }
+  return url
+}
+
+const handleAvatarUpload = async (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  try {
+    const res = await uploadImage(file)
+    if (res.code === 200 && res.data) {
+      form.value.avatar = resolveUploadUrl(res.data)
+    } else {
+      alert('头像上传失败: ' + (res.message || '未知错误'))
+    }
+  } catch (err) {
+    console.error('头像上传失败:', err)
+    alert('头像上传失败，请重试')
+  }
 }
 
 const openAdd = () => {
@@ -557,6 +600,46 @@ onMounted(loadFriends)
 
 .form-row input:focus {
   border-color: var(--accent);
+}
+
+.avatar-upload-row {
+  display: flex;
+  gap: 8px;
+}
+
+.avatar-upload-row input {
+  flex: 1;
+}
+
+.avatar-upload-btn {
+  padding: 8px 14px;
+  background: rgba(56, 248, 255, 0.15);
+  border: 1px solid rgba(56, 248, 255, 0.3);
+  border-radius: 6px;
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.avatar-upload-btn:hover {
+  background: rgba(56, 248, 255, 0.25);
+}
+
+.avatar-preview {
+  margin-top: 8px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(56, 248, 255, 0.3);
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .form-actions {
