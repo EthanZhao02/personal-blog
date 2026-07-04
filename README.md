@@ -1,5 +1,7 @@
 # 个人博客系统
 
+地址：https://ethanzhao02.github.io/personal-blog/#/
+
 基于 Vue3 + SpringBoot + MySQL 构建的个人博客系统，适合考研复试展示。
 
 ## 技术栈
