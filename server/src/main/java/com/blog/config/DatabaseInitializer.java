@@ -306,6 +306,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                 java.util.Map.of("name", "status", "type", "VARCHAR(50)"),
                 java.util.Map.of("name", "avatar", "type", "VARCHAR(500)"),
                 java.util.Map.of("name", "skills", "type", "TEXT"),
+                java.util.Map.of("name", "interests", "type", "TEXT"),
                 java.util.Map.of("name", "socials", "type", "TEXT")
         ));
     }
@@ -318,8 +319,9 @@ public class DatabaseInitializer implements CommandLineRunner {
             if (count == null || count == 0) {
                 log.warn("个人资料表为空，正在初始化默认资料...");
                 String skillsJson = "[{\"name\":\"Vue.js\",\"level\":85},{\"name\":\"Java/Spring\",\"level\":80},{\"name\":\"AI/LLM\",\"level\":75},{\"name\":\"Python\",\"level\":70}]";
+                String interestsJson = "[\"AI/LLM\",\"Web Dev\",\"Open Source\",\"Knowledge Management\"]";
                 String socialsJson = "[{\"name\":\"GitHub\",\"icon\":\"github\",\"url\":\"https://github.com/EthanZhao02\",\"color\":\"#333\",\"handle\":\"@EthanZhao02\"}]";
-                jdbcTemplate.update("INSERT INTO " + PROFILE_TABLE + " (id, name, tagline, bio, location, status, skills, socials) VALUES (1, 'E森赵', 'AI & Web Developer', '正在探索AI与Web开发的交汇点，专注知识管理和学习系统。', 'Earth', 'Available', ?, ?)", skillsJson, socialsJson);
+                jdbcTemplate.update("INSERT INTO " + PROFILE_TABLE + " (id, name, tagline, bio, location, status, skills, interests, socials) VALUES (1, 'E森赵', 'AI & Web Developer', '正在探索AI与Web开发的交汇点，专注知识管理和学习系统。', 'Earth', 'Available', ?, ?, ?)", skillsJson, interestsJson, socialsJson);
                 log.info("✓ 已初始化默认个人资料");
             }
         } catch (Exception e) {

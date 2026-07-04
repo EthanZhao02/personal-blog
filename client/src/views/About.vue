@@ -199,6 +199,9 @@
           <div class="editor-row"><label>简介</label><textarea v-model="editForm.bio" rows="3" placeholder="一段话介绍自己" /></div>
           <div class="editor-row"><label>位置</label><input v-model="editForm.location" placeholder="如：Beijing, China" /></div>
           <div class="editor-row"><label>状态</label><input v-model="editForm.status" placeholder="如：Available / Busy" /></div>
+          <div class="editor-row"><label>技能 Skills</label><textarea v-model="editForm.skillsText" rows="5" placeholder='[&#10;  {"name":"Vue.js","level":85},&#10;  {"name":"Java","level":80}&#10;]' class="editor-json" /></div>
+          <div class="editor-row"><label>兴趣 Interests</label><textarea v-model="editForm.interestsText" rows="3" placeholder='["AI", "Web Dev", "Open Source"]' class="editor-json" /></div>
+          <div class="editor-row"><label>社交链接 Connect</label><textarea v-model="editForm.socialsText" rows="6" placeholder='[&#10;  {"name":"GitHub","icon":"github","url":"https://...","handle":"@xxx"}&#10;]' class="editor-json" /></div>
           <div class="editor-actions">
             <button @click="showEditor = false" class="editor-cancel">取消</button>
             <button @click="submitProfile" :disabled="saving" class="editor-save">{{ saving ? '保存中...' : '保存' }}</button>
@@ -247,6 +250,7 @@ const loadProfile = async () => {
         footer: siteConfig.about?.footer || '保持热爱，奔赴山海'
       }
       profile.value._skills = parseSkills(p.skills || siteConfig.about?.skills)
+      profile.value._interests = parseInterests(p.interests || siteConfig.about?.interests)
       profile.value._socials = parseSocials(p.socials)
       return
     }
@@ -261,6 +265,7 @@ const loadProfile = async () => {
     avatar: siteConfig.avatar || '',
     footer: siteConfig.about?.footer || '保持热爱，奔赴山海',
     _skills: parseSkills(siteConfig.about?.skills),
+    _interests: parseInterests(siteConfig.about?.interests),
     _socials: siteConfig.socials || []
   }
 }
@@ -271,13 +276,26 @@ const parseSocials = (raw) => {
   return arr
 }
 
+const parseInterests = (raw) => {
+  if (!raw) return siteConfig.about?.interests || []
+  const arr = typeof raw === 'string' ? JSON.parse(raw) : raw
+  return arr
+}
+
 const openEditor = () => {
+  // 把技能转为紧凑JSON供编辑
+  const skillsRaw = profile.value._skills?.map(s => ({ name: s.name, level: s.level })) || []
+  const socialsRaw = profile.value._socials || []
+  const interestsRaw = profile.value._interests || []
   editForm.value = {
     name: profile.value.name || '',
     tagline: profile.value.tagline || '',
     bio: profile.value.bio || '',
     location: profile.value.location || '',
-    status: profile.value.status || ''
+    status: profile.value.status || '',
+    skillsText: JSON.stringify(skillsRaw, null, 2),
+    interestsText: JSON.stringify(interestsRaw),
+    socialsText: JSON.stringify(socialsRaw, null, 2)
   }
   showEditor.value = true
 }
@@ -285,7 +303,16 @@ const openEditor = () => {
 const submitProfile = async () => {
   saving.value = true
   try {
-    const res = await updateProfile(editForm.value)
+    // 解析 JSON 字段
+    const payload = { ...editForm.value }
+    try { payload.skills = JSON.parse(editForm.value.skillsText || '[]') } catch { alert('Skills JSON 格式不正确'); saving.value = false; return }
+    try { payload.interests = JSON.parse(editForm.value.interestsText || '[]') } catch { alert('Interests JSON 格式不正确'); saving.value = false; return }
+    try { payload.socials = JSON.parse(editForm.value.socialsText || '[]') } catch { alert('Connect JSON 格式不正确'); saving.value = false; return }
+    delete payload.skillsText
+    delete payload.interestsText
+    delete payload.socialsText
+    
+    const res = await updateProfile(payload)
     if (res.code === 200) {
       showEditor.value = false
       await loadProfile()
@@ -301,7 +328,7 @@ const submitProfile = async () => {
 onMounted(loadProfile)
 
 const skills = computed(() => profile.value._skills || [])
-const interests = computed(() => siteConfig.about?.interests || [])
+const interests = computed(() => profile.value._interests || siteConfig.about?.interests || [])
 const socials = computed(() => profile.value._socials || [])
 
 const showQRCode = (social) => { currentQR.value = social; showQR.value = true }
@@ -931,6 +958,12 @@ const getSocialIcon = (icon) => {
 .editor-row input:focus,
 .editor-row textarea:focus {
   border-color: rgba(56, 248, 255, 0.4);
+}
+
+.editor-json {
+  font-family: 'JetBrains Mono', 'Consolas', monospace !important;
+  font-size: 12px !important;
+  line-height: 1.6;
 }
 .editor-actions {
   display: flex;

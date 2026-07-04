@@ -527,6 +527,8 @@ const loadTags = async () => {
 }
 
 const loadMyArticles = async () => {
+  const token = localStorage.getItem('token')
+  if (!token) return // 没登录就不调接口，避免控制台报错
   try {
     const res = await getMyArticles(1, 50)
     if (res.code === 200) {

@@ -16,6 +16,8 @@ public class Profile {
     private String avatar;
     /** JSON 数组: [{"name":"Vue","level":90},...] */
     private String skills;
+    /** JSON 数组: ["AI","Web Dev","Open Source",...] */
+    private String interests;
     /** JSON 数组: [{"name":"GitHub","icon":"github","url":"...","color":"#...","handle":"..."},...] */
     private String socials;
 }
