@@ -60,7 +60,10 @@
           <router-link to="/projects">All Projects</router-link>
         </div>
         <div class="project-focus">
-          <div class="project-mark">{{ featuredProject.icon || '◇' }}</div>
+          <div class="project-mark">
+            <img v-if="isProjectIconUrl(featuredProject.icon)" :src="featuredProject.icon" alt="project" />
+            <span v-else>{{ featuredProject.icon || '◇' }}</span>
+          </div>
           <div>
             <h2>{{ featuredProject.name }}</h2>
             <p>{{ featuredProject.description }}</p>
@@ -208,10 +211,15 @@ const heroStats = computed(() => [
 
 const activePhoto = computed(() => siteConfig.photos[currentPhoto.value] || siteConfig.photos[0] || '')
 const featuredProject = computed(() => projectsData.value[0] || siteConfig.projects?.[0] || {})
+const isProjectIconUrl = (icon) => icon && /^https?:\/\//.test(icon)
 const articles = ref([])
 const latestArticles = computed(() => articles.value.slice(0, 3))
 const totalArticles = computed(() => articles.value.length || siteConfig.content.articles?.length || 0)
-const projectTech = computed(() => featuredProject.value.techStack?.split(', ').slice(0, 5) || [])
+const projectTech = computed(() => {
+  const ts = featuredProject.value?.techStack
+  if (!ts) return []
+  return ts.split(/[,\s]+/).filter(Boolean).slice(0, 5)
+})
 
 const updateTime = () => {
   currentTime.value = new Date().toLocaleTimeString('en-US', {
@@ -618,6 +626,14 @@ onUnmounted(() => {
   background: rgba(56, 189, 248, 0.09);
   color: #38bdf8;
   font-size: 1.6rem;
+  overflow: hidden;
+}
+
+.project-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 }
 
 .project-focus h2 {
