@@ -25,10 +25,6 @@ public class DatabaseInitializer implements CommandLineRunner {
     private static final String USER_TABLE = "test.blog_user";
     private static final String MESSAGE_TABLE = "test.blog_message";
     private static final String COMMENT_TABLE = "test.blog_comment";
-    private static final String ARTICLE_TABLE = "test.blog_article";
-    private static final String CATEGORY_TABLE = "test.blog_category";
-    private static final String TAG_TABLE = "test.blog_tag";
-    private static final String FRIENDLINK_TABLE = "test.blog_friend_link";
 
     @Override
     public void run(String... args) throws Exception {
@@ -38,10 +34,6 @@ public class DatabaseInitializer implements CommandLineRunner {
         ensureUserIsAdminValue();
         ensureMessageColumns();
         ensureCommentColumns();
-        ensureArticleColumns();
-        ensureFriendLinkColumns();
-        ensureCategoryData();
-        ensureTagData();
         log.info("=== 数据库自检完成 ===");
     }
 
@@ -142,75 +134,6 @@ public class DatabaseInitializer implements CommandLineRunner {
                 Map.of("name", "parent_id", "type", "BIGINT"),
                 Map.of("name", "create_time", "type", "DATETIME")
         ));
-    }
-
-    /**
-     * 确保 article 表包含必要字段
-     */
-    private void ensureArticleColumns() {
-        ensureColumns(ARTICLE_TABLE, List.of(
-                Map.of("name", "attachments", "type", "TEXT"),
-                Map.of("name", "is_published", "type", "TINYINT(1)"),
-                Map.of("name", "cover_image", "type", "VARCHAR(500)"),
-                Map.of("name", "summary", "type", "VARCHAR(500)")
-        ));
-    }
-
-    /**
-     * 确保 friend_link 表包含实体类所有字段
-     */
-    private void ensureFriendLinkColumns() {
-        ensureColumns(FRIENDLINK_TABLE, List.of(
-                Map.of("name", "is_active", "type", "TINYINT(1)"),
-                Map.of("name", "sort_order", "type", "INT"),
-                Map.of("name", "update_time", "type", "DATETIME")
-        ));
-    }
-
-    /**
-     * 确保分类表有默认数据
-     */
-    private void ensureCategoryData() {
-        try {
-            Integer count = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM " + CATEGORY_TABLE, Integer.class
-            );
-            if (count == null || count == 0) {
-                log.warn("分类表为空，正在初始化默认分类...");
-                jdbcTemplate.update("INSERT INTO " + CATEGORY_TABLE + " (name, sort, create_time) VALUES ('技术', 1, NOW())");
-                jdbcTemplate.update("INSERT INTO " + CATEGORY_TABLE + " (name, sort, create_time) VALUES ('生活', 2, NOW())");
-                jdbcTemplate.update("INSERT INTO " + CATEGORY_TABLE + " (name, sort, create_time) VALUES ('随笔', 3, NOW())");
-                jdbcTemplate.update("INSERT INTO " + CATEGORY_TABLE + " (name, sort, create_time) VALUES ('项目', 4, NOW())");
-                log.info("✓ 已初始化默认分类");
-            } else {
-                log.info("✓ 分类数据已存在");
-            }
-        } catch (Exception e) {
-            log.error("✗ 初始化分类数据失败", e);
-        }
-    }
-
-    /**
-     * 确保标签表有默认数据
-     */
-    private void ensureTagData() {
-        try {
-            Integer count = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM " + TAG_TABLE, Integer.class
-            );
-            if (count == null || count == 0) {
-                log.warn("标签表为空，正在初始化默认标签...");
-                String[] tags = {"Java", "Vue", "MySQL", "SpringBoot", "Spring", "JavaScript", "TypeScript", "Python", "Docker", "Git"};
-                for (String tag : tags) {
-                    jdbcTemplate.update("INSERT INTO " + TAG_TABLE + " (name, create_time) VALUES (?, NOW())", tag);
-                }
-                log.info("✓ 已初始化默认标签");
-            } else {
-                log.info("✓ 标签数据已存在");
-            }
-        } catch (Exception e) {
-            log.error("✗ 初始化标签数据失败", e);
-        }
     }
 
     /**
