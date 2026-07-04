@@ -330,10 +330,10 @@ onMounted(() => {
   border: 1px solid rgba(126, 238, 255, 0.24);
   border-radius: 12px;
   background:
-    linear-gradient(135deg, rgba(15, 24, 45, 0.88), rgba(8, 12, 24, 0.74));
-  backdrop-filter: blur(18px) saturate(1.25);
-  -webkit-backdrop-filter: blur(18px) saturate(1.25);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28), 0 0 34px rgba(56, 248, 255, 0.08);
+    linear-gradient(135deg, rgba(15, 24, 45, 0.62), rgba(8, 12, 24, 0.48));
+  backdrop-filter: blur(22px) saturate(1.25);
+  -webkit-backdrop-filter: blur(22px) saturate(1.25);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22), 0 0 34px rgba(56, 248, 255, 0.06);
   position: relative;
   overflow: hidden;
 }
