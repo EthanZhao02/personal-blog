@@ -131,9 +131,9 @@
 
 .btn-back {
   padding: 10px 24px;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-light);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(148, 226, 255, 0.3);
+  color: rgba(226, 239, 255, 0.9);
   border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
@@ -141,7 +141,8 @@
 }
 
 .btn-back:hover {
-  border-color: var(--text);
-  color: var(--text);
+  border-color: rgba(56, 248, 255, 0.6);
+  color: #fff;
+  background: rgba(56, 248, 255, 0.1);
 }
 </style>

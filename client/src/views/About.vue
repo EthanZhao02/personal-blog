@@ -11,16 +11,22 @@
         <div class="profile-header">
           <div class="avatar-section">
             <div class="avatar-wrapper">
-              <img
-                v-if="siteConfig.avatar"
-                :src="siteConfig.avatar"
-                :alt="siteConfig.name"
-                @error="onAvatarError"
-              />
-              <div v-else class="avatar-placeholder">
-                {{ siteConfig.name?.charAt(0) || '?' }}
+              <div class="avatar-core">
+                <img
+                  v-if="siteConfig.avatar"
+                  :src="siteConfig.avatar"
+                  :alt="siteConfig.name"
+                  @error="onAvatarError"
+                />
+                <div v-else class="avatar-placeholder">
+                  {{ siteConfig.name?.charAt(0) || '?' }}
+                </div>
               </div>
-              <div class="avatar-ring" aria-hidden="true"></div>
+              <div class="avatar-glow-ring" aria-hidden="true"></div>
+              <div class="avatar-scan-line" aria-hidden="true"></div>
+              <div class="avatar-particles" aria-hidden="true">
+                <span v-for="n in 6" :key="n" class="particle" :style="{ '--i': n }"></span>
+              </div>
             </div>
             <div class="profile-name">
               <h1 class="name-text">{{ siteConfig.name }}</h1>
@@ -339,17 +345,111 @@ const getSocialIcon = (icon) => {
   background: rgba(56, 248, 255, 0.1);
 }
 
-.avatar-ring {
+.avatar-core {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  animation: coreFloat 4s ease-in-out infinite;
+}
+
+.avatar-core img,
+.avatar-core .avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  object-fit: cover;
+  border: 2px solid rgba(56, 248, 255, 0.3);
+}
+
+.avatar-glow-ring {
   position: absolute;
-  inset: -4px;
-  border: 1px solid rgba(56, 248, 255, 0.2);
-  border-radius: 20px;
-  animation: ringRotate 8s linear infinite;
+  inset: -8px;
+  border-radius: 24px;
+  background: conic-gradient(from 0deg, transparent, rgba(56, 248, 255, 0.4), transparent, rgba(155, 92, 255, 0.4), transparent);
+  animation: ringRotate 6s linear infinite;
+  opacity: 0.6;
+}
+
+.avatar-glow-ring::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: rgba(8, 14, 27, 0.9);
+  border-radius: 22px;
+}
+
+.avatar-scan-line {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.avatar-scan-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.8), transparent);
+  animation: scanLine 3s ease-in-out infinite;
+}
+
+.avatar-particles {
+  position: absolute;
+  inset: -20px;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(56, 248, 255, 0.8);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  animation: particleOrbit 4s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.5s);
 }
 
 @keyframes ringRotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@keyframes coreFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes scanLine {
+  0% { top: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes particleOrbit {
+  0% {
+    transform: rotate(calc(var(--i) * 60deg)) translateX(50px) scale(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: rotate(calc(var(--i) * 60deg)) translateX(50px) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: rotate(calc(var(--i) * 60deg + 180deg)) translateX(50px) scale(1);
+  }
+  100% {
+    transform: rotate(calc(var(--i) * 60deg + 180deg)) translateX(50px) scale(0);
+    opacity: 0;
+  }
 }
 
 .profile-name {

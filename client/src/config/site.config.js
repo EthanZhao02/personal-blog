@@ -62,9 +62,11 @@ const socials = [
   {
     name: 'QQ',
     handle: '2317733506',
-    url: 'tencent://message/?uin=2317733506',
+    url: '#qq-qr',
     color: '#22d3ee',
     icon: 'qq',
+    isQRCode: true,
+    qrCodeUrl: '/photos/qq-qr.jpg',
   },
   {
     name: '邮箱',
@@ -390,7 +392,7 @@ export const siteConfig = {
   },
   auth: {
     staticNotice: '当前 GitHub Pages 只能展示静态页面；站内账号登录需要单独部署 Spring Boot 后端与 MySQL。',
-    localNotice: '本地或服务器模式下可使用数据库中的账号登录，默认初始化账号为 admin / 123456。',
+    localNotice: '管理员登录入口。如有账号问题请联系站长。',
   },
   donateIntro: '如果我的博客对你有帮助，欢迎随手支持一下。',
   wechatPay: '',

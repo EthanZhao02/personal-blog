@@ -220,24 +220,10 @@ const useFallbackCategories = () => {
 
 const loadArticles = async () => {
   loading.value = true
-  if (isStaticMode) {
-    useFallbackArticles()
-    loading.value = false
-    return
-  }
-  try {
-    const res = await getArticleList(1, 200)
-    if (res.code === 200) {
-      articles.value = res.data?.records || []
-    } else {
-      useFallbackArticles()
-    }
-  } catch (e) {
-    useFallbackArticles()
-    if (import.meta.env.DEV) console.info('使用静态文章数据', e?.message || e)
-  } finally {
-    loading.value = false
-  }
+  // 强制使用静态数据，避免API问题
+  useFallbackArticles()
+  loading.value = false
+  return
 }
 
 const loadTags = async () => {

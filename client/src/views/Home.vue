@@ -520,8 +520,9 @@ onUnmounted(() => {
   transform: translateX(100%);
 }
 
+/* Bento Grid Layout - 3+3 整齐布局 */
 .project-card {
-  grid-column: span 5;
+  grid-column: span 4;
 }
 
 .articles-card {
@@ -529,19 +530,19 @@ onUnmounted(() => {
 }
 
 .research-card {
-  grid-column: span 3;
-}
-
-.learning-card {
-  grid-column: span 5;
-}
-
-.timeline-card {
   grid-column: span 4;
 }
 
+.learning-card {
+  grid-column: span 6;
+}
+
+.timeline-card {
+  grid-column: span 6;
+}
+
 .connect-card {
-  grid-column: span 3;
+  grid-column: span 12;
 }
 
 .card-heading {
@@ -774,11 +775,17 @@ onUnmounted(() => {
 
   .project-card,
   .articles-card,
-  .research-card,
-  .learning-card,
-  .timeline-card,
-  .connect-card {
+  .research-card {
     grid-column: span 6;
+  }
+
+  .learning-card,
+  .timeline-card {
+    grid-column: span 6;
+  }
+
+  .connect-card {
+    grid-column: span 12;
   }
 }
 

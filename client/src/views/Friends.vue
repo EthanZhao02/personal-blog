@@ -18,10 +18,10 @@
           <div class="apply-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38f8ff" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
           <div>
             <h3 class="apply-title">申请友链</h3>
-            <p class="apply-desc">在 GitHub Discussions 留言申请，提供你的博客名称、链接和简介</p>
+            <p class="apply-desc">在留言板留言申请友链，提供你的博客名称、链接和简介</p>
           </div>
         </div>
-        <a href="https://github.com/EthanZhao02/personal-blog/discussions" target="_blank" rel="noopener" class="apply-btn">前往申请</a>
+        <router-link to="/message" class="apply-btn">前往留言板</router-link>
       </div>
 
       <!-- 友链网格 -->
