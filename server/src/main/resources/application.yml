@@ -16,10 +16,6 @@ server:
       force: true
 
 spring:
-  sql:
-    init:
-      mode: always
-      continue-on-error: true
   servlet:
     multipart:
       max-file-size: 10MB
