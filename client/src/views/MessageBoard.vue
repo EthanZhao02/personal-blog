@@ -303,13 +303,45 @@ onMounted(loadMessages)
 .bg-scanlines {
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(56, 248, 255, 0.015) 3px,
-    rgba(56, 248, 255, 0.015) 6px
-  );
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(56, 248, 255, 0.015) 3px,
+      rgba(56, 248, 255, 0.015) 6px
+    ),
+    radial-gradient(circle at 20% 50%, rgba(56, 248, 255, 0.04), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(155, 92, 255, 0.04), transparent 50%);
+}
+
+/* 浮动粒子背景 */
+.bg-scanlines::before,
+.bg-scanlines::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #38f8ff;
+  box-shadow: 
+    100px 200px 0 0 rgba(56, 248, 255, 0.3),
+    300px 400px 0 0 rgba(56, 248, 255, 0.2),
+    500px 100px 0 0 rgba(155, 92, 255, 0.3),
+    700px 500px 0 0 rgba(56, 248, 255, 0.15),
+    900px 300px 0 0 rgba(155, 92, 255, 0.2),
+    1100px 700px 0 0 rgba(56, 248, 255, 0.25),
+    200px 600px 0 0 rgba(56, 248, 255, 0.1),
+    600px 150px 0 0 rgba(155, 92, 255, 0.15);
+  animation: particleFloat 15s ease-in-out infinite;
+}
+.bg-scanlines::after {
+  animation-delay: -7s;
+  animation-duration: 20s;
+}
+@keyframes particleFloat {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+  50% { transform: translateY(-30px) translateX(20px); opacity: 0.6; }
 }
 
 .message-container {
@@ -322,6 +354,12 @@ onMounted(loadMessages)
 /* 页面头部 */
 .page-header {
   margin-bottom: 40px;
+  animation: headerIn 0.6s var(--ease-out) backwards;
+}
+
+@keyframes headerIn {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .header-badge {
@@ -334,6 +372,13 @@ onMounted(loadMessages)
   border: 1px solid rgba(56, 248, 255, 0.3);
   border-radius: 4px;
   margin-bottom: 16px;
+  box-shadow: 0 0 20px rgba(56, 248, 255, 0.1);
+  animation: badgePulse 3s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(56, 248, 255, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(56, 248, 255, 0.25); }
 }
 
 .page-title {
@@ -358,8 +403,29 @@ onMounted(loadMessages)
   border: 1px solid rgba(56, 248, 255, 0.2);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 0 0 60px rgba(56, 248, 255, 0.04);
   backdrop-filter: blur(10px);
+  animation: panelIn 0.6s var(--ease-out) 0.2s backwards;
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(30px); filter: blur(8px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* 终端边框发光效果 */
+.terminal-panel::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(56, 248, 255, 0.3), transparent 40%, transparent 60%, rgba(155, 92, 255, 0.2));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 /* 终端头部 */
@@ -472,6 +538,19 @@ onMounted(loadMessages)
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   align-self: flex-start;
+  animation: msgIn 0.4s var(--ease-out) backwards;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.message-bubble:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(56, 248, 255, 0.08);
+  border-color: rgba(56, 248, 255, 0.2);
+}
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateX(-20px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
 }
 
 .message-bubble.message-mine {

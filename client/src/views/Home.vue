@@ -9,9 +9,9 @@
       ></span>
     </div>
 
-    <section class="hero-section">
+    <section class="hero-section" :class="{ 'hero-enter': heroVisible }">
       <div class="hero-copy reveal-up">
-        <h1>Hi, I'm Ethan Zhao.</h1>
+        <h1><span class="typed-cursor">{{ typedText }}</span><span class="cursor-blink">|</span></h1>
         <p class="hero-role">{{ siteConfig.role }}</p>
         <p class="hero-slogan">{{ siteConfig.subtitle }}</p>
 
@@ -53,7 +53,7 @@
       </div>
     </section>
 
-    <section class="bento-grid" aria-label="Portfolio overview">
+    <section class="bento-grid" :class="{ 'bento-enter': bentoVisible }" aria-label="Portfolio overview">
       <article class="bento-card project-card reveal-up">
         <div class="card-heading">
           <span>Featured Projects</span>
@@ -187,7 +187,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, nextTick } from 'vue'
 import siteConfig from '../config/site.config.js'
 import { getArticleList } from '../api/article'
 import { getProjects } from '../api/project'
@@ -197,6 +197,13 @@ const currentTime = ref('')
 let timeTimer = null
 let carouselTimer = null
 
+// 入场动画状态
+const heroVisible = ref(false)
+const bentoVisible = ref(false)
+const typedText = ref('')
+const fullText = 'Hi, I\'m Ethan Zhao.'
+let typeTimer = null
+
 const particleDots = [
   { id: 1, left: '7%', top: '18%', delay: '0s' },
   { id: 2, left: '21%', top: '64%', delay: '1.4s' },
@@ -204,6 +211,10 @@ const particleDots = [
   { id: 4, left: '64%', top: '72%', delay: '2.1s' },
   { id: 5, left: '82%', top: '16%', delay: '1.1s' },
   { id: 6, left: '92%', top: '54%', delay: '2.7s' },
+  { id: 7, left: '15%', top: '42%', delay: '1.8s' },
+  { id: 8, left: '55%', top: '10%', delay: '0.4s' },
+  { id: 9, left: '78%', top: '88%', delay: '2.4s' },
+  { id: 10, left: '33%', top: '82%', delay: '1.2s' },
 ]
 
 const projectsCount = ref(siteConfig.projects?.length || 0)
@@ -254,6 +265,20 @@ onMounted(async () => {
   updateTime()
   timeTimer = setInterval(updateTime, 1000)
   carouselTimer = setInterval(nextPhoto, 5200)
+  // 入场动画序列
+  heroVisible.value = true
+  // 打字机效果
+  let i = 0
+  typeTimer = setInterval(() => {
+    if (i < fullText.length) {
+      typedText.value += fullText[i]
+      i++
+    } else {
+      clearInterval(typeTimer)
+      // 打字完成后显示 bento
+      setTimeout(() => { bentoVisible.value = true }, 300)
+    }
+  }, 55)
   // 从API加载最新文章
   try {
     const res = await getArticleList(1, 5)
@@ -261,7 +286,6 @@ onMounted(async () => {
       articles.value = res.data.records
     }
   } catch (e) {
-    // API失败时使用静态数据
     if (siteConfig.content.articles?.length) {
       articles.value = siteConfig.content.articles
     }
@@ -281,6 +305,7 @@ onMounted(async () => {
 onUnmounted(() => {
   if (timeTimer) clearInterval(timeTimer)
   if (carouselTimer) clearInterval(carouselTimer)
+  if (typeTimer) clearInterval(typeTimer)
 })
 </script>
 
@@ -320,6 +345,44 @@ onUnmounted(() => {
   z-index: 1;
   width: min(1240px, 100%);
   margin: 0 auto;
+}
+
+/* 入场动画 */
+.hero-section {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+}
+.hero-section.hero-enter {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bento-grid {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+}
+.bento-grid.bento-enter {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 打字机光标 */
+.typed-cursor {
+  background: linear-gradient(135deg, #fff 0%, #38bdf8 50%, #9b5cff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cursor-blink {
+  color: #38f8ff;
+  animation: blink 0.8s step-end infinite;
+  font-weight: 300;
+}
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 
 .hero-section {
