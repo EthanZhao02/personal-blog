@@ -48,6 +48,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         ensureCommentColumns();
         ensureArticleColumns();
         ensureFriendLinkColumns();
+        ensureFriendLinkData();
         ensureProjectColumns();
         ensureCategoryColumns();
         ensureCategoryData();
@@ -188,6 +189,73 @@ public class DatabaseInitializer implements CommandLineRunner {
                 Map.of("name", "sort_order", "type", "INT"),
                 Map.of("name", "update_time", "type", "DATETIME")
         ));
+    }
+
+    /**
+     * 清理线上误录入的测试友链；如果没有可展示友链，则补入静态站同款默认数据。
+     */
+    private void ensureFriendLinkData() {
+        try {
+            int deleted = jdbcTemplate.update(
+                "DELETE FROM " + FRIENDLINK_TABLE + " WHERE " +
+                "TRIM(COALESCE(name, '')) IN ('嘀咕嘀咕', 'vDVD', 'VS VS v', '放松放松') " +
+                "OR TRIM(COALESCE(url, '')) IN ('的DVD', 'VS VS', '三十分') " +
+                "OR (is_active = 1 AND (url IS NULL OR TRIM(url) = '' OR url NOT LIKE 'http%'))"
+            );
+            if (deleted > 0) {
+                log.info("已清理测试/无效友链 {} 条", deleted);
+            }
+
+            Integer activeCount = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM " + FRIENDLINK_TABLE + " WHERE is_active = 1",
+                Integer.class
+            );
+            if (activeCount == null || activeCount == 0) {
+                insertDefaultFriendLinks();
+            }
+        } catch (Exception e) {
+            log.error("修正友链默认数据失败", e);
+        }
+    }
+
+    private void insertDefaultFriendLinks() {
+        jdbcTemplate.update(
+            "INSERT INTO " + FRIENDLINK_TABLE +
+            " (name, description, avatar, url, category, email, is_active, sort_order, create_time, update_time) " +
+            "VALUES (?, ?, ?, ?, ?, ?, 1, ?, NOW(), NOW())",
+            "Souta",
+            "技术博客与个人站点参考",
+            "https://api.dicebear.com/7.x/identicon/svg?seed=souta",
+            "https://souta.cc",
+            "tech",
+            "",
+            10
+        );
+        jdbcTemplate.update(
+            "INSERT INTO " + FRIENDLINK_TABLE +
+            " (name, description, avatar, url, category, email, is_active, sort_order, create_time, update_time) " +
+            "VALUES (?, ?, ?, ?, ?, ?, 1, ?, NOW(), NOW())",
+            "理想之 clover",
+            "关于 AI 与技术的思考",
+            "https://api.dicebear.com/7.x/identicon/svg?seed=clover",
+            "https://idealclover.top",
+            "tech",
+            "",
+            20
+        );
+        jdbcTemplate.update(
+            "INSERT INTO " + FRIENDLINK_TABLE +
+            " (name, description, avatar, url, category, email, is_active, sort_order, create_time, update_time) " +
+            "VALUES (?, ?, ?, ?, ?, ?, 1, ?, NOW(), NOW())",
+            "qwqwq",
+            "有趣的项目与想法",
+            "https://api.dicebear.com/7.x/identicon/svg?seed=qwqwq",
+            "https://qwqwq.com",
+            "other",
+            "",
+            30
+        );
+        log.info("已初始化默认友链数据");
     }
 
     /**

@@ -25,6 +25,18 @@
         </div>
         <button class="apply-cta" type="button" @click="openApplyForm">{{ ui.applyAction }}</button>
       </section>
+      <section v-else class="apply-panel apply-compact admin-compact">
+        <div class="apply-info">
+          <div class="apply-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/><path d="M4 7.5A3.5 3.5 0 0 1 7.5 4h9A3.5 3.5 0 0 1 20 7.5v9a3.5 3.5 0 0 1-3.5 3.5h-9A3.5 3.5 0 0 1 4 16.5z"/></svg>
+          </div>
+          <div>
+            <h3 class="apply-title">{{ ui.adminTitle }}</h3>
+            <p class="apply-desc">{{ ui.adminDesc }}</p>
+          </div>
+        </div>
+        <button class="apply-cta admin-cta" type="button" @click="openAdd">+ {{ ui.addFriend }}</button>
+      </section>
 
       <transition name="apply-modal">
         <div v-if="!userStore.isAdmin && showApplyForm" class="apply-modal-overlay" @click.self="closeApplyForm">
@@ -73,10 +85,6 @@
       </transition>
 
       <!-- 管理员添加按钮(有友链时) -->
-      <button v-if="userStore.isAdmin && !loading && friends.length" class="add-friend-btn" @click="openAdd">
-        + {{ ui.addFriend }}
-      </button>
-
       <!-- 友链网格 -->
       <main class="friends-grid" v-if="!loading && friends.length">
         <div
@@ -111,7 +119,7 @@
             </div>
           </a>
           <!-- 管理员按钮 -->
-          <div class="node-admin-actions" v-if="userStore.isAdmin">
+          <div class="node-admin-actions" v-if="userStore.isAdmin && !friend.isFallback">
             <button @click="openEdit(friend)" class="admin-btn edit-btn">编辑</button>
             <button @click="handleDelete(friend.id)" class="admin-btn del-btn">删除</button>
           </div>
@@ -200,6 +208,8 @@ const ui = computed(() => siteLanguage.value === 'en'
       applyTitle: 'Apply For A Link',
       applyDesc: 'The page keeps the link network clean. Open the application cabin only when you need to submit a site.',
       applyAction: 'Apply',
+      adminTitle: 'Friend Link Console',
+      adminDesc: 'Admin mode is active. Add, edit, or remove real friend-link nodes here.',
       applyBadge: 'LINK REQUEST',
       applyModalDesc: 'Submit your site information here. When the backend is available, it will enter the review queue.',
       siteName: 'Site Name *',
@@ -229,6 +239,8 @@ const ui = computed(() => siteLanguage.value === 'en'
       applyTitle: '申请友链',
       applyDesc: '友链页先展示关系网络，需要提交站点时再打开申请舱，页面不会一进来就铺满表单。',
       applyAction: '申请友链',
+      adminTitle: '友链管理舱',
+      adminDesc: '当前为管理员模式，可以在这里新增、编辑或移除真实友链节点。',
       applyBadge: 'LINK REQUEST',
       applyModalDesc: '把站点资料投递到这里，后台开启后会以待审核节点进入管理列表。',
       siteName: '站点名称 *',
@@ -256,8 +268,29 @@ const useFallbackFriends = () => {
   friends.value = fallbackFriends.map(friend => ({
     ...friend,
     avatar: resolveUploadUrl(friend.avatar),
+    isFallback: true,
   }))
 }
+
+const backendTestNames = new Set(['嘀咕嘀咕', 'vDVD', 'VS VS v', '放松放松'])
+const backendTestUrls = new Set(['的DVD', 'VS VS', '三十分'])
+
+const isValidFriend = (friend) => {
+  const name = String(friend?.name || '').trim()
+  const url = String(friend?.url || '').trim()
+  if (!name || !/^https?:\/\//i.test(url)) return false
+  if (backendTestNames.has(name) || backendTestUrls.has(url)) return false
+  return true
+}
+
+const normalizeFriends = (list = []) => list
+  .map(friend => ({
+    ...friend,
+    name: String(friend.name || '').trim(),
+    url: String(friend.url || '').trim(),
+    avatar: resolveUploadUrl(friend.avatar),
+  }))
+  .filter(isValidFriend)
 
 const loadFriends = async () => {
   loading.value = true
@@ -265,10 +298,12 @@ const loadFriends = async () => {
     const url = userStore.isAdmin ? '/friend/link/all' : '/friend/link/list'
     const res = await getFriendLinks(url)
     if ((res.code === 200 || res.code === 0) && res.data?.length) {
-      friends.value = res.data.map(friend => ({
-        ...friend,
-        avatar: resolveUploadUrl(friend.avatar),
-      }))
+      const normalizedFriends = normalizeFriends(res.data)
+      if (normalizedFriends.length) {
+        friends.value = normalizedFriends
+      } else {
+        useFallbackFriends()
+      }
     } else {
       useFallbackFriends()
     }
