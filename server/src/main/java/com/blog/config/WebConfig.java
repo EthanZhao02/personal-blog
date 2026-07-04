@@ -47,8 +47,9 @@ public class WebConfig implements WebMvcConfigurer {
                         // 分类和标签 - 公开
                         "/category/list",
                         "/tag/list",
-                        // 评论相关 - 公开
+                        // 评论相关 - 公开（支持游客评论）
                         "/comment/list/**",
+                        "/comment/add",
                         // 留言相关 - 公开
                         "/message/list",
                         "/message/add",

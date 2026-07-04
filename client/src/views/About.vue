@@ -102,10 +102,10 @@
             <template v-for="social in siteConfig.socials" :key="social.name">
               <!-- 普通链接 -->
               <a
-                v-if="!social.isQRCode"
+                v-if="!social.isQRCode && !social.url?.startsWith('#')"
                 :href="social.url"
-                :target="social.url?.startsWith('#') ? undefined : '_blank'"
-                :rel="social.url?.startsWith('#') ? undefined : 'noopener noreferrer'"
+                target="_blank"
+                rel="noopener noreferrer"
                 class="contact-node"
                 :style="{ '--node-color': social.color || '#38f8ff' }"
               >
@@ -120,6 +120,24 @@
                   </svg>
                 </span>
               </a>
+              <!-- 占位链接（未配置真实URL） -->
+              <div
+                v-else-if="!social.isQRCode && social.url?.startsWith('#')"
+                class="contact-node placeholder-link"
+                :style="{ '--node-color': social.color || '#38f8ff' }"
+                title="链接待配置"
+              >
+                <span class="contact-icon" v-html="getSocialIcon(social.icon)"></span>
+                <span class="contact-copy">
+                  <span class="contact-name">{{ social.name }}</span>
+                  <span v-if="social.handle" class="contact-detail">{{ social.handle }}</span>
+                </span>
+                <span class="contact-arrow">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M7 17l9.2-9.2M17 17V7H7"/>
+                  </svg>
+                </span>
+              </div>
               <!-- 二维码弹窗 -->
               <div
                 v-else
@@ -156,7 +174,7 @@
           <div class="qr-content" @click.stop>
             <button class="qr-close" @click="closeQRCode">×</button>
             <h4 class="qr-title">{{ currentQR?.name }}</h4>
-            <img v-if="currentQR?.qrCodeUrl" :src="currentQR.qrCodeUrl" :alt="currentQR?.name" class="qr-image" />
+            <img v-if="currentQR?.qrCodeUrl" :src="resolveAssetUrl(currentQR.qrCodeUrl)" :alt="currentQR?.name" class="qr-image" />
             <p class="qr-tip">扫描二维码关注我</p>
           </div>
         </div>
@@ -174,6 +192,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import siteConfig from '../config/site.config'
+import { resolveAssetUrl } from '../config/site.config'
 
 const showQR = ref(false)
 const currentQR = ref(null)
@@ -361,24 +380,30 @@ const getSocialIcon = (icon) => {
 
 .avatar-glow-ring {
   position: absolute;
-  inset: -6px;
-  border-radius: 22px;
-  background: conic-gradient(from 0deg, transparent 0%, rgba(56, 248, 255, 0.25) 30%, rgba(155, 92, 255, 0.25) 70%, transparent 100%);
-  animation: ringRotate 10s linear infinite;
-  opacity: 0.5;
+  inset: -8px;
+  border-radius: 24px;
+  background: conic-gradient(from 0deg, transparent 0%, rgba(56, 248, 255, 0.7) 30%, rgba(155, 92, 255, 0.7) 70%, transparent 100%);
+  animation: ringRotate 4s linear infinite;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 8px rgba(56, 248, 255, 0.45));
 }
 
 .avatar-glow-ring::before {
   content: '';
   position: absolute;
-  inset: 2px;
-  background: rgba(8, 14, 27, 0.95);
-  border-radius: 20px;
+  inset: 3px;
+  background: rgba(8, 14, 27, 0.92);
+  border-radius: 21px;
+}
+
+@keyframes ringRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes coreFloat {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+  50% { transform: translateY(-3px); }
 }
 
 .profile-name {
@@ -727,5 +752,14 @@ const getSocialIcon = (icon) => {
 
 .qr-trigger {
   cursor: pointer;
+}
+
+.placeholder-link {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.placeholder-link:hover {
+  transform: none;
 }
 </style>

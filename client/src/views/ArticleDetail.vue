@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="article-page" v-if="article">
     <div class="article-inner">
 
@@ -1304,18 +1304,19 @@ watch(() => route.params.id, () => {
 }
 .about-avatar .avatar-glow-ring {
   position: absolute;
-  inset: -5px;
-  border-radius: 20px;
-  background: conic-gradient(from 0deg, transparent 0%, rgba(56, 248, 255, 0.25) 30%, rgba(155, 92, 255, 0.25) 70%, transparent 100%);
-  animation: ringRotate 10s linear infinite;
-  opacity: 0.5;
+  inset: -7px;
+  border-radius: 22px;
+  background: conic-gradient(from 0deg, transparent 0%, rgba(56, 248, 255, 0.7) 30%, rgba(155, 92, 255, 0.7) 70%, transparent 100%);
+  animation: ringRotate 4s linear infinite;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 6px rgba(56, 248, 255, 0.45));
 }
 .about-avatar .avatar-glow-ring::before {
   content: '';
   position: absolute;
   inset: 2px;
-  background: rgba(8, 14, 27, 0.95);
-  border-radius: 18px;
+  background: rgba(8, 14, 27, 0.92);
+  border-radius: 20px;
 }
 @keyframes ringRotate {
   from { transform: rotate(0deg); }
