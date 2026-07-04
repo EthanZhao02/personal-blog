@@ -155,7 +155,7 @@
                   <a v-if="!social.isQRCode && social.url && !social.url.startsWith('#')"
                     :href="social.url" target="_blank" rel="noopener"
                     class="connect-card"
-                    :style="{ '--card-color': social.color || '#38f8ff' }">
+                    :style="{ '--card-color': social.color || '#60a5fa' }">
                     <span class="cc-icon" v-html="getSocialIcon(social.icon)"></span>
                     <div class="cc-info">
                       <span class="cc-name">{{ social.name }}</span>
@@ -164,7 +164,7 @@
                     <svg class="cc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
                   </a>
                   <div v-else-if="social.isQRCode"
-                    class="connect-card qr-card" @click="showQRCode(social)" :style="{ '--card-color': social.color || '#38f8ff' }">
+                    class="connect-card qr-card" @click="showQRCode(social)" :style="{ '--card-color': social.color || '#60a5fa' }">
                     <span class="cc-icon" v-html="getSocialIcon(social.icon)"></span>
                     <div class="cc-info">
                       <span class="cc-name">{{ social.name }}</span>
@@ -172,7 +172,7 @@
                     </div>
                     <svg class="cc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
                   </div>
-                  <div v-else class="connect-card placeholder-card" :style="{ '--card-color': social.color || '#38f8ff' }">
+                  <div v-else class="connect-card placeholder-card" :style="{ '--card-color': social.color || '#60a5fa' }">
                     <span class="cc-icon" v-html="getSocialIcon(social.icon)"></span>
                     <div class="cc-info">
                       <span class="cc-name">{{ social.name }}</span>
@@ -407,7 +407,7 @@ const getHobbyIcon = (name) => {
     '代码': '💻', '编程': '💻', '写作': '✍️',
     '茶': '🍵', '手工': '🔨', '回附': '🔧'
   }
-  return map[name] || '✨'
+  return map[name] || '01'
 }
 const showQRCode = (s) => { currentQR.value = s; showQR.value = true }
 const closeQRCode = () => { showQR.value = false; currentQR.value = null }
@@ -484,11 +484,11 @@ const getSocialIcon = (icon) => {
   grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
   background:
     linear-gradient(135deg, rgba(12, 20, 35, 0.88), rgba(8, 12, 24, 0.9)),
-    repeating-linear-gradient(90deg, rgba(125, 211, 252, 0.035) 0 1px, transparent 1px 96px);
-  border: 1px solid rgba(56, 248, 255, 0.18);
+    repeating-linear-gradient(90deg, rgba(147, 197, 253, 0.035) 0 1px, transparent 1px 96px);
+  border: 1px solid rgba(96, 165, 250, 0.18);
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 24px 80px rgba(0,0,0,0.35), inset 0 0 90px rgba(56,248,255,0.035);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.35), inset 0 0 90px rgba(96,165,250,0.035);
   animation: resumeIn 0.7s var(--ease-out) backwards;
 }
 
@@ -502,17 +502,17 @@ const getSocialIcon = (icon) => {
   position: absolute; top: 14px; right: 14px; z-index: 10;
   display: flex; align-items: center; gap: 4px;
   padding: 6px 12px;
-  background: rgba(56, 248, 255, 0.1);
-  border: 1px solid rgba(56, 248, 255, 0.25);
-  border-radius: 6px; color: #38f8ff; font-size: 12px; cursor: pointer;
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  border-radius: 6px; color: #60a5fa; font-size: 12px; cursor: pointer;
   transition: all 0.2s;
 }
-.edit-resume-btn:hover { background: rgba(56, 248, 255, 0.2); }
+.edit-resume-btn:hover { background: rgba(96, 165, 250, 0.2); }
 
 /* 左侧栏 */
 .resume-sidebar {
   padding: 36px 28px 28px;
-  border-right: 1px solid rgba(56, 248, 255, 0.1);
+  border-right: 1px solid rgba(96, 165, 250, 0.1);
   text-align: center;
   display: flex; flex-direction: column; align-items: center; gap: 14px;
 }
@@ -533,27 +533,27 @@ const getSocialIcon = (icon) => {
 }
 .avatar-frame {
   width: 100%; height: 100%; border-radius: 18px; overflow: hidden;
-  border: 2px solid rgba(56, 248, 255, 0.3);
+  border: 2px solid rgba(96, 165, 250, 0.3);
   position: relative; z-index: 2;
 }
 .ai-core-avatar .avatar-frame {
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  border-color: rgba(125, 211, 252, 0.52);
-  box-shadow: 0 0 32px rgba(56, 248, 255, 0.16), inset 0 0 24px rgba(56, 248, 255, 0.08);
+  border-color: rgba(147, 197, 253, 0.52);
+  box-shadow: 0 0 32px rgba(96, 165, 250, 0.16), inset 0 0 24px rgba(96, 165, 250, 0.08);
 }
 .avatar-frame img, .avatar-placeholder {
   width: 100%; height: 100%; object-fit: cover;
 }
 .avatar-placeholder {
   display: flex; align-items: center; justify-content: center;
-  font-size: 36px; font-weight: 700; color: #38f8ff;
-  background: rgba(56, 248, 255, 0.1);
+  font-size: 36px; font-weight: 700; color: #60a5fa;
+  background: rgba(96, 165, 250, 0.1);
 }
 .avatar-glow {
   position: absolute; z-index: 1; inset: -4px; border-radius: 22px;
-  background: conic-gradient(from 0deg, rgba(56,248,255,0) 0%, rgba(56,248,255,0.45) 25%, rgba(155,92,255,0.45) 75%, rgba(56,248,255,0) 100%);
+  background: conic-gradient(from 0deg, rgba(96,165,250,0) 0%, rgba(96,165,250,0.45) 25%, rgba(155,92,255,0.45) 75%, rgba(96,165,250,0) 100%);
   animation: glowSpin 6s linear infinite; opacity: 0.5;
 }
 .ai-core-avatar .avatar-glow {
@@ -572,7 +572,7 @@ const getSocialIcon = (icon) => {
   position: absolute;
   border-radius: 999px;
   pointer-events: none;
-  border: 1px solid rgba(125, 211, 252, 0.28);
+  border: 1px solid rgba(147, 197, 253, 0.28);
 }
 .neural-a {
   inset: 0;
@@ -587,15 +587,15 @@ const getSocialIcon = (icon) => {
 .neural-c {
   inset: 34px;
   border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: inset 0 0 28px rgba(56, 248, 255, 0.08);
+  box-shadow: inset 0 0 28px rgba(96, 165, 250, 0.08);
   animation: corePulse 2.6s ease-in-out infinite;
 }
 .avatar-laser {
   position: absolute;
   width: 118px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.86), rgba(167, 139, 250, 0.72), transparent);
-  filter: drop-shadow(0 0 12px rgba(56, 248, 255, 0.52));
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.86), rgba(167, 139, 250, 0.72), transparent);
+  filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.52));
   pointer-events: none;
   transform-origin: center;
 }
@@ -607,8 +607,8 @@ const getSocialIcon = (icon) => {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: #e0f7ff;
-  box-shadow: 0 0 16px rgba(56, 248, 255, 0.78);
+  background: #dbeafe;
+  box-shadow: 0 0 16px rgba(96, 165, 250, 0.78);
 }
 .node-a { transform: translate(58px, -44px); }
 .node-b { transform: translate(-62px, 38px); background: #a78bfa; }
@@ -630,7 +630,7 @@ const getSocialIcon = (icon) => {
 
 .sidebar-name {
   font-size: 22px; font-weight: 700; color: #fff; margin: 0;
-  background: linear-gradient(135deg, #fff 0%, #38f8ff 100%);
+  background: linear-gradient(135deg, #fff 0%, #60a5fa 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -642,10 +642,10 @@ const getSocialIcon = (icon) => {
   display: flex; align-items: center; gap: 8px; font-size: 12px;
   color: rgba(255,255,255,0.45); justify-content: center;
 }
-.status-badge { color: #38f8ff; }
+.status-badge { color: #60a5fa; }
 .sidebar-bio {
   text-align: left; padding: 14px 0 0;
-  border-top: 1px solid rgba(56,248,255,0.08);
+  border-top: 1px solid rgba(96,165,250,0.08);
 }
 .sidebar-bio p {
   font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.8; margin: 0;
@@ -663,11 +663,11 @@ const getSocialIcon = (icon) => {
 }
 .block-tag {
   font-size: 10px; font-weight: 600; letter-spacing: 0.18em;
-  color: rgba(56, 248, 255, 0.55); white-space: nowrap;
+  color: rgba(96, 165, 250, 0.55); white-space: nowrap;
 }
 .block-line {
   flex: 1; height: 1px;
-  background: linear-gradient(to right, rgba(56,248,255,0.15), transparent);
+  background: linear-gradient(to right, rgba(96,165,250,0.15), transparent);
 }
 
 /* Skills */
@@ -680,34 +680,34 @@ const getSocialIcon = (icon) => {
 }
 .skill-bar {
   height: 100%; border-radius: 3px;
-  background: linear-gradient(90deg, #38f8ff 0%, #9b5cff 100%);
+  background: linear-gradient(90deg, #60a5fa 0%, #9b5cff 100%);
   transition: width 0.6s ease;
 }
 .skill-pct {
   width: 32px; font-size: 10px; font-family: 'SF Mono', monospace;
-  color: #38f8ff; text-align: right;
+  color: #60a5fa; text-align: right;
 }
 
 /* Interests */
 .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag-pill {
   padding: 6px 14px; font-size: 12px; color: rgba(255,255,255,0.65);
-  background: rgba(56,248,255,0.06); border: 1px solid rgba(56,248,255,0.12);
+  background: rgba(96,165,250,0.06); border: 1px solid rgba(96,165,250,0.12);
   border-radius: 7px; transition: all 0.2s;
 }
 .tag-pill:hover {
-  background: rgba(56,248,255,0.14); border-color: rgba(56,248,255,0.3); color: #fff;
+  background: rgba(96,165,250,0.14); border-color: rgba(96,165,250,0.3); color: #fff;
 }
 
 /* Hobbies */
 .hobby-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
 .hobby-card {
   display: flex; align-items: center; gap: 10px; padding: 12px 14px;
-  background: rgba(255,255,255,0.025); border: 1px solid rgba(56,248,255,0.08);
+  background: rgba(255,255,255,0.025); border: 1px solid rgba(96,165,250,0.08);
   border-radius: 10px; transition: all 0.2s;
 }
 .hobby-card:hover {
-  background: rgba(56,248,255,0.06); border-color: rgba(56,248,255,0.2); transform: translateY(-2px);
+  background: rgba(96,165,250,0.06); border-color: rgba(96,165,250,0.2); transform: translateY(-2px);
 }
 .hobby-icon { font-size: 20px; line-height: 1; }
 .hobby-name { font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 500; }
@@ -716,11 +716,11 @@ const getSocialIcon = (icon) => {
 .tool-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .tool-item {
   display: flex; flex-direction: column; gap: 3px; padding: 8px 14px;
-  background: rgba(255,255,255,0.02); border: 1px solid rgba(56,248,255,0.08);
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(96,165,250,0.08);
   border-radius: 8px; transition: all 0.2s;
 }
 .tool-item:hover {
-  background: rgba(56,248,255,0.06); border-color: rgba(56,248,255,0.2);
+  background: rgba(96,165,250,0.06); border-color: rgba(96,165,250,0.2);
 }
 .tool-name { font-size: 13px; color: rgba(255,255,255,0.8); font-weight: 500; }
 .tool-cat { font-size: 10px; color: rgba(255,255,255,0.35); }
@@ -728,7 +728,7 @@ const getSocialIcon = (icon) => {
 /* Story / Name Origin */
 .story-text {
   font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.9; margin: 0;
-  padding: 14px 18px; background: rgba(255,255,255,0.02); border-left: 2px solid rgba(56,248,255,0.3);
+  padding: 14px 18px; background: rgba(255,255,255,0.02); border-left: 2px solid rgba(96,165,250,0.3);
   border-radius: 0 8px 8px 0;
 }
 
@@ -736,32 +736,32 @@ const getSocialIcon = (icon) => {
 .connect-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
 .connect-card {
   display: flex; align-items: center; gap: 10px; padding: 12px 14px;
-  background: rgba(255,255,255,0.025); border: 1px solid rgba(56,248,255,0.08);
+  background: rgba(255,255,255,0.025); border: 1px solid rgba(96,165,250,0.08);
   border-radius: 10px; text-decoration: none; color: inherit;
   transition: all 0.25s var(--ease-out); cursor: pointer;
   position: relative; overflow: hidden;
 }
 .connect-card::after {
   content: ''; position: absolute; inset: 0;
-  background: linear-gradient(120deg, transparent, rgba(56,248,255,0.06), transparent);
+  background: linear-gradient(120deg, transparent, rgba(96,165,250,0.06), transparent);
   transform: translateX(-100%); transition: transform 0.5s var(--ease-out);
   pointer-events: none;
 }
 .connect-card:hover {
-  background: rgba(255,255,255,0.05); border-color: var(--card-color, #38f8ff);
+  background: rgba(255,255,255,0.05); border-color: var(--card-color, #60a5fa);
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2), 0 0 20px var(--card-color, rgba(56,248,255,0.15));
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2), 0 0 20px var(--card-color, rgba(96,165,250,0.15));
 }
 .connect-card:hover::after {
   transform: translateX(100%);
 }
 .cc-icon { display: flex; color: rgba(255,255,255,0.5); transition: color 0.2s; }
-.connect-card:hover .cc-icon { color: var(--card-color, #38f8ff); }
+.connect-card:hover .cc-icon { color: var(--card-color, #60a5fa); }
 .cc-info { flex: 1; min-width: 0; }
 .cc-name { display: block; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
 .cc-handle { display: block; margin-top: 2px; font-size: 11px; color: rgba(255,255,255,0.35); }
 .cc-arrow { color: rgba(255,255,255,0.25); transition: color 0.2s; }
-.connect-card:hover .cc-arrow { color: var(--card-color, #38f8ff); }
+.connect-card:hover .cc-arrow { color: var(--card-color, #60a5fa); }
 .qr-card::before {
   content: 'SCAN';
   position: absolute;
@@ -779,11 +779,11 @@ const getSocialIcon = (icon) => {
   margin-top: 20px; text-align: center;
   font-family: 'SF Mono', monospace; font-size: 13px; color: rgba(255,255,255,0.25);
 }
-.footer-bracket { color: rgba(56,248,255,0.35); }
+.footer-bracket { color: rgba(96,165,250,0.35); }
 
 /* 角标 */
 .corner { position: absolute; width: 24px; height: 24px; pointer-events: none; }
-.corner::before, .corner::after { content: ''; position: absolute; background: rgba(56,248,255,0.35); }
+.corner::before, .corner::after { content: ''; position: absolute; background: rgba(96,165,250,0.35); }
 .corner.top-left { top: 10px; left: 10px; }
 .corner.top-left::before { width: 12px; height: 1.5px; top: 0; left: 0; }
 .corner.top-left::after { width: 1.5px; height: 12px; top: 0; left: 0; }
@@ -804,7 +804,7 @@ const getSocialIcon = (icon) => {
   backdrop-filter: blur(4px);
 }
 .editor-panel {
-  background: rgba(12,20,35,0.98); border: 1px solid rgba(56,248,255,0.2);
+  background: rgba(12,20,35,0.98); border: 1px solid rgba(96,165,250,0.2);
   border-radius: 14px; padding: 24px; width: 90%; max-width: 440px; max-height: 85vh; overflow-y: auto;
 }
 .editor-panel h3 { font-size: 16px; color: #fff; margin: 0 0 16px; }
@@ -814,16 +814,16 @@ const getSocialIcon = (icon) => {
   padding: 8px 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
   border-radius: 6px; color: #fff; font-size: 13px; outline: none; font-family: inherit; resize: vertical;
 }
-.editor-row input:focus, .editor-row textarea:focus { border-color: rgba(56,248,255,0.4); }
+.editor-row input:focus, .editor-row textarea:focus { border-color: rgba(96,165,250,0.4); }
 .editor-json { font-family: 'JetBrains Mono', 'Consolas', monospace !important; font-size: 12px !important; }
 .editor-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
 .editor-cancel { padding: 6px 16px; background: none; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #888; font-size: 13px; cursor: pointer; }
-.editor-save { padding: 6px 20px; background: #38f8ff; border: none; border-radius: 6px; color: #0c1423; font-size: 13px; font-weight: 600; cursor: pointer; }
+.editor-save { padding: 6px 20px; background: #60a5fa; border: none; border-radius: 6px; color: #0c1423; font-size: 13px; font-weight: 600; cursor: pointer; }
 .editor-save:disabled { opacity: 0.5; }
 
 /* ======== 二维码弹窗 ======== */
 .qr-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1001; }
-.qr-content { background: linear-gradient(135deg, rgba(17,27,49,0.95), rgba(8,14,27,0.95)); border: 1px solid rgba(56,248,255,0.3); border-radius: 10px; padding: 32px; text-align: center; position: relative; max-width: 360px; width: min(100%, 360px); box-shadow: 0 0 40px rgba(56,248,255,0.2); }
+.qr-content { background: linear-gradient(135deg, rgba(17,27,49,0.95), rgba(8,14,27,0.95)); border: 1px solid rgba(96,165,250,0.3); border-radius: 10px; padding: 32px; text-align: center; position: relative; max-width: 360px; width: min(100%, 360px); box-shadow: 0 0 40px rgba(96,165,250,0.2); }
 .qr-close { position: absolute; top: 12px; right: 16px; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 24px; cursor: pointer; }
 .qr-close:hover { color: #fff; }
 .qr-title { font-size: 18px; font-weight: 600; color: #fff; margin: 0 0 20px; }
@@ -843,7 +843,7 @@ const getSocialIcon = (icon) => {
 @media (max-width: 720px) {
   .about-page { padding: 72px 14px 80px; }
   .resume-panel { grid-template-columns: 1fr; }
-  .resume-sidebar { border-right: none; border-bottom: 1px solid rgba(56,248,255,0.1); padding: 28px 20px 20px; }
+  .resume-sidebar { border-right: none; border-bottom: 1px solid rgba(96,165,250,0.1); padding: 28px 20px 20px; }
   .resume-main { padding: 20px; }
   .connect-grid { grid-template-columns: 1fr; }
   .skill-label { width: 65px; font-size: 11px; }

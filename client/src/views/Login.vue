@@ -164,9 +164,9 @@ const handleLogin = async () => {
 .auth-notice {
   margin-bottom: 26px;
   padding: 14px 16px;
-  border: 1px solid rgba(125, 211, 252, 0.22);
+  border: 1px solid rgba(147, 197, 253, 0.22);
   border-radius: 8px;
-  background: rgba(125, 211, 252, 0.07);
+  background: rgba(147, 197, 253, 0.07);
   text-align: left;
 }
 

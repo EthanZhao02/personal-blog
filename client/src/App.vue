@@ -289,7 +289,7 @@ const isActive = (path) => {
 }
 
 // 光点特效配置
-const DUST_COLORS = ['#38f8ff', '#7c3aed', '#7dd3fc', '#ffbd66', '#ff4fd8']
+const DUST_COLORS = ['#60a5fa', '#7c3aed', '#93c5fd', '#ffbd66', '#ff4fd8']
 
 const toggleLanguage = () => {
   language.value = language.value === 'zh' ? 'en' : 'zh'
@@ -442,7 +442,7 @@ onUnmounted(() => {
   pointer-events: none;
   border-radius: 999px;
   background:
-    radial-gradient(circle, rgba(56, 248, 255, 0.18), rgba(124, 58, 237, 0.08) 38%, transparent 68%);
+    radial-gradient(circle, rgba(96, 165, 250, 0.18), rgba(124, 58, 237, 0.08) 38%, transparent 68%);
   filter: blur(18px);
   opacity: 0.72;
   mix-blend-mode: screen;
@@ -459,7 +459,7 @@ onUnmounted(() => {
   overflow: hidden;
   padding: 28px;
   background:
-    radial-gradient(circle at 50% 48%, rgba(56, 248, 255, 0.22), transparent 30%),
+    radial-gradient(circle at 50% 48%, rgba(96, 165, 250, 0.22), transparent 30%),
     radial-gradient(circle at 50% 48%, rgba(124, 58, 237, 0.22), transparent 52%),
     linear-gradient(135deg, rgba(3, 7, 18, 0.98), rgba(6, 13, 34, 0.96));
 }
@@ -468,8 +468,8 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(125, 211, 252, 0.05) 1px, transparent 1px) 0 0 / 72px 72px,
-    linear-gradient(0deg, rgba(125, 211, 252, 0.04) 1px, transparent 1px) 0 0 / 72px 72px,
+    linear-gradient(90deg, rgba(147, 197, 253, 0.05) 1px, transparent 1px) 0 0 / 72px 72px,
+    linear-gradient(0deg, rgba(147, 197, 253, 0.04) 1px, transparent 1px) 0 0 / 72px 72px,
     repeating-linear-gradient(115deg, transparent 0 12px, rgba(255, 255, 255, 0.025) 12px 13px);
   mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 70%);
   animation: portalGrid 7s linear infinite;
@@ -487,7 +487,7 @@ onUnmounted(() => {
 .portal-ring {
   position: absolute;
   border-radius: 999px;
-  border: 1px solid rgba(125, 211, 252, 0.32);
+  border: 1px solid rgba(147, 197, 253, 0.32);
   box-shadow: inset 0 0 34px rgba(56, 189, 248, 0.08), 0 0 34px rgba(56, 189, 248, 0.12);
 }
 
@@ -513,9 +513,9 @@ onUnmounted(() => {
   position: absolute;
   width: 58%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.84), rgba(167, 139, 250, 0.72), transparent);
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.84), rgba(167, 139, 250, 0.72), transparent);
   transform-origin: center;
-  filter: drop-shadow(0 0 14px rgba(56, 248, 255, 0.55));
+  filter: drop-shadow(0 0 14px rgba(96, 165, 250, 0.55));
 }
 
 .beam-a { transform: rotate(16deg); animation: beamSweep 4.6s ease-in-out infinite; }
@@ -527,8 +527,8 @@ onUnmounted(() => {
   width: 9px;
   height: 9px;
   border-radius: 999px;
-  background: #e0f7ff;
-  box-shadow: 0 0 18px rgba(56, 248, 255, 0.8);
+  background: #dbeafe;
+  box-shadow: 0 0 18px rgba(96, 165, 250, 0.8);
 }
 
 .node-a { transform: translate(190px, -124px); animation: nodeFloat 4s ease-in-out infinite; }
@@ -554,7 +554,7 @@ onUnmounted(() => {
 .welcome-copy h1 {
   margin: 0;
   color: transparent;
-  background: linear-gradient(90deg, #ffffff, #38f8ff 42%, #a78bfa 82%);
+  background: linear-gradient(90deg, #ffffff, #60a5fa 42%, #a78bfa 82%);
   -webkit-background-clip: text;
   background-clip: text;
   font-size: clamp(2.35rem, 7.2vw, 5.9rem);
@@ -562,7 +562,7 @@ onUnmounted(() => {
   font-weight: 950;
   word-break: keep-all;
   overflow-wrap: normal;
-  text-shadow: 0 0 34px rgba(56, 248, 255, 0.1);
+  text-shadow: 0 0 34px rgba(96, 165, 250, 0.1);
 }
 
 .welcome-copy p {
@@ -578,14 +578,14 @@ onUnmounted(() => {
   height: 2px;
   margin: 28px auto 26px;
   overflow: hidden;
-  background: rgba(125, 211, 252, 0.15);
+  background: rgba(147, 197, 253, 0.15);
 }
 
 .welcome-progress span {
   display: block;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #38f8ff, #a78bfa, #ffffff);
+  background: linear-gradient(90deg, #60a5fa, #a78bfa, #ffffff);
   transform-origin: left;
   animation: portalLoad 7.2s var(--ease-out) forwards;
 }
@@ -597,13 +597,13 @@ onUnmounted(() => {
   gap: 10px;
   min-height: 48px;
   padding: 0 22px;
-  border: 1px solid rgba(125, 211, 252, 0.52);
+  border: 1px solid rgba(147, 197, 253, 0.52);
   border-radius: 8px;
   background: rgba(8, 14, 27, 0.58);
   color: #f8fbff;
   font-weight: 850;
   cursor: pointer;
-  box-shadow: 0 18px 44px rgba(56, 248, 255, 0.13);
+  box-shadow: 0 18px 44px rgba(96, 165, 250, 0.13);
   transition: transform 0.22s var(--ease-out), border-color 0.22s, background 0.22s;
 }
 
@@ -619,8 +619,8 @@ onUnmounted(() => {
 
 .welcome-enter:hover {
   transform: translateY(-2px);
-  border-color: #38f8ff;
-  background: rgba(56, 248, 255, 0.12);
+  border-color: #60a5fa;
+  background: rgba(96, 165, 250, 0.12);
 }
 
 .welcome-skip {
@@ -629,7 +629,7 @@ onUnmounted(() => {
   right: 24px;
   z-index: 2;
   padding: 8px 10px;
-  border: 1px solid rgba(125, 211, 252, 0.28);
+  border: 1px solid rgba(147, 197, 253, 0.28);
   border-radius: 8px;
   background: rgba(8, 14, 27, 0.42);
   color: rgba(226, 239, 255, 0.66);
@@ -686,7 +686,7 @@ onUnmounted(() => {
   pointer-events: none;
   overflow: hidden;
   background:
-    linear-gradient(35deg, transparent 0 43%, rgba(125, 211, 252, 0.055) 43.5% 44%, transparent 44.5% 100%) 0 0 / 260px 260px,
+    linear-gradient(35deg, transparent 0 43%, rgba(147, 197, 253, 0.055) 43.5% 44%, transparent 44.5% 100%) 0 0 / 260px 260px,
     linear-gradient(145deg, transparent 0 58%, rgba(167, 139, 250, 0.05) 58.5% 59%, transparent 59.5% 100%) 80px 40px / 300px 300px,
     radial-gradient(circle, rgba(238, 247, 255, 0.32) 0 1px, transparent 1.6px) 0 0 / 138px 138px;
   opacity: 0.82;
@@ -697,7 +697,7 @@ onUnmounted(() => {
   content: '';
   position: absolute;
   inset: 9% 5%;
-  border: 1px solid rgba(126, 238, 255, 0.08);
+  border: 1px solid rgba(96, 165, 250, 0.08);
   border-radius: 18px;
   transform: skewY(-4deg);
   animation: frameBreath 7s ease-in-out infinite;
@@ -716,9 +716,9 @@ onUnmounted(() => {
   display: block;
   width: 360px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.44), rgba(155, 92, 255, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.44), rgba(155, 92, 255, 0.3), transparent);
   transform-origin: center;
-  filter: drop-shadow(0 0 12px rgba(56, 248, 255, 0.3));
+  filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.3));
 }
 
 .line-a {
@@ -748,7 +748,7 @@ onUnmounted(() => {
   height: 8px;
   border-radius: 999px;
   background: rgba(226, 247, 255, 0.9);
-  box-shadow: 0 0 18px rgba(56, 248, 255, 0.66), 0 0 34px rgba(167, 139, 250, 0.16);
+  box-shadow: 0 0 18px rgba(96, 165, 250, 0.66), 0 0 34px rgba(167, 139, 250, 0.16);
   animation: nodeSignal 6.4s ease-in-out infinite;
 }
 
@@ -775,7 +775,7 @@ onUnmounted(() => {
   place-items: center;
   padding: 24px;
   background:
-    radial-gradient(circle at 50% 50%, rgba(56, 248, 255, 0.14), transparent 32%),
+    radial-gradient(circle at 50% 50%, rgba(96, 165, 250, 0.14), transparent 32%),
     rgba(2, 6, 18, 0.76);
   backdrop-filter: blur(16px);
 }
@@ -790,12 +790,12 @@ onUnmounted(() => {
   align-items: center;
   overflow: hidden;
   padding: clamp(24px, 5vw, 42px);
-  border: 1px solid rgba(125, 211, 252, 0.26);
+  border: 1px solid rgba(147, 197, 253, 0.26);
   border-radius: 8px;
   background:
     linear-gradient(135deg, rgba(12, 24, 46, 0.86), rgba(4, 8, 20, 0.88)),
-    repeating-linear-gradient(90deg, rgba(125, 211, 252, 0.055) 0 1px, transparent 1px 84px);
-  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.46), inset 0 0 90px rgba(56, 248, 255, 0.06);
+    repeating-linear-gradient(90deg, rgba(147, 197, 253, 0.055) 0 1px, transparent 1px 84px);
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.46), inset 0 0 90px rgba(96, 165, 250, 0.06);
 }
 
 .time-gate-close {
@@ -817,8 +817,8 @@ onUnmounted(() => {
   aspect-ratio: 1;
   justify-self: center;
   border-radius: 999px;
-  border: 1px solid rgba(125, 211, 252, 0.3);
-  box-shadow: inset 0 0 42px rgba(56, 248, 255, 0.08), 0 0 42px rgba(56, 248, 255, 0.1);
+  border: 1px solid rgba(147, 197, 253, 0.3);
+  box-shadow: inset 0 0 42px rgba(96, 165, 250, 0.08), 0 0 42px rgba(96, 165, 250, 0.1);
 }
 
 .time-gate-orbit::before,
@@ -845,7 +845,7 @@ onUnmounted(() => {
   top: 50%;
   width: 48%;
   height: 1px;
-  background: linear-gradient(90deg, rgba(56, 248, 255, 0.9), transparent);
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.9), transparent);
   transform-origin: left center;
   animation: portalSpin 4.6s linear infinite;
 }
@@ -859,7 +859,7 @@ onUnmounted(() => {
 }
 
 .time-gate-code {
-  color: #7dd3fc;
+  color: #93c5fd;
   font: 800 11px/1 'SF Mono', 'Consolas', monospace;
   letter-spacing: 0.18em;
 }
@@ -886,7 +886,7 @@ onUnmounted(() => {
 
 .time-gate-path span {
   padding: 7px 10px;
-  border: 1px solid rgba(125, 211, 252, 0.18);
+  border: 1px solid rgba(147, 197, 253, 0.18);
   border-radius: 999px;
   background: rgba(8, 14, 27, 0.48);
   color: rgba(226, 239, 255, 0.72);
@@ -897,9 +897,9 @@ onUnmounted(() => {
   margin-top: 28px;
   min-height: 44px;
   padding: 0 20px;
-  border: 1px solid rgba(56, 248, 255, 0.54);
+  border: 1px solid rgba(96, 165, 250, 0.54);
   border-radius: 8px;
-  background: linear-gradient(135deg, rgba(56, 248, 255, 0.2), rgba(124, 58, 237, 0.22));
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(124, 58, 237, 0.22));
   color: #f8fbff;
   font-weight: 850;
   cursor: pointer;
@@ -908,7 +908,7 @@ onUnmounted(() => {
 
 .time-gate-action:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 36px rgba(56, 248, 255, 0.16);
+  box-shadow: 0 16px 36px rgba(96, 165, 250, 0.16);
 }
 
 .time-gate-enter-active,
@@ -1010,7 +1010,7 @@ onUnmounted(() => {
   gap: 2px;
   color: var(--text);
   line-height: 1.05;
-  text-shadow: 0 0 18px rgba(56, 248, 255, 0.2), 0 2px 12px rgba(0, 0, 0, 0.65);
+  text-shadow: 0 0 18px rgba(96, 165, 250, 0.2), 0 2px 12px rgba(0, 0, 0, 0.65);
 }
 
 .nav-brand strong {
@@ -1045,7 +1045,7 @@ onUnmounted(() => {
   right: 0;
   bottom: -8px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.22), rgba(124, 58, 237, 0.18), transparent);
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.22), rgba(124, 58, 237, 0.18), transparent);
   opacity: 0.55;
   pointer-events: none;
 }
@@ -1057,7 +1057,7 @@ onUnmounted(() => {
   bottom: 0;
   width: 120px;
   left: -140px;
-  background: linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.24), transparent);
+  background: linear-gradient(90deg, transparent, rgba(147, 197, 253, 0.24), transparent);
   animation: navSweep 6.2s var(--ease-out) infinite;
   pointer-events: none;
 }
@@ -1091,12 +1091,12 @@ onUnmounted(() => {
 .nav-item:hover {
   color: var(--accent-soft);
   transform: translateY(-1px);
-  text-shadow: 0 0 18px rgba(56, 248, 255, 0.52), 0 2px 12px rgba(0, 0, 0, 0.72);
+  text-shadow: 0 0 18px rgba(96, 165, 250, 0.52), 0 2px 12px rgba(0, 0, 0, 0.72);
 }
 
 .nav-item.active {
   color: #ffffff;
-  text-shadow: 0 0 20px rgba(56, 248, 255, 0.62), 0 2px 12px rgba(0, 0, 0, 0.72);
+  text-shadow: 0 0 20px rgba(96, 165, 250, 0.62), 0 2px 12px rgba(0, 0, 0, 0.72);
 }
 
 .nav-item.active::after {
@@ -1107,7 +1107,7 @@ onUnmounted(() => {
   bottom: 2px;
   height: 2px;
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  box-shadow: 0 0 12px rgba(56, 248, 255, 0.6);
+  box-shadow: 0 0 12px rgba(96, 165, 250, 0.6);
 }
 
 .nav-item.active .nav-icon {
@@ -1130,7 +1130,7 @@ onUnmounted(() => {
   display: inline-grid;
   place-items: center;
   padding: 0 8px;
-  border: 1px solid rgba(125, 211, 252, 0.22);
+  border: 1px solid rgba(147, 197, 253, 0.22);
   border-radius: 8px;
   background: rgba(5, 8, 22, 0.22);
   color: rgba(226, 239, 255, 0.76);
@@ -1143,9 +1143,9 @@ onUnmounted(() => {
 
 .nav-tool:hover {
   transform: translateY(-1px);
-  border-color: rgba(56, 248, 255, 0.54);
+  border-color: rgba(96, 165, 250, 0.54);
   color: #ffffff;
-  background: rgba(56, 248, 255, 0.08);
+  background: rgba(96, 165, 250, 0.08);
 }
 
 @keyframes navSweep {
@@ -1241,7 +1241,7 @@ onUnmounted(() => {
 .future-rail-links a,
 .future-rail-links button {
   color: rgba(226, 239, 255, 0.54);
-  border-bottom: 1px solid rgba(125, 211, 252, 0.2);
+  border-bottom: 1px solid rgba(147, 197, 253, 0.2);
   border-top: 0;
   border-left: 0;
   border-right: 0;
@@ -1255,8 +1255,8 @@ onUnmounted(() => {
 .future-rail-links a:hover,
 .future-rail-links button:hover {
   color: #eaf7ff;
-  border-color: rgba(56, 248, 255, 0.58);
-  text-shadow: 0 0 16px rgba(56, 248, 255, 0.3);
+  border-color: rgba(96, 165, 250, 0.58);
+  text-shadow: 0 0 16px rgba(96, 165, 250, 0.3);
 }
 
 .footer-admin-link {
@@ -1273,7 +1273,7 @@ onUnmounted(() => {
 
 .footer-admin-link:hover {
   color: var(--accent);
-  background: rgba(56, 248, 255, 0.08);
+  background: rgba(96, 165, 250, 0.08);
 }
 
 .footer-admin-login {

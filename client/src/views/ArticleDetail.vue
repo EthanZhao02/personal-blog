@@ -821,7 +821,7 @@ watch(() => route.params.id, () => {
 :deep(.article-body em) { font-style: italic; }
 :deep(.article-body code) {
   font-family: 'Fira Code', monospace;
-  background: rgba(56, 248, 255, 0.09);
+  background: rgba(96, 165, 250, 0.09);
   padding: 2px 6px;
   border-radius: 3px;
   font-size: 0.88em;
@@ -939,13 +939,13 @@ watch(() => route.params.id, () => {
   color: var(--text-lighter);
   margin-bottom: 16px;
   padding: 12px 16px;
-  background: rgba(56, 248, 255, 0.05);
-  border: 1px solid rgba(56, 248, 255, 0.15);
+  background: rgba(96, 165, 250, 0.05);
+  border: 1px solid rgba(96, 165, 250, 0.15);
   border-radius: 8px;
 }
 
 .giscus-hint a {
-  color: #38f8ff;
+  color: #60a5fa;
   text-decoration: none;
 }
 
@@ -1013,7 +1013,7 @@ watch(() => route.params.id, () => {
 .reply-notice {
   margin-top: 8px;
   padding: 6px 12px;
-  background: rgba(56, 248, 255, 0.08);
+  background: rgba(96, 165, 250, 0.08);
   border-radius: 6px;
   font-size: 13px;
   color: var(--accent);
@@ -1084,7 +1084,7 @@ watch(() => route.params.id, () => {
   transition: all 0.2s;
 }
 .page-btn:hover:not(:disabled) {
-  background: rgba(56, 248, 255, 0.16);
+  background: rgba(96, 165, 250, 0.16);
   color: var(--accent-soft);
 }
 .page-btn:disabled {
@@ -1166,7 +1166,7 @@ watch(() => route.params.id, () => {
   height: 100%;
   object-fit: cover;
   border-radius: 16px;
-  border: 2px solid rgba(56, 248, 255, 0.3);
+  border: 2px solid rgba(96, 165, 250, 0.3);
   background: rgba(8, 14, 27, 0.92);
 }
 .about-avatar .avatar-glow-ring {
@@ -1174,7 +1174,7 @@ watch(() => route.params.id, () => {
   z-index: 1;
   inset: -4px;
   border-radius: 20px;
-  background: conic-gradient(from 0deg, rgba(56, 248, 255, 0) 0%, rgba(56, 248, 255, 0.55) 25%, rgba(155, 92, 255, 0.55) 75%, rgba(56, 248, 255, 0) 100%);
+  background: conic-gradient(from 0deg, rgba(96, 165, 250, 0) 0%, rgba(96, 165, 250, 0.55) 25%, rgba(155, 92, 255, 0.55) 75%, rgba(96, 165, 250, 0) 100%);
   animation: ringRotate 6s linear infinite;
   opacity: 0.55;
 }

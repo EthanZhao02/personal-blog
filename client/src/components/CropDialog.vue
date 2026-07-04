@@ -224,7 +224,7 @@ const doCrop = () => {
 }
 .crop-panel {
   background: rgba(12,20,35,0.98);
-  border: 1px solid rgba(56,248,255,0.2);
+  border: 1px solid rgba(96,165,250,0.2);
   border-radius: 16px;
   padding: 20px 24px;
   max-width: 560px;
@@ -246,18 +246,18 @@ const doCrop = () => {
 .crop-mask { position: absolute; background: rgba(0,0,0,0.55); pointer-events: none; }
 .crop-box {
   position: absolute;
-  outline: 2px solid #38f8ff;
+  outline: 2px solid #60a5fa;
   outline-offset: -2px;
   cursor: move;
 }
 .crop-grid::before,
 .crop-grid::after {
   content: ''; position: absolute;
-  background: rgba(56,248,255,0.3);
+  background: rgba(96,165,250,0.3);
 }
 .crop-grid::before {
   left: 33.33%; top: 0; width: 1px; height: 100%;
-  box-shadow: 1px 0 0 0 rgba(56,248,255,0.3);
+  box-shadow: 1px 0 0 0 rgba(96,165,250,0.3);
 }
 .crop-grid::after {
   top: 50%; left: 0; height: 1px; width: 100%;
@@ -265,7 +265,7 @@ const doCrop = () => {
 .crop-handle {
   position: absolute;
   width: 12px; height: 12px;
-  border: 2px solid #38f8ff;
+  border: 2px solid #60a5fa;
   background: rgba(12,20,35,0.9);
   z-index: 2;
 }
@@ -284,7 +284,7 @@ const doCrop = () => {
   color: #888;
 }
 .crop-btn.confirm {
-  background: #38f8ff; border: none;
+  background: #60a5fa; border: none;
   color: #0c1423;
 }
 .crop-btn.confirm:hover {

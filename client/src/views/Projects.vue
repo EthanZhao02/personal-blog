@@ -23,7 +23,7 @@
           <!-- 收起态 -->
           <div class="cell-collapsed" @click="toggleExpand(project.id || index)">
             <div class="cell-header">
-              <div class="cell-icon" :style="{ '--icon-color': project.color || '#38f8ff' }">
+              <div class="cell-icon" :style="{ '--icon-color': project.color || '#60a5fa' }">
                 <img v-if="isImageUrl(project.icon)" :src="resolveUrl(project.icon)" :alt="project.name" />
                 <span v-else>{{ project.icon || '◇' }}</span>
               </div>
@@ -179,7 +179,7 @@ const projects = ref([])
 const loading = ref(true)
 const showForm = ref(false)
 const editingId = ref(null)
-const form = ref({ name: '', icon: '', color: '#38f8ff', tag: '', description: '', status: '', techStack: '', features: '', url: '', githubUrl: '' })
+const form = ref({ name: '', icon: '', color: '#60a5fa', tag: '', description: '', status: '', techStack: '', features: '', url: '', githubUrl: '' })
 const iconInput = ref(null)
 const showCrop = ref(false)
 const cropFile = ref(null)
@@ -272,14 +272,14 @@ if (route.query.id) {
 
 const openAdd = () => {
   editingId.value = null
-  form.value = { name: '', icon: '◇', color: '#38f8ff', tag: '', description: '', status: '', techStack: '', features: '', url: '', githubUrl: '' }
+  form.value = { name: '', icon: '◇', color: '#60a5fa', tag: '', description: '', status: '', techStack: '', features: '', url: '', githubUrl: '' }
   showForm.value = true
 }
 
 const openEdit = (p) => {
   editingId.value = p.id
   form.value = {
-    name: p.name || '', icon: p.icon || '◇', color: p.color || '#38f8ff',
+    name: p.name || '', icon: p.icon || '◇', color: p.color || '#60a5fa',
     tag: p.tag || '', description: p.description || '', status: p.status || '',
     techStack: p.techStack || '', features: Array.isArray(p.features) ? p.features.join(', ') : (p.features || ''),
     url: p.url || '', githubUrl: p.githubUrl || ''
@@ -334,8 +334,8 @@ onMounted(loadProjects)
   position: absolute;
   inset: 0;
   background-image: 
-    linear-gradient(rgba(56, 248, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(56, 248, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(rgba(96, 165, 250, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.02) 1px, transparent 1px);
   background-size: 40px 40px;
   mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
 }
@@ -357,9 +357,9 @@ onMounted(loadProjects)
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.2em;
-  color: #38f8ff;
+  color: #60a5fa;
   padding: 6px 12px;
-  border: 1px solid rgba(56, 248, 255, 0.3);
+  border: 1px solid rgba(96, 165, 250, 0.3);
   border-radius: 4px;
   margin-bottom: 16px;
 }
@@ -368,7 +368,7 @@ onMounted(loadProjects)
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
   margin: 0 0 8px 0;
-  background: linear-gradient(135deg, #fff 0%, #38f8ff 100%);
+  background: linear-gradient(135deg, #fff 0%, #60a5fa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -390,7 +390,7 @@ onMounted(loadProjects)
 .project-cell {
   position: relative;
   background: rgba(12, 20, 35, 0.6);
-  border: 1px solid rgba(56, 248, 255, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.1);
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -398,12 +398,12 @@ onMounted(loadProjects)
 }
 
 .project-cell:hover {
-  border-color: rgba(56, 248, 255, 0.25);
+  border-color: rgba(96, 165, 250, 0.25);
 }
 
 .project-cell.expanded {
   grid-column: 1 / -1;
-  border-color: rgba(56, 248, 255, 0.3);
+  border-color: rgba(96, 165, 250, 0.3);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
 }
 
@@ -428,9 +428,9 @@ onMounted(loadProjects)
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  color: var(--icon-color, #38f8ff);
-  background: rgba(56, 248, 255, 0.1);
-  border: 1px solid rgba(56, 248, 255, 0.2);
+  color: var(--icon-color, #60a5fa);
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.2);
   border-radius: 12px;
   flex-shrink: 0;
   overflow: hidden;
@@ -449,8 +449,8 @@ onMounted(loadProjects)
 
 .icon-upload-btn {
   padding: 8px 14px;
-  background: rgba(56, 248, 255, 0.1);
-  border: 1px solid rgba(56, 248, 255, 0.3);
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.3);
   border-radius: 6px;
   color: var(--accent);
   font-size: 13px;
@@ -494,7 +494,7 @@ onMounted(loadProjects)
 
 .cell-status.status-live {
   background: rgba(56, 189, 248, 0.14);
-  color: #38bdf8;
+  color: #60a5fa;
   border: 1px solid rgba(56, 189, 248, 0.32);
 }
 
@@ -505,9 +505,9 @@ onMounted(loadProjects)
 }
 
 .cell-status.status-oss {
-  background: rgba(56, 248, 255, 0.1);
-  color: #38f8ff;
-  border: 1px solid rgba(56, 248, 255, 0.2);
+  background: rgba(96, 165, 250, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.2);
 }
 
 .project-cell:hover .cell-icon {
@@ -535,26 +535,26 @@ onMounted(loadProjects)
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(56, 248, 255, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.2);
   border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .project-cell:hover .cell-expand-indicator {
-  border-color: rgba(56, 248, 255, 0.4);
-  background: rgba(56, 248, 255, 0.1);
+  border-color: rgba(96, 165, 250, 0.4);
+  background: rgba(96, 165, 250, 0.1);
 }
 
 .indicator-icon {
   font-size: 20px;
   font-weight: 300;
-  color: #38f8ff;
+  color: #60a5fa;
   line-height: 1;
 }
 
 /* 展开态 */
 .cell-expanded {
-  border-top: 1px solid rgba(56, 248, 255, 0.1);
+  border-top: 1px solid rgba(96, 165, 250, 0.1);
 }
 
 .expanded-content {
@@ -574,9 +574,9 @@ onMounted(loadProjects)
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.15em;
-  color: rgba(56, 248, 255, 0.6);
+  color: rgba(96, 165, 250, 0.6);
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(56, 248, 255, 0.1);
+  border-bottom: 1px solid rgba(96, 165, 250, 0.1);
 }
 
 .section-text {
@@ -607,7 +607,7 @@ onMounted(loadProjects)
   content: '▹';
   position: absolute;
   left: 0;
-  color: #38f8ff;
+  color: #60a5fa;
 }
 
 .tech-tags {
@@ -619,10 +619,10 @@ onMounted(loadProjects)
 .tech-tag {
   font-size: 12px;
   padding: 6px 12px;
-  background: rgba(56, 248, 255, 0.1);
-  border: 1px solid rgba(56, 248, 255, 0.2);
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.2);
   border-radius: 6px;
-  color: rgba(56, 248, 255, 0.8);
+  color: rgba(96, 165, 250, 0.8);
 }
 
 .expanded-actions {
@@ -641,19 +641,19 @@ onMounted(loadProjects)
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
-  border: 1px solid rgba(56, 248, 255, 0.2);
-  background: rgba(56, 248, 255, 0.05);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  background: rgba(96, 165, 250, 0.05);
   color: rgba(255, 255, 255, 0.8);
 }
 
 .action-btn:hover {
-  background: rgba(56, 248, 255, 0.1);
-  border-color: rgba(56, 248, 255, 0.4);
+  background: rgba(96, 165, 250, 0.1);
+  border-color: rgba(96, 165, 250, 0.4);
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, rgba(56, 248, 255, 0.2), rgba(155, 92, 255, 0.2));
-  border-color: rgba(56, 248, 255, 0.4);
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(155, 92, 255, 0.2));
+  border-color: rgba(96, 165, 250, 0.4);
   color: #fff;
 }
 
@@ -722,8 +722,8 @@ onMounted(loadProjects)
   display: block;
   margin: 24px auto 0;
   padding: 10px 24px;
-  background: linear-gradient(135deg, rgba(56, 248, 255, 0.2), rgba(155, 92, 255, 0.2));
-  border: 1px solid rgba(56, 248, 255, 0.4);
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(155, 92, 255, 0.2));
+  border: 1px solid rgba(96, 165, 250, 0.4);
   border-radius: 8px;
   color: #fff;
   font-size: 13px;
@@ -734,7 +734,7 @@ onMounted(loadProjects)
 
 .add-project-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(56, 248, 255, 0.2);
+  box-shadow: 0 8px 20px rgba(96, 165, 250, 0.2);
 }
 
 /* 表单弹窗 */
@@ -750,7 +750,7 @@ onMounted(loadProjects)
 
 .form-panel {
   background: rgba(12, 20, 35, 0.95);
-  border: 1px solid rgba(56, 248, 255, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.2);
   border-radius: 16px;
   padding: 24px;
   width: 90%;

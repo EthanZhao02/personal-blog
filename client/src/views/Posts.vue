@@ -337,7 +337,7 @@ onMounted(() => {
   position: absolute;
   width: 1px;
   height: 100%;
-  background: linear-gradient(to bottom, transparent, rgba(56, 248, 255, 0.1), transparent);
+  background: linear-gradient(to bottom, transparent, rgba(96, 165, 250, 0.1), transparent);
 }
 
 .bg-line:nth-child(1) { left: 20%; }
@@ -358,7 +358,7 @@ onMounted(() => {
   align-items: flex-end;
   margin-bottom: 40px;
   padding-bottom: 32px;
-  border-bottom: 1px solid rgba(56, 248, 255, 0.1);
+  border-bottom: 1px solid rgba(96, 165, 250, 0.1);
 }
 
 .header-content {
@@ -370,9 +370,9 @@ onMounted(() => {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.2em;
-  color: #38f8ff;
+  color: #60a5fa;
   padding: 6px 12px;
-  border: 1px solid rgba(56, 248, 255, 0.3);
+  border: 1px solid rgba(96, 165, 250, 0.3);
   border-radius: 4px;
   margin-bottom: 16px;
 }
@@ -382,7 +382,7 @@ onMounted(() => {
   font-weight: 700;
   color: #fff;
   margin: 0 0 8px 0;
-  background: linear-gradient(135deg, #fff 0%, #38f8ff 100%);
+  background: linear-gradient(135deg, #fff 0%, #60a5fa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -408,7 +408,7 @@ onMounted(() => {
   display: block;
   font-size: 32px;
   font-weight: 700;
-  color: #38f8ff;
+  color: #60a5fa;
   line-height: 1;
 }
 
@@ -421,7 +421,7 @@ onMounted(() => {
 .stat-divider {
   width: 1px;
   height: 40px;
-  background: rgba(56, 248, 255, 0.2);
+  background: rgba(96, 165, 250, 0.2);
 }
 
 /* 筛选面板 */
@@ -431,7 +431,7 @@ onMounted(() => {
   gap: 32px;
   padding: 24px;
   background: rgba(12, 20, 35, 0.6);
-  border: 1px solid rgba(56, 248, 255, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.1);
   border-radius: 12px;
   margin-bottom: 40px;
   backdrop-filter: blur(10px);
@@ -458,7 +458,7 @@ onMounted(() => {
 
 .chip {
   padding: 8px 18px;
-  border: 1px solid rgba(56, 248, 255, 0.15);
+  border: 1px solid rgba(96, 165, 250, 0.15);
   border-radius: 20px;
   background: rgba(12, 20, 35, 0.6);
   color: rgba(255, 255, 255, 0.6);
@@ -474,15 +474,15 @@ onMounted(() => {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(56, 248, 255, 0.1), rgba(155, 92, 255, 0.1));
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(155, 92, 255, 0.1));
   opacity: 0;
   transition: opacity 0.25s;
 }
 
 .chip:hover {
-  border-color: rgba(56, 248, 255, 0.4);
-  color: #38f8ff;
-  box-shadow: 0 0 15px rgba(56, 248, 255, 0.15);
+  border-color: rgba(96, 165, 250, 0.4);
+  color: #60a5fa;
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.15);
 }
 
 .chip:hover::before {
@@ -490,15 +490,15 @@ onMounted(() => {
 }
 
 .chip.active {
-  background: linear-gradient(135deg, rgba(56, 248, 255, 0.15), rgba(155, 92, 255, 0.15));
-  border-color: rgba(56, 248, 255, 0.5);
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(155, 92, 255, 0.15));
+  border-color: rgba(96, 165, 250, 0.5);
   color: #fff;
-  box-shadow: 0 0 20px rgba(56, 248, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .filter-select {
   padding: 8px 16px;
-  border: 1px solid rgba(56, 248, 255, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.2);
   border-radius: 8px;
   background: rgba(12, 20, 35, 0.8);
   color: rgba(255, 255, 255, 0.9);
@@ -506,7 +506,7 @@ onMounted(() => {
   cursor: pointer;
   min-width: 140px;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2338f8ff' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 32px;
@@ -514,8 +514,8 @@ onMounted(() => {
 
 .filter-select:focus {
   outline: none;
-  border-color: rgba(56, 248, 255, 0.5);
-  box-shadow: 0 0 10px rgba(56, 248, 255, 0.1);
+  border-color: rgba(96, 165, 250, 0.5);
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.1);
 }
 
 .filter-select option {
@@ -541,7 +541,7 @@ onMounted(() => {
   bottom: 0;
   width: 2px;
   background: linear-gradient(to bottom, 
-    rgba(56, 248, 255, 0.3),
+    rgba(96, 165, 250, 0.3),
     rgba(155, 92, 255, 0.3),
     transparent
   );
@@ -568,7 +568,7 @@ onMounted(() => {
   font-size: 48px;
   font-weight: 800;
   color: transparent;
-  -webkit-text-stroke: 1px rgba(56, 248, 255, 0.25);
+  -webkit-text-stroke: 1px rgba(96, 165, 250, 0.25);
   line-height: 1;
   font-family: 'SF Mono', monospace;
   letter-spacing: -2px;
@@ -577,7 +577,7 @@ onMounted(() => {
 .year-line {
   flex: 1;
   height: 1px;
-  background: linear-gradient(to right, rgba(56, 248, 255, 0.2), transparent);
+  background: linear-gradient(to right, rgba(96, 165, 250, 0.2), transparent);
 }
 
 /* 文章网格 */
@@ -592,7 +592,7 @@ onMounted(() => {
 .article-card {
   position: relative;
   background: linear-gradient(135deg, #1a1a2e, #16213e);
-  border: 1px solid rgba(56, 248, 255, 0.08);
+  border: 1px solid rgba(96, 165, 250, 0.08);
   border-radius: 10px;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -605,7 +605,7 @@ onMounted(() => {
 
 .article-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(56, 248, 255, 0.25);
+  border-color: rgba(96, 165, 250, 0.25);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
@@ -629,12 +629,12 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(56, 248, 255, 0.05), rgba(155, 92, 255, 0.05));
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.05), rgba(155, 92, 255, 0.05));
 }
 
 .fallback-icon {
   font-size: 48px;
-  color: rgba(56, 248, 255, 0.1);
+  color: rgba(96, 165, 250, 0.1);
 }
 
 .card-overlay {
@@ -663,7 +663,7 @@ onMounted(() => {
   right: 14px;
   font-size: 12px;
   font-weight: 600;
-  color: #38f8ff;
+  color: #60a5fa;
   opacity: 0;
   transform: translateX(-8px);
   transition: all 0.3s ease;
@@ -682,7 +682,7 @@ onMounted(() => {
   border-radius: 10px;
   opacity: 0;
   transition: opacity 0.3s;
-  box-shadow: inset 0 0 0 1px rgba(56, 248, 255, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.3);
   pointer-events: none;
   z-index: 4;
 }
@@ -710,10 +710,10 @@ onMounted(() => {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   padding: 2px 8px;
-  background: rgba(56, 248, 255, 0.2);
-  border: 1px solid rgba(56, 248, 255, 0.3);
+  background: rgba(96, 165, 250, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.3);
   border-radius: 3px;
-  color: #38f8ff;
+  color: #60a5fa;
 }
 
 .card-views {
@@ -780,8 +780,8 @@ onMounted(() => {
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 2px solid rgba(56, 248, 255, 0.2);
-  border-top-color: #38f8ff;
+  border: 2px solid rgba(96, 165, 250, 0.2);
+  border-top-color: #60a5fa;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

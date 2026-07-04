@@ -141,8 +141,8 @@
 }
 
 .btn-back:hover {
-  border-color: rgba(56, 248, 255, 0.6);
+  border-color: rgba(96, 165, 250, 0.6);
   color: #fff;
-  background: rgba(56, 248, 255, 0.1);
+  background: rgba(96, 165, 250, 0.1);
 }
 </style>

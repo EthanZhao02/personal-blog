@@ -464,7 +464,7 @@ const setupConstellation = () => {
 
       const alpha = 0.34 + Math.sin(star.pulse) * 0.22
       ctx.beginPath()
-      ctx.fillStyle = `rgba(125, 211, 252, ${alpha})`
+      ctx.fillStyle = `rgba(147, 197, 253, ${alpha})`
       ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2)
       ctx.fill()
     })
@@ -478,7 +478,7 @@ const setupConstellation = () => {
         const distance = Math.sqrt(dx * dx + dy * dy)
         if (distance < 120) {
           ctx.beginPath()
-          ctx.strokeStyle = `rgba(56, 248, 255, ${(1 - distance / 120) * 0.16})`
+          ctx.strokeStyle = `rgba(96, 165, 250, ${(1 - distance / 120) * 0.16})`
           ctx.lineWidth = 1
           ctx.moveTo(a.x, a.y)
           ctx.lineTo(b.x, b.y)
@@ -566,9 +566,9 @@ onUnmounted(() => {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(circle 360px at var(--mouse-x, 52vw) var(--mouse-y, 42vh), rgba(56, 248, 255, 0.14), transparent 68%),
+    radial-gradient(circle 360px at var(--mouse-x, 52vw) var(--mouse-y, 42vh), rgba(96, 165, 250, 0.14), transparent 68%),
     linear-gradient(135deg, rgba(255, 189, 102, 0.08), transparent 34%),
-    linear-gradient(225deg, rgba(125, 211, 252, 0.1), transparent 42%);
+    linear-gradient(225deg, rgba(147, 197, 253, 0.1), transparent 42%);
   transition: background 0.18s linear;
 }
 
@@ -618,8 +618,8 @@ onUnmounted(() => {
   display: block;
   height: 1px;
   width: 42vw;
-  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.52), rgba(255, 189, 102, 0.28), transparent);
-  filter: drop-shadow(0 0 18px rgba(56, 248, 255, 0.32));
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.52), rgba(255, 189, 102, 0.28), transparent);
+  filter: drop-shadow(0 0 18px rgba(96, 165, 250, 0.32));
   animation: railFloat 8s ease-in-out infinite;
 }
 
@@ -682,7 +682,7 @@ onUnmounted(() => {
   gap: 9px;
   margin-bottom: 18px;
   padding: 8px 11px;
-  border: 1px solid rgba(125, 211, 252, 0.26);
+  border: 1px solid rgba(147, 197, 253, 0.26);
   border-radius: 999px;
   background: rgba(8, 14, 27, 0.5);
   color: rgba(199, 251, 255, 0.72);
@@ -695,7 +695,7 @@ onUnmounted(() => {
   height: 8px;
   border-radius: 999px;
   background: var(--ink-blue);
-  box-shadow: 0 0 18px rgba(125, 211, 252, 0.72);
+  box-shadow: 0 0 18px rgba(147, 197, 253, 0.72);
   animation: livePulse 1.8s ease-in-out infinite;
 }
 
@@ -711,15 +711,15 @@ onUnmounted(() => {
 .hero-copy h1 span {
   display: block;
   color: transparent;
-  background: linear-gradient(90deg, #ffffff, #38f8ff 42%, #ffbd66 86%);
+  background: linear-gradient(90deg, #ffffff, #60a5fa 42%, #ffbd66 86%);
   -webkit-background-clip: text;
   background-clip: text;
-  text-shadow: 0 0 34px rgba(56, 248, 255, 0.12);
+  text-shadow: 0 0 34px rgba(96, 165, 250, 0.12);
 }
 
 .hero-role {
   margin: 24px 0 0;
-  color: #7dd3fc;
+  color: #93c5fd;
   font-size: 1.08rem;
   font-weight: 800;
 }
@@ -741,12 +741,12 @@ onUnmounted(() => {
   gap: 10px;
   margin-top: 24px;
   padding: 12px 14px;
-  border: 1px solid rgba(126, 238, 255, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.2);
   border-radius: 8px;
   background: rgba(5, 8, 22, 0.54);
   color: rgba(238, 247, 255, 0.82);
   font: 700 13px/1.5 'SF Mono', 'Consolas', monospace;
-  box-shadow: inset 0 0 34px rgba(56, 248, 255, 0.035);
+  box-shadow: inset 0 0 34px rgba(96, 165, 250, 0.035);
 }
 
 .terminal-prompt {
@@ -754,7 +754,7 @@ onUnmounted(() => {
 }
 
 .cursor-blink {
-  color: #38f8ff;
+  color: #60a5fa;
   animation: blink 0.8s step-end infinite;
 }
 
@@ -807,16 +807,16 @@ onUnmounted(() => {
 }
 
 .hero-btn.primary {
-  border-color: rgba(56, 248, 255, 0.6);
-  background: linear-gradient(135deg, #38f8ff, #7dd3fc);
+  border-color: rgba(96, 165, 250, 0.6);
+  background: linear-gradient(135deg, #60a5fa, #93c5fd);
   color: #04101f;
-  box-shadow: 0 18px 46px rgba(56, 248, 255, 0.18);
+  box-shadow: 0 18px 46px rgba(96, 165, 250, 0.18);
 }
 
 .hero-btn:hover {
   transform: translateY(-2px);
-  border-color: rgba(56, 248, 255, 0.72);
-  box-shadow: 0 18px 42px rgba(56, 248, 255, 0.14);
+  border-color: rgba(96, 165, 250, 0.72);
+  box-shadow: 0 18px 42px rgba(96, 165, 250, 0.14);
 }
 
 .hero-metrics {
@@ -843,7 +843,7 @@ onUnmounted(() => {
   top: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, #38f8ff, #7dd3fc, #ffbd66);
+  background: linear-gradient(90deg, #60a5fa, #93c5fd, #ffbd66);
   transform: scaleX(0.4);
   transform-origin: left;
   transition: transform 0.28s var(--ease-out);
@@ -880,7 +880,7 @@ onUnmounted(() => {
   border: 1px solid rgba(148, 226, 255, 0.28);
   border-radius: 8px;
   background: rgba(7, 11, 21, 0.76);
-  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.46), inset 0 0 76px rgba(56, 248, 255, 0.08);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.46), inset 0 0 76px rgba(96, 165, 250, 0.08);
   transform-style: preserve-3d;
   animation: frameHover 8s ease-in-out infinite;
 }
@@ -905,7 +905,7 @@ onUnmounted(() => {
   height: 28%;
   pointer-events: none;
   background:
-    linear-gradient(180deg, transparent, rgba(56, 248, 255, 0.18), rgba(125, 211, 252, 0.08), transparent),
+    linear-gradient(180deg, transparent, rgba(96, 165, 250, 0.18), rgba(147, 197, 253, 0.08), transparent),
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 11px);
   mix-blend-mode: screen;
   filter: blur(0.2px);
@@ -932,12 +932,12 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: #38f8ff;
-  box-shadow: 0 0 14px rgba(56, 248, 255, 0.6);
+  background: #60a5fa;
+  box-shadow: 0 0 14px rgba(96, 165, 250, 0.6);
 }
 
 .frame-topbar span:nth-child(2) {
-  background: #7dd3fc;
+  background: #93c5fd;
 }
 
 .frame-topbar span:nth-child(3) {
@@ -976,7 +976,7 @@ onUnmounted(() => {
   background:
     linear-gradient(180deg, rgba(5, 8, 22, 0.05), rgba(5, 8, 22, 0.5)),
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.032) 0 1px, transparent 1px 5px),
-    repeating-linear-gradient(90deg, rgba(56, 248, 255, 0.05) 0 1px, transparent 1px 74px);
+    repeating-linear-gradient(90deg, rgba(96, 165, 250, 0.05) 0 1px, transparent 1px 74px);
   pointer-events: none;
 }
 
@@ -986,7 +986,7 @@ onUnmounted(() => {
   inset: 0;
   background:
     radial-gradient(circle at 48% 30%, rgba(255, 255, 255, 0.14), transparent 16%),
-    linear-gradient(120deg, transparent 34%, rgba(56, 248, 255, 0.12) 48%, transparent 62%);
+    linear-gradient(120deg, transparent 34%, rgba(96, 165, 250, 0.12) 48%, transparent 62%);
   opacity: 0.58;
   mix-blend-mode: screen;
   animation: holoBreath 5.8s ease-in-out infinite;
@@ -999,16 +999,16 @@ onUnmounted(() => {
   bottom: 94px;
   width: 116px;
   height: 116px;
-  border: 1px solid rgba(125, 211, 252, 0.42);
+  border: 1px solid rgba(147, 197, 253, 0.42);
   border-radius: 999px;
-  box-shadow: inset 0 0 36px rgba(125, 211, 252, 0.12), 0 0 34px rgba(125, 211, 252, 0.12);
+  box-shadow: inset 0 0 36px rgba(147, 197, 253, 0.12), 0 0 34px rgba(147, 197, 253, 0.12);
 }
 
 .scanner-dial::before {
   content: '';
   position: absolute;
   inset: 12px;
-  border: 1px dashed rgba(56, 248, 255, 0.34);
+  border: 1px dashed rgba(96, 165, 250, 0.34);
   border-radius: inherit;
   animation: scanSpin 7s linear infinite;
 }
@@ -1019,7 +1019,7 @@ onUnmounted(() => {
   top: 50%;
   width: 44%;
   height: 1px;
-  background: linear-gradient(90deg, rgba(56, 248, 255, 0.85), transparent);
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.85), transparent);
   transform-origin: left center;
   animation: scanSpin 3.2s linear infinite;
 }
@@ -1059,7 +1059,7 @@ onUnmounted(() => {
 }
 
 .visual-readout span {
-  color: #7dd3fc;
+  color: #93c5fd;
 }
 
 .visual-next {
@@ -1091,8 +1091,8 @@ onUnmounted(() => {
 
 .visual-next:hover {
   transform: translateX(2px);
-  border-color: #38f8ff;
-  background: rgba(56, 248, 255, 0.12);
+  border-color: #60a5fa;
+  background: rgba(96, 165, 250, 0.12);
 }
 
 .journey-panel {
@@ -1115,7 +1115,7 @@ onUnmounted(() => {
 }
 
 .journey-panel-head strong {
-  color: #7dd3fc;
+  color: #93c5fd;
   text-align: right;
 }
 
@@ -1174,7 +1174,7 @@ onUnmounted(() => {
 }
 
 .section-head span {
-  color: #7dd3fc;
+  color: #93c5fd;
   font: 800 12px/1 'SF Mono', 'Consolas', monospace;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1210,7 +1210,7 @@ onUnmounted(() => {
   right: 0;
   top: 46px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(56, 248, 255, 0.5), rgba(255, 189, 102, 0.35), transparent);
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.5), rgba(255, 189, 102, 0.35), transparent);
 }
 
 .life-timeline-item {
@@ -1226,14 +1226,14 @@ onUnmounted(() => {
   width: 78px;
   height: 78px;
   margin: 0 auto 16px;
-  border: 1px solid rgba(125, 211, 252, 0.36);
+  border: 1px solid rgba(147, 197, 253, 0.36);
   border-radius: 999px;
   background: rgba(5, 8, 22, 0.82);
-  box-shadow: 0 0 28px rgba(56, 248, 255, 0.12);
+  box-shadow: 0 0 28px rgba(96, 165, 250, 0.12);
 }
 
 .life-node span {
-  color: #7dd3fc;
+  color: #93c5fd;
   font: 900 13px/1 'SF Mono', 'Consolas', monospace;
 }
 
@@ -1248,8 +1248,8 @@ onUnmounted(() => {
 
 .life-card:hover {
   transform: translateY(-5px);
-  border-color: rgba(56, 248, 255, 0.44);
-  box-shadow: 0 18px 42px rgba(56, 248, 255, 0.1);
+  border-color: rgba(96, 165, 250, 0.44);
+  box-shadow: 0 18px 42px rgba(96, 165, 250, 0.1);
 }
 
 .life-card h3 {
@@ -1274,9 +1274,9 @@ onUnmounted(() => {
 
 .life-tags span {
   padding: 5px 8px;
-  border: 1px solid rgba(125, 211, 252, 0.18);
+  border: 1px solid rgba(147, 197, 253, 0.18);
   border-radius: 999px;
-  background: rgba(125, 211, 252, 0.07);
+  background: rgba(147, 197, 253, 0.07);
   color: rgba(199, 251, 255, 0.82);
   font-size: 0.72rem;
 }
@@ -1307,7 +1307,7 @@ onUnmounted(() => {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, transparent, rgba(56, 248, 255, 0.08), transparent);
+  background: linear-gradient(120deg, transparent, rgba(96, 165, 250, 0.08), transparent);
   transform: translateX(-100%);
   transition: transform 0.6s var(--ease-out);
   pointer-events: none;
@@ -1315,7 +1315,7 @@ onUnmounted(() => {
 
 .bento-card:hover {
   transform: translateY(-5px);
-  border-color: rgba(56, 248, 255, 0.38);
+  border-color: rgba(96, 165, 250, 0.38);
   box-shadow: var(--shadow-hover);
 }
 
@@ -1351,7 +1351,7 @@ onUnmounted(() => {
 }
 
 .card-heading a:hover {
-  color: #38f8ff;
+  color: #60a5fa;
 }
 
 .project-focus {
@@ -1368,10 +1368,10 @@ onUnmounted(() => {
   height: 58px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(56, 248, 255, 0.34);
+  border: 1px solid rgba(96, 165, 250, 0.34);
   border-radius: 8px;
-  background: rgba(56, 248, 255, 0.09);
-  color: #38f8ff;
+  background: rgba(96, 165, 250, 0.09);
+  color: #60a5fa;
   font-size: 1.6rem;
   overflow: hidden;
 }
@@ -1508,8 +1508,8 @@ onUnmounted(() => {
 }
 
 .quick-link:hover {
-  border-color: rgba(56, 248, 255, 0.4);
-  background: rgba(56, 248, 255, 0.06);
+  border-color: rgba(96, 165, 250, 0.4);
+  background: rgba(96, 165, 250, 0.06);
   transform: translateY(-2px);
 }
 
@@ -1519,8 +1519,8 @@ onUnmounted(() => {
   display: grid;
   place-items: center;
   border-radius: 8px;
-  color: #38f8ff;
-  background: rgba(56, 248, 255, 0.1);
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.1);
   flex-shrink: 0;
 }
 

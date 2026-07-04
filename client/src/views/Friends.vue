@@ -13,10 +13,10 @@
       </header>
 
       <!-- 申请入口 -->
-      <section class="apply-panel apply-compact">
+      <section v-if="!userStore.isAdmin" class="apply-panel apply-compact">
         <div class="apply-info">
           <div class="apply-icon" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38f8ff" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
           </div>
           <div>
             <h3 class="apply-title">{{ ui.applyTitle }}</h3>
@@ -27,7 +27,7 @@
       </section>
 
       <transition name="apply-modal">
-        <div v-if="showApplyForm" class="apply-modal-overlay" @click.self="closeApplyForm">
+        <div v-if="!userStore.isAdmin && showApplyForm" class="apply-modal-overlay" @click.self="closeApplyForm">
           <form class="apply-modal-panel friend-apply-form" @submit.prevent="submitApplication">
             <button class="apply-modal-close" type="button" @click="closeApplyForm" :aria-label="ui.close">×</button>
             <div class="apply-modal-head">
@@ -439,7 +439,7 @@ onMounted(loadFriends)
   position: absolute;
   inset: 0;
   background-image: 
-    radial-gradient(circle at 20% 30%, rgba(56, 248, 255, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 20% 30%, rgba(96, 165, 250, 0.06) 0%, transparent 40%),
     radial-gradient(circle at 80% 70%, rgba(155, 92, 255, 0.06) 0%, transparent 40%);
 }
 
@@ -460,9 +460,9 @@ onMounted(loadFriends)
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.2em;
-  color: #38f8ff;
+  color: #60a5fa;
   padding: 6px 12px;
-  border: 1px solid rgba(56, 248, 255, 0.3);
+  border: 1px solid rgba(96, 165, 250, 0.3);
   border-radius: 4px;
   margin-bottom: 16px;
 }
@@ -471,7 +471,7 @@ onMounted(loadFriends)
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
   margin: 0 0 8px 0;
-  background: linear-gradient(135deg, #fff 0%, #38f8ff 100%);
+  background: linear-gradient(135deg, #fff 0%, #60a5fa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -492,10 +492,10 @@ onMounted(loadFriends)
   padding: 18px 0 22px !important;
   margin-bottom: 34px;
   border: 0 !important;
-  border-bottom: 1px solid rgba(126, 238, 255, 0.16) !important;
+  border-bottom: 1px solid rgba(96, 165, 250, 0.16) !important;
   border-radius: 0 !important;
   background:
-    linear-gradient(90deg, rgba(56, 248, 255, 0.08), transparent 58%),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.08), transparent 58%),
     transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
@@ -519,8 +519,8 @@ onMounted(loadFriends)
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  background: rgba(56, 248, 255, 0.1);
-  border: 1px solid rgba(56, 248, 255, 0.2);
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.2);
   border-radius: 12px;
 }
 
@@ -542,9 +542,9 @@ onMounted(loadFriends)
   flex-shrink: 0;
   min-height: 42px;
   padding: 0 18px;
-  border: 1px solid rgba(56, 248, 255, 0.42);
+  border: 1px solid rgba(96, 165, 250, 0.42);
   border-radius: 8px;
-  background: rgba(56, 248, 255, 0.08);
+  background: rgba(96, 165, 250, 0.08);
   color: #f8fbff;
   font-size: 13px;
   font-weight: 800;
@@ -554,8 +554,8 @@ onMounted(loadFriends)
 
 .apply-cta:hover {
   transform: translateY(-2px);
-  border-color: rgba(56, 248, 255, 0.68);
-  box-shadow: 0 14px 28px rgba(56, 248, 255, 0.13);
+  border-color: rgba(96, 165, 250, 0.68);
+  box-shadow: 0 14px 28px rgba(96, 165, 250, 0.13);
 }
 
 .apply-modal-overlay {
@@ -575,12 +575,12 @@ onMounted(loadFriends)
   max-height: min(86vh, 780px);
   overflow-y: auto;
   padding: clamp(22px, 4vw, 32px);
-  border: 1px solid rgba(125, 211, 252, 0.24);
+  border: 1px solid rgba(147, 197, 253, 0.24);
   border-radius: 8px;
   background:
     linear-gradient(135deg, rgba(16, 29, 54, 0.95), rgba(5, 9, 21, 0.94)),
-    repeating-linear-gradient(90deg, rgba(125, 211, 252, 0.045) 0 1px, transparent 1px 76px);
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.48), inset 0 0 80px rgba(56, 248, 255, 0.045);
+    repeating-linear-gradient(90deg, rgba(147, 197, 253, 0.045) 0 1px, transparent 1px 76px);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.48), inset 0 0 80px rgba(96, 165, 250, 0.045);
 }
 
 .apply-modal-close {
@@ -601,7 +601,7 @@ onMounted(loadFriends)
 }
 
 .apply-modal-head span {
-  color: #7dd3fc;
+  color: #93c5fd;
   font: 800 11px/1 'SF Mono', 'Consolas', monospace;
   letter-spacing: 0.16em;
 }
@@ -652,7 +652,7 @@ onMounted(loadFriends)
 .apply-form-grid input {
   min-height: 42px;
   padding: 0 12px;
-  border: 1px solid rgba(125, 211, 252, 0.16);
+  border: 1px solid rgba(147, 197, 253, 0.16);
   border-radius: 8px;
   background: rgba(5, 8, 22, 0.42);
   color: #eef7ff;
@@ -661,8 +661,8 @@ onMounted(loadFriends)
 }
 
 .apply-form-grid input:focus {
-  border-color: rgba(56, 248, 255, 0.48);
-  box-shadow: 0 0 0 4px rgba(56, 248, 255, 0.08);
+  border-color: rgba(96, 165, 250, 0.48);
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.08);
 }
 
 .apply-wide {
@@ -679,9 +679,9 @@ onMounted(loadFriends)
 }
 
 .apply-btn {
-  border: 1px solid rgba(56, 248, 255, 0.4);
+  border: 1px solid rgba(96, 165, 250, 0.4);
   padding: 12px 24px;
-  background: linear-gradient(135deg, rgba(56, 248, 255, 0.2), rgba(155, 92, 255, 0.2));
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(155, 92, 255, 0.2));
   border-radius: 8px;
   color: #fff;
   font-size: 13px;
@@ -694,7 +694,7 @@ onMounted(loadFriends)
 
 .apply-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(56, 248, 255, 0.2);
+  box-shadow: 0 8px 20px rgba(96, 165, 250, 0.2);
 }
 
 .apply-btn:disabled {
@@ -713,7 +713,7 @@ onMounted(loadFriends)
 }
 
 .apply-msg.ok {
-  color: #7dd3fc;
+  color: #93c5fd;
 }
 
 /* 友链网格 */
@@ -726,7 +726,7 @@ onMounted(loadFriends)
 .friend-node {
   position: relative;
   background: rgba(12, 20, 35, 0.6);
-  border: 1px solid rgba(56, 248, 255, 0.08);
+  border: 1px solid rgba(96, 165, 250, 0.08);
   border-radius: 10px;
   transition: all 0.3s ease;
   overflow: hidden;
@@ -734,7 +734,7 @@ onMounted(loadFriends)
 }
 
 .friend-node:hover {
-  border-color: rgba(56, 248, 255, 0.25);
+  border-color: rgba(96, 165, 250, 0.25);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
@@ -760,7 +760,7 @@ onMounted(loadFriends)
   left: 32px;
   width: 2px;
   height: 8px;
-  background: rgba(56, 248, 255, 0.3);
+  background: rgba(96, 165, 250, 0.3);
 }
 
 .friend-node:first-child .node-connector {
@@ -774,8 +774,8 @@ onMounted(loadFriends)
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  background: rgba(56, 248, 255, 0.1);
-  border: 1px solid rgba(56, 248, 255, 0.2);
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -790,7 +790,7 @@ onMounted(loadFriends)
 .avatar-placeholder {
   font-size: 16px;
   font-weight: 700;
-  color: #38f8ff;
+  color: #60a5fa;
 }
 
 /* 节点信息 */
@@ -824,7 +824,7 @@ onMounted(loadFriends)
   gap: 6px;
   font-size: 10px;
   font-weight: 600;
-  color: #38bdf8;
+  color: #60a5fa;
   letter-spacing: 0.1em;
 }
 
@@ -832,8 +832,8 @@ onMounted(loadFriends)
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #38bdf8;
-  box-shadow: 0 0 8px #38bdf8;
+  background: #60a5fa;
+  box-shadow: 0 0 8px #60a5fa;
   animation: pulse 2s ease-in-out infinite;
 }
 
@@ -864,8 +864,8 @@ onMounted(loadFriends)
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 2px solid rgba(56, 248, 255, 0.2);
-  border-top-color: #38f8ff;
+  border: 2px solid rgba(96, 165, 250, 0.2);
+  border-top-color: #60a5fa;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -926,8 +926,8 @@ onMounted(loadFriends)
   display: block;
   margin: 24px auto 0;
   padding: 10px 24px;
-  background: linear-gradient(135deg, rgba(56, 248, 255, 0.2), rgba(155, 92, 255, 0.2));
-  border: 1px solid rgba(56, 248, 255, 0.4);
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(155, 92, 255, 0.2));
+  border: 1px solid rgba(96, 165, 250, 0.4);
   border-radius: 8px;
   color: #fff;
   font-size: 13px;
@@ -938,7 +938,7 @@ onMounted(loadFriends)
 
 .add-friend-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(56, 248, 255, 0.2);
+  box-shadow: 0 8px 20px rgba(96, 165, 250, 0.2);
 }
 
 /* 表单弹窗 */
@@ -954,7 +954,7 @@ onMounted(loadFriends)
 
 .form-panel {
   background: rgba(12, 20, 35, 0.95);
-  border: 1px solid rgba(56, 248, 255, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.2);
   border-radius: 16px;
   padding: 24px;
   width: 90%;
@@ -1005,8 +1005,8 @@ onMounted(loadFriends)
 
 .avatar-upload-btn {
   padding: 8px 14px;
-  background: rgba(56, 248, 255, 0.15);
-  border: 1px solid rgba(56, 248, 255, 0.3);
+  background: rgba(96, 165, 250, 0.15);
+  border: 1px solid rgba(96, 165, 250, 0.3);
   border-radius: 6px;
   color: var(--accent);
   font-size: 13px;
@@ -1016,7 +1016,7 @@ onMounted(loadFriends)
 }
 
 .avatar-upload-btn:hover {
-  background: rgba(56, 248, 255, 0.25);
+  background: rgba(96, 165, 250, 0.25);
 }
 
 .avatar-preview {
@@ -1025,7 +1025,7 @@ onMounted(loadFriends)
   height: 60px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid rgba(56, 248, 255, 0.3);
+  border: 2px solid rgba(96, 165, 250, 0.3);
 }
 
 .avatar-preview img {

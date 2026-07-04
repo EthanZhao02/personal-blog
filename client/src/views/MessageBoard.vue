@@ -406,10 +406,10 @@ onMounted(loadMessages)
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 18% 30%, rgba(56, 248, 255, 0.06), transparent 34%),
+    radial-gradient(circle at 18% 30%, rgba(96, 165, 250, 0.06), transparent 34%),
     radial-gradient(circle at 82% 72%, rgba(124, 58, 237, 0.08), transparent 38%),
-    linear-gradient(90deg, rgba(125, 211, 252, 0.025) 1px, transparent 1px) 0 0 / 58px 58px,
-    linear-gradient(0deg, rgba(125, 211, 252, 0.02) 1px, transparent 1px) 0 0 / 58px 58px;
+    linear-gradient(90deg, rgba(147, 197, 253, 0.025) 1px, transparent 1px) 0 0 / 58px 58px,
+    linear-gradient(0deg, rgba(147, 197, 253, 0.02) 1px, transparent 1px) 0 0 / 58px 58px;
 }
 
 .message-container {
@@ -437,7 +437,7 @@ onMounted(loadMessages)
   inset: 34px 0 0;
   pointer-events: none;
   background:
-    linear-gradient(100deg, transparent 0 34%, rgba(56, 248, 255, 0.12) 34.4% 34.7%, transparent 35% 100%),
+    linear-gradient(100deg, transparent 0 34%, rgba(96, 165, 250, 0.12) 34.4% 34.7%, transparent 35% 100%),
     linear-gradient(32deg, transparent 0 64%, rgba(167, 139, 250, 0.1) 64.4% 64.7%, transparent 65% 100%),
     radial-gradient(circle, rgba(238, 247, 255, 0.28) 0 1px, transparent 1.6px) 0 0 / 92px 92px;
   opacity: 0.42;
@@ -452,7 +452,7 @@ onMounted(loadMessages)
 .note-composer {
   align-self: start;
   padding: 22px;
-  border: 1px solid rgba(125, 211, 252, 0.22);
+  border: 1px solid rgba(147, 197, 253, 0.22);
   border-radius: 8px;
   background:
     linear-gradient(135deg, rgba(15, 27, 50, 0.86), rgba(6, 10, 22, 0.7)),
@@ -470,8 +470,8 @@ onMounted(loadMessages)
   display: grid;
   place-items: center;
   border-radius: 999px;
-  border: 1px solid rgba(125, 211, 252, 0.22);
-  box-shadow: inset 0 0 28px rgba(56, 248, 255, 0.08), 0 0 34px rgba(56, 248, 255, 0.08);
+  border: 1px solid rgba(147, 197, 253, 0.22);
+  box-shadow: inset 0 0 28px rgba(96, 165, 250, 0.08), 0 0 34px rgba(96, 165, 250, 0.08);
 }
 
 .composer-orbit::before,
@@ -486,7 +486,7 @@ onMounted(loadMessages)
 
 .composer-orbit::after {
   inset: 35px;
-  border-color: rgba(56, 248, 255, 0.42);
+  border-color: rgba(96, 165, 250, 0.42);
   animation-duration: 5.5s;
   animation-direction: reverse;
 }
@@ -496,8 +496,8 @@ onMounted(loadMessages)
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: #e0f7ff;
-  box-shadow: 0 0 16px rgba(56, 248, 255, 0.76);
+  background: #dbeafe;
+  box-shadow: 0 0 16px rgba(96, 165, 250, 0.76);
 }
 
 .composer-orbit span:nth-child(1) { transform: translate(44px, -28px); }
@@ -516,7 +516,7 @@ onMounted(loadMessages)
 }
 
 .composer-head strong {
-  color: #7dd3fc;
+  color: #93c5fd;
 }
 
 .input-form {
@@ -528,7 +528,7 @@ onMounted(loadMessages)
 .form-input,
 .form-textarea {
   width: 100%;
-  border: 1px solid rgba(125, 211, 252, 0.16);
+  border: 1px solid rgba(147, 197, 253, 0.16);
   border-radius: 8px;
   background: rgba(5, 8, 22, 0.48);
   color: #fff;
@@ -550,8 +550,8 @@ onMounted(loadMessages)
 
 .form-input:focus,
 .form-textarea:focus {
-  border-color: rgba(56, 248, 255, 0.48);
-  box-shadow: 0 0 0 4px rgba(56, 248, 255, 0.08);
+  border-color: rgba(96, 165, 250, 0.48);
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.08);
 }
 
 .send-btn {
@@ -562,9 +562,9 @@ onMounted(loadMessages)
   gap: 8px;
   min-height: 44px;
   padding: 0 20px;
-  border: 1px solid rgba(56, 248, 255, 0.42);
+  border: 1px solid rgba(96, 165, 250, 0.42);
   border-radius: 8px;
-  background: linear-gradient(135deg, rgba(56, 248, 255, 0.2), rgba(124, 58, 237, 0.22));
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(124, 58, 237, 0.22));
   color: #fff;
   font-size: 13px;
   font-weight: 800;
@@ -574,7 +574,7 @@ onMounted(loadMessages)
 
 .send-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(56, 248, 255, 0.16);
+  box-shadow: 0 12px 28px rgba(96, 165, 250, 0.16);
 }
 
 .send-btn:disabled {
@@ -592,9 +592,9 @@ onMounted(loadMessages)
 }
 
 .submit-msg.ok {
-  border-color: rgba(56, 248, 255, 0.32);
-  background: rgba(56, 248, 255, 0.1);
-  color: #7dd3fc;
+  border-color: rgba(96, 165, 250, 0.32);
+  background: rgba(96, 165, 250, 0.1);
+  color: #93c5fd;
 }
 
 .note-board {
@@ -614,7 +614,7 @@ onMounted(loadMessages)
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(115deg, transparent 0 44%, rgba(56, 248, 255, 0.12) 45%, transparent 46% 100%),
+    linear-gradient(115deg, transparent 0 44%, rgba(96, 165, 250, 0.12) 45%, transparent 46% 100%),
     linear-gradient(35deg, transparent 0 52%, rgba(167, 139, 250, 0.11) 53%, transparent 54% 100%),
     radial-gradient(circle, rgba(238, 247, 255, 0.36) 0 1px, transparent 1.5px) 0 0 / 90px 90px;
   opacity: 0.18;
@@ -633,11 +633,11 @@ onMounted(loadMessages)
   position: relative;
   min-height: 188px;
   padding: 20px 18px 16px;
-  border: 1px solid rgba(125, 211, 252, 0.22);
+  border: 1px solid rgba(147, 197, 253, 0.22);
   border-radius: 8px;
   background:
     linear-gradient(145deg, rgba(18, 32, 58, 0.9), rgba(9, 15, 29, 0.82)),
-    repeating-linear-gradient(180deg, transparent 0 31px, rgba(125, 211, 252, 0.05) 31px 32px);
+    repeating-linear-gradient(180deg, transparent 0 31px, rgba(147, 197, 253, 0.05) 31px 32px);
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   transform: rotate(var(--note-rotate, 0deg));
   transform-origin: 50% 10%;
@@ -655,8 +655,8 @@ onMounted(loadMessages)
 
 .message-note:hover {
   transform: translateY(-5px) rotate(0deg);
-  border-color: rgba(56, 248, 255, 0.46);
-  box-shadow: 0 22px 56px rgba(56, 248, 255, 0.12), 0 20px 52px rgba(0, 0, 0, 0.32);
+  border-color: rgba(96, 165, 250, 0.46);
+  box-shadow: 0 22px 56px rgba(96, 165, 250, 0.12), 0 20px 52px rgba(0, 0, 0, 0.32);
 }
 
 .message-note.message-local {
@@ -670,8 +670,8 @@ onMounted(loadMessages)
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: #7dd3fc;
-  box-shadow: 0 0 18px rgba(125, 211, 252, 0.72);
+  background: #93c5fd;
+  box-shadow: 0 0 18px rgba(147, 197, 253, 0.72);
 }
 
 .bubble-header {
@@ -714,11 +714,11 @@ onMounted(loadMessages)
   flex-wrap: wrap;
   margin-top: 14px;
   padding-top: 10px;
-  border-top: 1px solid rgba(125, 211, 252, 0.11);
+  border-top: 1px solid rgba(147, 197, 253, 0.11);
 }
 
 .bubble-meta {
-  color: rgba(125, 211, 252, 0.58);
+  color: rgba(147, 197, 253, 0.58);
   font: 800 10px/1 'SF Mono', 'Consolas', monospace;
 }
 
@@ -732,14 +732,14 @@ onMounted(loadMessages)
 
 .msg-btn {
   padding: 3px 8px;
-  border: 1px solid rgba(125, 211, 252, 0.16);
+  border: 1px solid rgba(147, 197, 253, 0.16);
   background: rgba(5, 8, 22, 0.38);
   color: rgba(226, 239, 255, 0.5);
   font-size: 11px;
 }
 
 .msg-btn:hover {
-  border-color: rgba(56, 248, 255, 0.48);
+  border-color: rgba(96, 165, 250, 0.48);
   color: #eaf7ff;
 }
 
@@ -752,7 +752,7 @@ onMounted(loadMessages)
 .reply-form {
   margin-top: 12px;
   padding: 10px;
-  border: 1px solid rgba(125, 211, 252, 0.14);
+  border: 1px solid rgba(147, 197, 253, 0.14);
   border-radius: 8px;
   background: rgba(5, 8, 22, 0.38);
 }
@@ -764,14 +764,14 @@ onMounted(loadMessages)
 }
 
 .sub-reply-name {
-  color: #7dd3fc;
+  color: #93c5fd;
   font-weight: 800;
 }
 
 .reply-input {
   width: 100%;
   padding: 8px 10px;
-  border: 1px solid rgba(125, 211, 252, 0.16);
+  border: 1px solid rgba(147, 197, 253, 0.16);
   border-radius: 7px;
   background: rgba(0, 0, 0, 0.26);
   color: #fff;
@@ -788,14 +788,14 @@ onMounted(loadMessages)
 .reply-submit {
   padding: 5px 14px;
   border: 0;
-  background: #38f8ff;
+  background: #60a5fa;
   color: #06101f;
   font-weight: 800;
 }
 
 .reply-cancel {
   padding: 5px 14px;
-  border: 1px solid rgba(125, 211, 252, 0.18);
+  border: 1px solid rgba(147, 197, 253, 0.18);
   background: transparent;
   color: rgba(226, 239, 255, 0.56);
 }
@@ -813,7 +813,7 @@ onMounted(loadMessages)
 .giscus-intro {
   margin-bottom: 18px;
   padding: 14px;
-  border: 1px solid rgba(125, 211, 252, 0.16);
+  border: 1px solid rgba(147, 197, 253, 0.16);
   border-radius: 8px;
   background: rgba(5, 8, 22, 0.34);
 }

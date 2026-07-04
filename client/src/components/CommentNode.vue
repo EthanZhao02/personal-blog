@@ -169,7 +169,7 @@ const formatDate = (s) => {
 .comment-badge {
   font-size: 11px;
   padding: 1px 8px;
-  background: rgba(56, 248, 255, 0.1);
+  background: rgba(96, 165, 250, 0.1);
   color: var(--accent);
   border-radius: 10px;
   font-weight: 600;
