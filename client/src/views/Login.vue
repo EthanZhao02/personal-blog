@@ -202,6 +202,9 @@ const handleLogin = async () => {
   width: 100%;
   text-align: center;
   margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .btn:disabled {

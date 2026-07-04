@@ -113,6 +113,10 @@
                   <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                 </svg>
               </button>
+
+              <div v-if="submitMsg" class="submit-msg" :class="submitOk ? 'ok' : 'err'">
+                {{ submitMsg }}
+              </div>
             </div>
           </div>
         </template>
@@ -134,6 +138,8 @@ const nickname = ref('')
 const contact = ref('')
 const content = ref('')
 const messageListRef = ref(null)
+const submitMsg = ref('')
+const submitOk = ref(false)
 
 const loadMessages = async () => {
   loading.value = true
@@ -158,6 +164,8 @@ const loadMessages = async () => {
 const handleSubmit = async () => {
   if (!content.value.trim() || sending.value) return
   sending.value = true
+  submitMsg.value = ''
+  submitOk.value = false
   try {
     const res = await addMessage({
       nickname: nickname.value || '匿名用户',
@@ -171,10 +179,18 @@ const handleSubmit = async () => {
         createTime: new Date().toISOString()
       })
       content.value = ''
+      submitMsg.value = '✓ 消息发送成功'
+      submitOk.value = true
       await nextTick()
       scrollToBottom()
+      setTimeout(() => { submitMsg.value = '' }, 3000)
+    } else {
+      submitMsg.value = '✗ 发送失败：' + (res.message || '未知错误')
+      submitOk.value = false
     }
   } catch (e) {
+    submitMsg.value = '✗ 发送失败：' + (e?.message || '网络错误，请检查后端是否启动')
+    submitOk.value = false
     if (import.meta.env.DEV) console.error('发送失败', e)
   } finally {
     sending.value = false
@@ -530,6 +546,26 @@ onMounted(loadMessages)
 .send-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.submit-msg {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.submit-msg.ok {
+  background: rgba(56, 248, 255, 0.12);
+  border: 1px solid rgba(56, 248, 255, 0.3);
+  color: #38f8ff;
+}
+
+.submit-msg.err {
+  background: rgba(255, 100, 100, 0.12);
+  border: 1px solid rgba(255, 100, 100, 0.3);
+  color: #ff8a8a;
 }
 
 /* Giscus 静态模式 */
