@@ -29,7 +29,6 @@ public class DatabaseInitializer implements CommandLineRunner {
     private static final String CATEGORY_TABLE = "test.blog_category";
     private static final String TAG_TABLE = "test.blog_tag";
     private static final String FRIENDLINK_TABLE = "test.blog_friend_link";
-    private static final String PROJECT_TABLE = "test.blog_project";
 
     @Override
     public void run(String... args) throws Exception {
@@ -41,8 +40,6 @@ public class DatabaseInitializer implements CommandLineRunner {
         ensureCommentColumns();
         ensureArticleColumns();
         ensureFriendLinkColumns();
-        ensureProjectColumns();
-        ensureCategoryColumns();
         ensureCategoryData();
         ensureTagData();
         log.info("=== 数据库自检完成 ===");
@@ -167,41 +164,6 @@ public class DatabaseInitializer implements CommandLineRunner {
                 Map.of("name", "is_active", "type", "TINYINT(1)"),
                 Map.of("name", "sort_order", "type", "INT"),
                 Map.of("name", "update_time", "type", "DATETIME")
-        ));
-    }
-
-    /**
-     * 确保 project 表包含实体类所有字段
-     */
-    private void ensureProjectColumns() {
-        ensureColumns(PROJECT_TABLE, List.of(
-                Map.of("name", "name", "type", "VARCHAR(200)"),
-                Map.of("name", "description", "type", "TEXT"),
-                Map.of("name", "url", "type", "VARCHAR(500)"),
-                Map.of("name", "github_url", "type", "VARCHAR(500)"),
-                Map.of("name", "icon", "type", "VARCHAR(50)"),
-                Map.of("name", "image_url", "type", "VARCHAR(500)"),
-                Map.of("name", "tag", "type", "VARCHAR(50)"),
-                Map.of("name", "tech_stack", "type", "TEXT"),
-                Map.of("name", "badge", "type", "VARCHAR(50)"),
-                Map.of("name", "category", "type", "VARCHAR(50)"),
-                Map.of("name", "stats", "type", "TEXT"),
-                Map.of("name", "status", "type", "VARCHAR(50)"),
-                Map.of("name", "is_open_source", "type", "TINYINT(1)"),
-                Map.of("name", "article_url", "type", "VARCHAR(500)"),
-                Map.of("name", "sort_order", "type", "INT"),
-                Map.of("name", "is_active", "type", "TINYINT(1)"),
-                Map.of("name", "create_time", "type", "DATETIME"),
-                Map.of("name", "update_time", "type", "DATETIME")
-        ));
-    }
-
-    /**
-     * 确保 category 表包含实体类所有字段
-     */
-    private void ensureCategoryColumns() {
-        ensureColumns(CATEGORY_TABLE, List.of(
-                Map.of("name", "sort", "type", "INT")
         ));
     }
 
