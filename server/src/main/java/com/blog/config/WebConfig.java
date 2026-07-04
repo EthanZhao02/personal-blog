@@ -23,7 +23,16 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080", "https://ethanzhao02.github.io", "https://ethanzhao02.github.io/personal-blog", "https://personal-blog-api-muty.onrender.com")
+                .allowedOriginPatterns(
+                        "http://localhost:*",
+                        "http://127.0.0.1:*",
+                        "https://ethanzhao02.github.io",
+                        "https://ethanzhao02.github.io/personal-blog",
+                        "https://*.pages.dev",
+                        "https://personal-blog-api-muty.onrender.com"
+                )
+                // 兼容老配置
+                .allowedOrigins("https://ethanzhao02.github.io", "https://ethanzhao02.github.io/personal-blog", "https://personal-blog-api-muty.onrender.com")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)
