@@ -80,6 +80,60 @@
             </div>
           </section>
 
+          <!-- Hobbies -->
+          <section class="resume-block" v-if="hobbies.length">
+            <div class="block-head">
+              <span class="block-tag">HOBBIES</span>
+              <div class="block-line"></div>
+            </div>
+            <div class="block-body">
+              <div class="hobby-grid">
+                <div v-for="item in hobbies" :key="item" class="hobby-card">
+                  <span class="hobby-icon">{{ getHobbyIcon(item) }}</span>
+                  <span class="hobby-name">{{ item }}</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Tools -->
+          <section class="resume-block" v-if="tools.length">
+            <div class="block-head">
+              <span class="block-tag">TOOLBELT</span>
+              <div class="block-line"></div>
+            </div>
+            <div class="block-body">
+              <div class="tool-grid">
+                <div v-for="tool in tools" :key="tool.name" class="tool-item">
+                  <span class="tool-name">{{ tool.name }}</span>
+                  <span v-if="tool.category" class="tool-cat">{{ tool.category }}</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Blog Story -->
+          <section class="resume-block" v-if="profile.blogStory">
+            <div class="block-head">
+              <span class="block-tag">BLOG STORY</span>
+              <div class="block-line"></div>
+            </div>
+            <div class="block-body">
+              <p class="story-text">{{ profile.blogStory }}</p>
+            </div>
+          </section>
+
+          <!-- Name Origin -->
+          <section class="resume-block" v-if="profile.nameOrigin">
+            <div class="block-head">
+              <span class="block-tag">ABOUT THE NAME</span>
+              <div class="block-line"></div>
+            </div>
+            <div class="block-body">
+              <p class="story-text">{{ profile.nameOrigin }}</p>
+            </div>
+          </section>
+
           <!-- Connect -->
           <section class="resume-block" v-if="socials.length">
             <div class="block-head">
@@ -153,6 +207,13 @@
           <div class="editor-row"><label>社交链接 Connect</label><textarea v-model="editForm.socialsText" rows="6" placeholder='[
   {"name":"GitHub","icon":"github","url":"https://...","handle":"@xxx"}
 ]' class="editor-json" /></div>
+          <div class="editor-row"><label>爱好 Hobbies</label><textarea v-model="editForm.hobbiesText" rows="3" placeholder='["阅读", "摄影", "桌游"]' class="editor-json" /></div>
+          <div class="editor-row"><label>常用工具 Tools</label><textarea v-model="editForm.toolsText" rows="5" placeholder='[
+  {"name":"VS Code","category":"编辑器"},
+  {"name":"Cursor","category":"AI编程"}
+]' class="editor-json" /></div>
+          <div class="editor-row"><label>博客历程 Blog Story</label><textarea v-model="editForm.blogStory" rows="4" placeholder="这个博客的故事..." /></div>
+          <div class="editor-row"><label>名字由来 About the Name</label><textarea v-model="editForm.nameOrigin" rows="3" placeholder="名字的含义与由来..." /></div>
           <div class="editor-actions">
             <button @click="showEditor = false" class="editor-cancel">取消</button>
             <button @click="submitProfile" :disabled="saving" class="editor-save">{{ saving ? '保存中...' : '保存' }}</button>
@@ -200,6 +261,14 @@ const parseSocials = (raw) => {
   if (!raw) return siteConfig.socials || []
   return typeof raw === 'string' ? JSON.parse(raw) : raw
 }
+const parseHobbies = (raw) => {
+  if (!raw) return []
+  return typeof raw === 'string' ? JSON.parse(raw) : raw
+}
+const parseTools = (raw) => {
+  if (!raw) return []
+  return typeof raw === 'string' ? JSON.parse(raw) : raw
+}
 
 const loadProfile = async () => {
   try {
@@ -214,9 +283,13 @@ const loadProfile = async () => {
         status: p.status || siteConfig.about?.status,
         avatar: p.avatar || siteConfig.avatar,
         footer: siteConfig.about?.footer || '保持热爱，奔赴山海',
+        blogStory: p.blogStory || '',
+        nameOrigin: p.nameOrigin || '',
         _skills: parseSkills(p.skills || siteConfig.about?.skills),
         _interests: parseInterests(p.interests || siteConfig.about?.interests),
-        _socials: parseSocials(p.socials)
+        _socials: parseSocials(p.socials),
+        _hobbies: parseHobbies(p.hobbies),
+        _tools: parseTools(p.tools)
       }
       return
     }
@@ -229,9 +302,13 @@ const loadProfile = async () => {
     status: siteConfig.about?.status || 'Available',
     avatar: siteConfig.avatar || '',
     footer: siteConfig.about?.footer || '保持热爱，奔赴山海',
+    blogStory: '',
+    nameOrigin: '',
     _skills: parseSkills(siteConfig.about?.skills),
     _interests: parseInterests(siteConfig.about?.interests),
-    _socials: siteConfig.socials || []
+    _socials: siteConfig.socials || [],
+    _hobbies: [],
+    _tools: []
   }
 }
 
@@ -240,6 +317,8 @@ onMounted(loadProfile)
 const skills = computed(() => profile.value._skills || [])
 const interests = computed(() => profile.value._interests || [])
 const socials = computed(() => profile.value._socials || [])
+const hobbies = computed(() => profile.value._hobbies || [])
+const tools = computed(() => profile.value._tools || [])
 
 const openEditor = () => {
   const skillsRaw = profile.value._skills?.map(s => ({ name: s.name, level: s.level })) || []
@@ -251,7 +330,11 @@ const openEditor = () => {
     status: profile.value.status || '',
     skillsText: JSON.stringify(skillsRaw, null, 2),
     interestsText: JSON.stringify(profile.value._interests || []),
-    socialsText: JSON.stringify(profile.value._socials || [], null, 2)
+    socialsText: JSON.stringify(profile.value._socials || [], null, 2),
+    hobbiesText: JSON.stringify(profile.value._hobbies || [], null, 2),
+    toolsText: JSON.stringify(profile.value._tools || [], null, 2),
+    blogStory: profile.value.blogStory || '',
+    nameOrigin: profile.value.nameOrigin || ''
   }
   showEditor.value = true
 }
@@ -260,11 +343,13 @@ const submitProfile = async () => {
   saving.value = true
   try {
     const payload = { ...editForm.value }
-    // 后端 skills/interests/socials 是 String 类型，需要 stringify
+    // 后端 skills/interests/socials/hobbies/tools 是 String 类型，需要 stringify
     try { payload.skills = JSON.stringify(JSON.parse(editForm.value.skillsText || '[]')) } catch { alert('Skills JSON 格式不正确'); saving.value = false; return }
     try { payload.interests = JSON.stringify(JSON.parse(editForm.value.interestsText || '[]')) } catch { alert('Interests JSON 格式不正确'); saving.value = false; return }
     try { payload.socials = JSON.stringify(JSON.parse(editForm.value.socialsText || '[]')) } catch { alert('Connect JSON 格式不正确'); saving.value = false; return }
-    delete payload.skillsText; delete payload.interestsText; delete payload.socialsText
+    try { payload.hobbies = JSON.stringify(JSON.parse(editForm.value.hobbiesText || '[]')) } catch { alert('Hobbies JSON 格式不正确'); saving.value = false; return }
+    try { payload.tools = JSON.stringify(JSON.parse(editForm.value.toolsText || '[]')) } catch { alert('Tools JSON 格式不正确'); saving.value = false; return }
+    delete payload.skillsText; delete payload.interestsText; delete payload.socialsText; delete payload.hobbiesText; delete payload.toolsText
     const res = await updateProfile(payload)
     if (res.code === 200) { showEditor.value = false; await loadProfile() }
     else alert(res.message || '保存失败')
@@ -277,6 +362,19 @@ const currentTimezone = computed(() => {
   return `UTC${offset >= 0 ? '+' : ''}${offset}`
 })
 const onAvatarError = (e) => { e.target.style.display = 'none' }
+const getHobbyIcon = (name) => {
+  const map = {
+    '阅读': '📚', '读书': '📚', '科幻': '🚀', '小说': '📖',
+    '摄影': '📷', '旅行': '✈️', '旅游': '✈️',
+    '桌游': '🎲', '游戏': '🎮', '咖啡': '☕', '探店': '☕',
+    '音乐': '🎵', '吉他': '🎸', '钢琴': '🎹',
+    '电影': '🎬', '运动': '⚽', '跑步': '🏃', '健身': '💪',
+    '烹饪': '🍳', '美食': '🍜', '画画': '🎨', '绘画': '🎨',
+    '代码': '💻', '编程': '💻', '写作': '✍️',
+    '茶': '🍵', '手工': '🔨', '回附': '🔧'
+  }
+  return map[name] || '✨'
+}
 const showQRCode = (s) => { currentQR.value = s; showQR.value = true }
 const closeQRCode = () => { showQR.value = false; currentQR.value = null }
 
@@ -448,6 +546,39 @@ const getSocialIcon = (icon) => {
 }
 .tag-pill:hover {
   background: rgba(56,248,255,0.14); border-color: rgba(56,248,255,0.3); color: #fff;
+}
+
+/* Hobbies */
+.hobby-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.hobby-card {
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  background: rgba(255,255,255,0.025); border: 1px solid rgba(56,248,255,0.08);
+  border-radius: 10px; transition: all 0.2s;
+}
+.hobby-card:hover {
+  background: rgba(56,248,255,0.06); border-color: rgba(56,248,255,0.2); transform: translateY(-2px);
+}
+.hobby-icon { font-size: 20px; line-height: 1; }
+.hobby-name { font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 500; }
+
+/* Tools */
+.tool-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.tool-item {
+  display: flex; flex-direction: column; gap: 3px; padding: 8px 14px;
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(56,248,255,0.08);
+  border-radius: 8px; transition: all 0.2s;
+}
+.tool-item:hover {
+  background: rgba(56,248,255,0.06); border-color: rgba(56,248,255,0.2);
+}
+.tool-name { font-size: 13px; color: rgba(255,255,255,0.8); font-weight: 500; }
+.tool-cat { font-size: 10px; color: rgba(255,255,255,0.35); }
+
+/* Story / Name Origin */
+.story-text {
+  font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.9; margin: 0;
+  padding: 14px 18px; background: rgba(255,255,255,0.02); border-left: 2px solid rgba(56,248,255,0.3);
+  border-radius: 0 8px 8px 0;
 }
 
 /* Connect */

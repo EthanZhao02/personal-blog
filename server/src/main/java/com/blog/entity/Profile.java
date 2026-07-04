@@ -20,4 +20,12 @@ public class Profile {
     private String interests;
     /** JSON 数组: [{"name":"GitHub","icon":"github","url":"...","color":"#...","handle":"..."},...] */
     private String socials;
+    /** JSON 数组: ["阅读","摄影","...",...] */
+    private String hobbies;
+    /** JSON 数组: [{"name":"VS Code","category":"编辑器"},...] */
+    private String tools;
+    /** 博客历程文本 */
+    private String blogStory;
+    /** 名字由来文本 */
+    private String nameOrigin;
 }

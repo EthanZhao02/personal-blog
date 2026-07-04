@@ -318,7 +318,11 @@ public class DatabaseInitializer implements CommandLineRunner {
                     "avatar VARCHAR(500)," +
                     "skills TEXT," +
                     "interests TEXT," +
-                    "socials TEXT" +
+                    "socials TEXT," +
+                    "hobbies TEXT," +
+                    "tools TEXT," +
+                    "blog_story TEXT," +
+                    "name_origin TEXT" +
                 ")");
                 log.info("✓ blog_profile 表创建成功");
             } else {
@@ -333,7 +337,11 @@ public class DatabaseInitializer implements CommandLineRunner {
                     java.util.Map.of("name", "avatar", "type", "VARCHAR(500)"),
                     java.util.Map.of("name", "skills", "type", "TEXT"),
                     java.util.Map.of("name", "interests", "type", "TEXT"),
-                    java.util.Map.of("name", "socials", "type", "TEXT")
+                    java.util.Map.of("name", "socials", "type", "TEXT"),
+                    java.util.Map.of("name", "hobbies", "type", "TEXT"),
+                    java.util.Map.of("name", "tools", "type", "TEXT"),
+                    java.util.Map.of("name", "blog_story", "type", "TEXT"),
+                    java.util.Map.of("name", "name_origin", "type", "TEXT")
                 ));
             }
         } catch (Exception e) {
@@ -351,7 +359,11 @@ public class DatabaseInitializer implements CommandLineRunner {
                 String skillsJson = "[{\"name\":\"Vue.js\",\"level\":85},{\"name\":\"Java/Spring\",\"level\":80},{\"name\":\"AI/LLM\",\"level\":75},{\"name\":\"Python\",\"level\":70}]";
                 String interestsJson = "[\"AI/LLM\",\"Web Dev\",\"Open Source\",\"Knowledge Management\"]";
                 String socialsJson = "[{\"name\":\"GitHub\",\"icon\":\"github\",\"url\":\"https://github.com/EthanZhao02\",\"color\":\"#333\",\"handle\":\"@EthanZhao02\"}]";
-                jdbcTemplate.update("INSERT INTO " + PROFILE_TABLE + " (id, name, tagline, bio, location, status, skills, interests, socials) VALUES (1, 'E森赵', 'AI & Web Developer', '正在探索AI与Web开发的交汇点，专注知识管理和学习系统。', 'Earth', 'Available', ?, ?, ?)", skillsJson, interestsJson, socialsJson);
+                String hobbiesJson = "[\"阅读科幻小说\",\"摄影\",\"桌游\",\"咖啡探店\"]";
+                String toolsJson = "[{\"name\":\"VS Code\",\"category\":\"编辑器\"},{\"name\":\"Cursor\",\"category\":\"AI编程\"},{\"name\":\"Obsidian\",\"category\":\"知识管理\"},{\"name\":\"Figma\",\"category\":\"设计\"},{\"name\":\"Docker\",\"category\":\"部署\"},{\"name\":\"Git\",\"category\":\"版本控制\"}]";
+                String blogStory = "这个博客始于2024年，起初只是想有一个属于自己的角落记录学习和思考。慢慢地，它变成了我的数字花园——种下想法，等待它们生长。在这里你会看到技术探索、项目复盘、读书笔记，还有一些深夜的胡思乱想。";
+                String nameOrigin = "Ethan Zhao ——Ethan取自希伯来语，意为坚定、持久；Zhao是姓氏。合在一起，希望自己能做一个坚定的创造者。";
+                jdbcTemplate.update("INSERT INTO " + PROFILE_TABLE + " (id, name, tagline, bio, location, status, skills, interests, socials, hobbies, tools, blog_story, name_origin) VALUES (1, 'E森赵', 'AI & Web Developer', '正在探索AI与Web开发的交汇点，专注知识管理和学习系统。', 'Earth', 'Available', ?, ?, ?, ?, ?, ?, ?)", skillsJson, interestsJson, socialsJson, hobbiesJson, toolsJson, blogStory, nameOrigin);
                 log.info("✓ 已初始化默认个人资料");
             }
         } catch (Exception e) {

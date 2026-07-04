@@ -85,9 +85,16 @@
           :to="`/article/${article.id}`"
           class="article-row"
         >
-          <time>{{ formatDate(article.createTime) }}</time>
-          <strong>{{ article.title }}</strong>
+          <div class="article-meta">
+            <time>{{ formatDate(article.createTime) }}</time>
+            <span v-if="article.categoryName" class="article-cat">{{ article.categoryName }}</span>
+          </div>
+          <div class="article-body">
+            <strong>{{ article.title }}</strong>
+            <p v-if="article.summary" class="article-summary">{{ article.summary }}</p>
+          </div>
         </router-link>
+        <div v-if="!latestArticles.length" class="empty-hint">暂无文章，敬请期待...</div>
       </article>
 
       <article class="bento-card learning-card reveal-up" style="animation-delay: 120ms">
@@ -205,16 +212,17 @@ const projectsData = ref([])
 const heroStats = computed(() => [
   { value: totalArticles.value, label: 'Articles' },
   { value: projectsCount.value, label: 'Projects' },
+  { value: totalViews.value, label: 'Views' },
   { value: siteConfig.learningTracks?.length || 0, label: 'Tracks' },
-  { value: siteConfig.researchInterests?.length || 0, label: 'Interests' },
 ])
 
 const activePhoto = computed(() => siteConfig.photos[currentPhoto.value] || siteConfig.photos[0] || '')
 const featuredProject = computed(() => projectsData.value[0] || siteConfig.projects?.[0] || {})
 const isProjectIconUrl = (icon) => icon && /^https?:\/\//.test(icon)
 const articles = ref([])
-const latestArticles = computed(() => articles.value.slice(0, 3))
+const latestArticles = computed(() => articles.value.slice(0, 4))
 const totalArticles = computed(() => articles.value.length || siteConfig.content.articles?.length || 0)
+const totalViews = computed(() => articles.value.reduce((sum, a) => sum + (a.viewCount || a.views || 0), 0))
 const projectTech = computed(() => {
   const ts = featuredProject.value?.techStack
   if (!ts) return []
@@ -248,7 +256,7 @@ onMounted(async () => {
   carouselTimer = setInterval(nextPhoto, 5200)
   // 从API加载最新文章
   try {
-    const res = await getArticleList(1, 3)
+    const res = await getArticleList(1, 5)
     if (res.code === 200 && res.data?.records) {
       articles.value = res.data.records
     }
@@ -669,15 +677,27 @@ onUnmounted(() => {
 
 .article-row {
   display: grid;
-  grid-template-columns: 54px 1fr;
+  grid-template-columns: 64px 1fr;
   gap: 14px;
   align-items: start;
   padding: 13px 0;
   border-top: 1px solid rgba(148, 226, 255, 0.11);
+  text-decoration: none;
+  transition: all 0.2s;
 }
 
 .article-row:first-of-type {
   border-top: 0;
+}
+
+.article-row:hover {
+  padding-left: 6px;
+}
+
+.article-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .article-row time {
@@ -686,9 +706,42 @@ onUnmounted(() => {
   font-size: 0.82rem;
 }
 
-.article-row strong {
+.article-cat {
+  font-size: 0.7rem;
+  color: rgba(148, 226, 255, 0.5);
+  padding: 2px 6px;
+  border: 1px solid rgba(148, 226, 255, 0.12);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.article-body {
+  min-width: 0;
+}
+
+.article-body strong {
   color: rgba(238, 247, 255, 0.88);
   line-height: 1.55;
+  display: block;
+}
+
+.article-summary {
+  margin: 6px 0 0;
+  color: rgba(226, 239, 255, 0.45);
+  font-size: 0.82rem;
+  line-height: 1.65;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.empty-hint {
+  padding: 20px 0;
+  text-align: center;
+  color: rgba(226, 239, 255, 0.3);
+  font-size: 0.88rem;
 }
 
 .track-row {
