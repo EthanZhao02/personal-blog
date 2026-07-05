@@ -148,7 +148,7 @@
               <div class="avatar-wrapper">
                 <div class="avatar-glow-ring" aria-hidden="true"></div>
                 <div class="avatar-core">
-                  <img :src="siteConfig.avatar" :alt="siteConfig.name" />
+                  <img :src="digitalAvatar" :alt="`${siteConfig.name} digital avatar`" />
                 </div>
               </div>
             </div>
@@ -199,6 +199,7 @@ const router = useRouter()
 const userStore = useUserStore()
 const isLoggedIn = computed(() => userStore.isLoggedIn)
 const siteLanguage = inject('siteLanguage', ref(localStorage.getItem('ethan-language') || 'zh'))
+const digitalAvatar = resolveAssetUrl('/photos/ethan-digital-avatar-v1.png')
 
 const ui = computed(() => siteLanguage.value === 'en'
   ? {
@@ -1165,6 +1166,7 @@ watch(() => route.params.id, () => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: 52% 18%;
   border-radius: 16px;
   border: 2px solid rgba(96, 165, 250, 0.3);
   background: rgba(8, 14, 27, 0.92);

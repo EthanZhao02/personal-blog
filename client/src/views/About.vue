@@ -26,8 +26,7 @@
             <span class="neural-node node-b" aria-hidden="true"></span>
             <span class="neural-node node-c" aria-hidden="true"></span>
             <div class="avatar-frame">
-              <img v-if="profile.avatar" :src="profile.avatar" :alt="profile.name" @error="onAvatarError" />
-              <div v-else class="avatar-placeholder">{{ profile.name?.charAt(0) || '?' }}</div>
+              <img :src="digitalAvatar" :alt="`${profile.name || 'Ethan'} digital avatar`" @error="onAvatarError" />
             </div>
             <div class="avatar-glow"></div>
           </div>
@@ -257,6 +256,7 @@ const showEditor = ref(false)
 const saving = ref(false)
 const editForm = ref({})
 const siteLanguage = inject('siteLanguage', ref(localStorage.getItem('ethan-language') || 'zh'))
+const digitalAvatar = resolveAssetUrl('/photos/ethan-digital-avatar-v1.png')
 
 const ui = computed(() => siteLanguage.value === 'en'
   ? {
@@ -541,14 +541,17 @@ const getSocialIcon = (icon) => {
   position: relative; z-index: 2;
 }
 .ai-core-avatar .avatar-frame {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
+  width: 112px;
+  height: 132px;
+  border-radius: 12px;
   border-color: rgba(147, 197, 253, 0.52);
   box-shadow: 0 0 32px rgba(96, 165, 250, 0.16), inset 0 0 24px rgba(96, 165, 250, 0.08);
 }
 .avatar-frame img, .avatar-placeholder {
   width: 100%; height: 100%; object-fit: cover;
+}
+.ai-core-avatar .avatar-frame img {
+  object-position: 52% 18%;
 }
 .avatar-placeholder {
   display: flex; align-items: center; justify-content: center;
@@ -561,8 +564,8 @@ const getSocialIcon = (icon) => {
   animation: glowSpin 6s linear infinite; opacity: 0.5;
 }
 .ai-core-avatar .avatar-glow {
-  inset: 23px;
-  border-radius: 50%;
+  inset: 10px 20px;
+  border-radius: 16px;
   opacity: 0.68;
 }
 .avatar-glow::before {
@@ -570,7 +573,7 @@ const getSocialIcon = (icon) => {
   background: rgba(8, 14, 27, 0.92); border-radius: 19px;
 }
 .ai-core-avatar .avatar-glow::before {
-  border-radius: 50%;
+  border-radius: 13px;
 }
 .neural-ring {
   position: absolute;

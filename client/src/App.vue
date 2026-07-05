@@ -87,9 +87,9 @@
     <!-- 顶部固定导航 -->
     <header class="souta-nav" @click.stop @touchstart.stop>
       <nav class="souta-nav-inner" @click.stop @touchstart.stop>
-        <router-link to="/" class="nav-brand" aria-label="Ethan Nexus">
+        <router-link to="/" class="nav-brand" aria-label="Ethan 智域">
           <strong>Ethan</strong>
-          <span>Nexus</span>
+          <span>智域</span>
         </router-link>
 
         <div class="nav-links" aria-label="Primary navigation">
@@ -150,6 +150,8 @@
         <span>{{ statsCopy.uv }} <strong>{{ formatStat(siteStats.uniqueVisitors) }}</strong></span>
       </div>
     </footer>
+
+    <AIGuide />
   </div>
 </template>
 
@@ -160,6 +162,7 @@ import { useRoute } from 'vue-router'
 import { useUserStore } from './stores/user'
 import { isStaticMode } from './config/site.config'
 import { getSiteStats, recordSiteVisit } from './api/siteStats'
+import AIGuide from './components/AIGuide.vue'
 
 const route = useRoute()
 const router = useRouter()

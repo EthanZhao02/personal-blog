@@ -107,6 +107,7 @@
             <div class="node-info">
               <h3 class="node-name">{{ friend.name }}</h3>
               <p class="node-desc">{{ friend.description }}</p>
+              <span v-if="friend.category" class="node-category">{{ formatFriendCategory(friend.category) }}</span>
             </div>
             <div class="node-status">
               <span class="status-dot" :class="{ 'status-pending': friend.isActive === 0 }"></span>
@@ -282,6 +283,14 @@ const normalizeSubmittedUrl = (value) => {
   if (isHttpUrl(url)) return url
   if (/^[\w.-]+\.[a-z]{2,}(\/.*)?$/i.test(url)) return `https://${url}`
   return url
+}
+const formatFriendCategory = (value) => {
+  const raw = cleanText(value)
+  const normalized = raw.toLowerCase()
+  const map = siteLanguage.value === 'en'
+    ? { tech: 'Tech', other: 'Other', blog: 'Blog', personal: 'Personal' }
+    : { tech: '技术博客', other: '其他站点', blog: '个人博客', personal: '个人站' }
+  return map[normalized] || raw
 }
 
 const useFallbackFriends = () => {
@@ -897,6 +906,25 @@ onMounted(loadFriends)
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+}
+
+.node-category {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 20px;
+  margin-top: 7px;
+  padding: 0 8px;
+  border: 1px solid rgba(147, 197, 253, 0.22);
+  border-radius: 999px;
+  background: rgba(96, 165, 250, 0.08);
+  color: rgba(219, 234, 254, 0.78);
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 状态指示 */

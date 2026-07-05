@@ -66,10 +66,10 @@
             <span></span>
             <span></span>
             <span></span>
-            <strong>NEXUS-VIEW / 2026</strong>
+            <strong>ETHAN-ZHIYU / 2026</strong>
           </div>
 
-          <img :src="activePhoto" alt="Ethan Nexus visual" class="visual-image" />
+          <img :src="activePhoto" alt="Ethan 智域 visual" class="visual-image" />
           <div class="visual-grid" aria-hidden="true"></div>
           <div class="scanner-dial" aria-hidden="true">
             <span></span>
@@ -77,12 +77,12 @@
             <span></span>
           </div>
 
-          <button class="visual-next" type="button" @click="nextPhoto" aria-label="Switch visual">
+          <button v-if="hasMultiplePhotos" class="visual-next" type="button" @click="nextPhoto" aria-label="Switch visual">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
           </button>
 
           <div class="visual-readout">
-            <span>ETHAN NEXUS</span>
+            <span>ETHAN 智域</span>
             <strong>{{ activePhotoIndex }}</strong>
           </div>
         </div>
@@ -347,6 +347,7 @@ const journeyMetrics = computed(() => [
 ])
 
 const activePhoto = computed(() => siteConfig.photos[currentPhoto.value] || siteConfig.photos[0] || '')
+const hasMultiplePhotos = computed(() => siteConfig.photos.length > 1)
 const activePhotoIndex = computed(() => `${String(currentPhoto.value + 1).padStart(2, '0')} / ${String(siteConfig.photos.length || 1).padStart(2, '0')}`)
 const featuredProject = computed(() => projectsData.value[0] || siteConfig.projects?.[0] || {})
 const latestArticles = computed(() => articles.value.slice(0, 4))

@@ -15,10 +15,7 @@ export const isStaticMode = import.meta.env.VITE_STATIC_MODE === 'true'
 
 const avatar = resolveAssetUrl('/photos/avatar-profile.jpg')
 const photos = [
-  resolveAssetUrl('/photos/hero-tech-01.png'),
-  resolveAssetUrl('/photos/hero-tech-02.png'),
-  resolveAssetUrl('/photos/hero-tech-03.png'),
-  resolveAssetUrl('/photos/hero-tech-04.png'),
+  resolveAssetUrl('/photos/ethan-digital-avatar-v1.png'),
 ]
 
 const socials = [
