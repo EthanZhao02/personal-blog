@@ -24,14 +24,14 @@
 
         <h1>
           <span>Ethan</span>
-          Nexus
+          智域
         </h1>
 
         <p class="hero-role">{{ siteConfig.role }}</p>
         <p class="hero-slogan">{{ siteConfig.subtitle }}</p>
 
         <div class="terminal-line" aria-label="Typing intro">
-          <span class="terminal-prompt">~/ethan-nexus</span>
+          <span class="terminal-prompt">~/ethan-zhiyu</span>
           <strong>{{ typedText }}</strong>
           <span class="cursor-blink">_</span>
         </div>

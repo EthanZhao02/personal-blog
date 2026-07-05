@@ -8,10 +8,17 @@
       <!-- 便签墙 -->
       <section class="message-lab">
         <aside class="note-composer">
-          <div class="composer-orbit" aria-hidden="true">
-            <span></span>
-            <span></span>
-            <span></span>
+          <div class="composer-signal" aria-hidden="true">
+            <div class="signal-stack">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="signal-copy">
+              <strong>{{ ui.signalTitle }}</strong>
+              <small>{{ ui.signalText }}</small>
+            </div>
           </div>
           <div class="composer-head">
             <span>{{ ui.uplink }}</span>
@@ -155,6 +162,8 @@ const ui = computed(() => siteLanguage.value === 'en'
       title: 'Message Board',
       desc: 'Leave a note, idea, or link request.',
       uplink: 'NOTE UPLINK',
+      signalTitle: 'CHANNEL READY',
+      signalText: 'GitHub discussion bridge',
       githubMode: 'GITHUB DISCUSSION',
       syncing: 'SYNCING',
       ready: 'READY',
@@ -184,6 +193,8 @@ const ui = computed(() => siteLanguage.value === 'en'
       title: '留言板',
       desc: '在这里留下一张便签、一个想法或一条建议',
       uplink: 'NOTE UPLINK',
+      signalTitle: '留言通道已就绪',
+      signalText: '接入 GitHub Discussions 留言区',
       githubMode: 'GITHUB DISCUSSION',
       syncing: 'SYNCING',
       ready: 'READY',
@@ -455,47 +466,80 @@ onMounted(loadMessages)
   clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
 }
 
-.composer-orbit {
-  width: 126px;
-  height: 126px;
-  margin: 0 auto 18px;
+.composer-signal {
   position: relative;
   display: grid;
-  place-items: center;
-  border-radius: 999px;
-  border: 1px solid rgba(147, 197, 253, 0.22);
-  box-shadow: inset 0 0 28px rgba(96, 165, 250, 0.08), 0 0 34px rgba(96, 165, 250, 0.08);
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  min-height: 76px;
+  margin-bottom: 18px;
+  padding: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(147, 197, 253, 0.18);
+  border-radius: 8px;
+  background:
+    linear-gradient(100deg, rgba(96, 165, 250, 0.1), transparent 48%),
+    rgba(5, 8, 22, 0.34);
 }
 
-.composer-orbit::before,
-.composer-orbit::after {
+.composer-signal::before {
   content: '';
   position: absolute;
-  inset: 16px;
-  border-radius: inherit;
-  border: 1px dashed rgba(167, 139, 250, 0.34);
-  animation: noteSpin 9s linear infinite;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent, rgba(147, 197, 253, 0.12), transparent),
+    repeating-linear-gradient(90deg, rgba(147, 197, 253, 0.08) 0 1px, transparent 1px 18px);
+  opacity: 0.44;
+  transform: translateX(-60%);
+  animation: signalSweep 4.8s ease-in-out infinite;
 }
 
-.composer-orbit::after {
-  inset: 35px;
-  border-color: rgba(96, 165, 250, 0.42);
-  animation-duration: 5.5s;
-  animation-direction: reverse;
+.signal-stack,
+.signal-copy {
+  position: relative;
+  z-index: 1;
 }
 
-.composer-orbit span {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #dbeafe;
-  box-shadow: 0 0 16px rgba(96, 165, 250, 0.76);
+.signal-stack {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  align-items: end;
+  height: 42px;
 }
 
-.composer-orbit span:nth-child(1) { transform: translate(44px, -28px); }
-.composer-orbit span:nth-child(2) { transform: translate(-46px, 18px); background: #a78bfa; }
-.composer-orbit span:nth-child(3) { transform: translate(8px, 48px); background: #ffbd66; }
+.signal-stack span {
+  display: block;
+  min-height: 12px;
+  border-radius: 999px 999px 3px 3px;
+  background: linear-gradient(180deg, #dbeafe, #60a5fa);
+  box-shadow: 0 0 18px rgba(96, 165, 250, 0.48);
+  animation: signalPulse 1.9s ease-in-out infinite;
+}
+
+.signal-stack span:nth-child(1) { height: 18px; animation-delay: -0.2s; opacity: 0.54; }
+.signal-stack span:nth-child(2) { height: 30px; animation-delay: -0.55s; opacity: 0.74; }
+.signal-stack span:nth-child(3) { height: 42px; animation-delay: -0.9s; }
+.signal-stack span:nth-child(4) { height: 25px; animation-delay: -1.25s; opacity: 0.64; }
+
+.signal-copy strong,
+.signal-copy small {
+  display: block;
+}
+
+.signal-copy strong {
+  color: #eef7ff;
+  font: 900 12px/1.2 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.12em;
+}
+
+.signal-copy small {
+  margin-top: 6px;
+  color: rgba(226, 239, 255, 0.48);
+  font-size: 12px;
+  line-height: 1.45;
+}
 
 .composer-head {
   display: flex;
@@ -826,8 +870,15 @@ onMounted(loadMessages)
   color: rgba(226, 239, 255, 0.46) !important;
 }
 
-@keyframes noteSpin {
-  to { transform: rotate(360deg); }
+@keyframes signalSweep {
+  0%, 22% { transform: translateX(-70%); opacity: 0; }
+  48% { opacity: 0.6; }
+  100% { transform: translateX(70%); opacity: 0; }
+}
+
+@keyframes signalPulse {
+  0%, 100% { transform: scaleY(0.86); filter: brightness(0.84); }
+  50% { transform: scaleY(1); filter: brightness(1.18); }
 }
 
 @keyframes noteIn {

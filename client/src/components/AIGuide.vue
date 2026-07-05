@@ -35,6 +35,31 @@
           </button>
         </div>
 
+        <div v-if="chatMessages.length" ref="chatLogRef" class="guide-chat-log" :aria-label="copy.chatLabel">
+          <div
+            v-for="(message, index) in chatMessages"
+            :key="`${message.role}-${index}`"
+            class="guide-chat-bubble"
+            :class="message.role"
+          >
+            {{ message.content }}
+          </div>
+        </div>
+
+        <form class="guide-chat" :aria-label="copy.chatLabel" @submit.prevent="sendChat">
+          <input
+            v-model="chatInput"
+            type="text"
+            :placeholder="copy.chatPlaceholder"
+            maxlength="180"
+          />
+          <button type="submit" :disabled="!chatInput.trim() || chatLoading">
+            {{ chatLoading ? copy.thinking : copy.send }}
+          </button>
+        </form>
+
+        <p class="guide-mode">{{ remoteChatEnabled ? copy.realMode : copy.localMode }}</p>
+
         <div class="guide-actions" :aria-label="copy.actionLabel">
           <button
             v-for="action in actions"
@@ -69,7 +94,7 @@
 </template>
 
 <script setup>
-import { computed, inject, ref } from 'vue'
+import { computed, inject, nextTick, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { resolveAssetUrl } from '../config/site.config'
 
@@ -78,7 +103,14 @@ const router = useRouter()
 const siteLanguage = inject('siteLanguage', ref(localStorage.getItem('ethan-language') || 'zh'))
 const isOpen = ref(false)
 const activePromptId = ref('intro')
+const chatInput = ref('')
+const chatLoading = ref(false)
+const chatMessages = ref([])
+const chatLogRef = ref(null)
 const avatarUrl = resolveAssetUrl('/photos/ethan-digital-avatar-v1.png')
+const configuredChatEndpoint = (import.meta.env.VITE_AI_CHAT_ENDPOINT || '').trim()
+const chatEndpoint = configuredChatEndpoint || '/api/ai/chat'
+const remoteChatEnabled = computed(() => Boolean(configuredChatEndpoint))
 
 const copy = computed(() => siteLanguage.value === 'en'
   ? {
@@ -87,6 +119,12 @@ const copy = computed(() => siteLanguage.value === 'en'
       answerLabel: 'Response',
       promptLabel: 'Preset questions',
       actionLabel: 'Quick navigation',
+      chatLabel: 'Ask Ethan AI',
+      chatPlaceholder: 'Ask about posts, projects, links...',
+      send: 'Send',
+      thinking: 'Thinking',
+      realMode: 'Real AI endpoint enabled.',
+      localMode: 'Local guide mode. Set VITE_AI_CHAT_ENDPOINT to enable real AI.',
       open: 'Open Ethan AI Guide',
       close: 'Close Ethan AI Guide',
     }
@@ -96,6 +134,12 @@ const copy = computed(() => siteLanguage.value === 'en'
       answerLabel: '应答',
       promptLabel: '预设问题',
       actionLabel: '快捷导航',
+      chatLabel: '询问 Ethan AI',
+      chatPlaceholder: '问文章、项目、友链或博客结构...',
+      send: '发送',
+      thinking: '思考中',
+      realMode: '真实 AI 接口已启用。',
+      localMode: '本地导览模式。配置 VITE_AI_CHAT_ENDPOINT 后可接入真实 AI。',
       open: '打开 Ethan 数字分身',
       close: '关闭 Ethan 数字分身',
     })
@@ -154,6 +198,82 @@ const actions = computed(() => siteLanguage.value === 'en'
 
 const activePrompt = computed(() => prompts.value.find(item => item.id === activePromptId.value) || prompts.value[0])
 
+const scrollChatToBottom = async () => {
+  await nextTick()
+  if (chatLogRef.value) {
+    chatLogRef.value.scrollTop = chatLogRef.value.scrollHeight
+  }
+}
+
+const localGuideAnswer = (question = '') => {
+  const normalized = question.toLowerCase()
+  const isEn = siteLanguage.value === 'en'
+
+  if (normalized.includes('friend') || normalized.includes('link') || question.includes('友链')) {
+    return isEn
+      ? 'Open Friends, submit the application form, then Ethan can review it from the admin side.'
+      : '进入友链页点击申请友链，填写站点名称、链接、头像和简介。管理员登录后可以审核，通过后会显示在友链页。'
+  }
+
+  if (normalized.includes('project') || normalized.includes('nlp') || normalized.includes('ai') || question.includes('项目') || question.includes('人工智能')) {
+    return isEn
+      ? 'Start with Projects. The current focus is a portfolio blog, backend practice, and NLP or AI engineering work.'
+      : '可以先看项目矩阵：这里会集中展示博客、后端实践、NLP/AI 工程和后续毕业设计相关沉淀。'
+  }
+
+  if (normalized.includes('post') || normalized.includes('article') || question.includes('文章') || question.includes('学习')) {
+    return isEn
+      ? 'Posts are the learning archive: frontend, backend, AI notes, project writeups, and review materials.'
+      : '文章归档适合看学习路线、技术笔记、项目复盘和后续复试/论文准备材料。'
+  }
+
+  if (normalized.includes('open') || normalized.includes('source') || question.includes('开源')) {
+    return isEn
+      ? 'The blog can be public as a portfolio. Graduation-project code should stay private until the thesis and defense are stable.'
+      : '博客适合公开展示；毕业设计项目还在论文和开发阶段，建议先保持私有，等答辩和核心实验稳定后再考虑开源。'
+  }
+
+  return isEn
+    ? activePrompt.value.answer
+    : '我现在是本地导览模式，可以回答博客结构、文章、项目、友链和留言相关问题。接入真实 AI 后，就可以根据站内内容做更自然的连续对话。'
+}
+
+const sendChat = async () => {
+  const question = chatInput.value.trim()
+  if (!question || chatLoading.value) return
+
+  chatMessages.value.push({ role: 'user', content: question })
+  chatInput.value = ''
+  chatLoading.value = true
+  await scrollChatToBottom()
+
+  try {
+    let answer = ''
+    if (remoteChatEnabled.value) {
+      const response = await fetch(chatEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question,
+          locale: siteLanguage.value,
+          messages: chatMessages.value.slice(-8),
+          page: route.path,
+        }),
+      })
+      if (!response.ok) throw new Error(`AI endpoint failed: ${response.status}`)
+      const data = await response.json()
+      answer = data.answer || data.message || data.output_text || ''
+    }
+    chatMessages.value.push({ role: 'assistant', content: answer || localGuideAnswer(question) })
+  } catch (error) {
+    if (import.meta.env.DEV) console.info('AI guide fallback', error?.message || error)
+    chatMessages.value.push({ role: 'assistant', content: localGuideAnswer(question) })
+  } finally {
+    chatLoading.value = false
+    await scrollChatToBottom()
+  }
+}
+
 const go = async (to) => {
   await router.push(to)
   isOpen.value = false
@@ -179,7 +299,7 @@ const go = async (to) => {
   z-index: 2;
   right: 0;
   bottom: 92px;
-  width: min(378px, calc(100vw - 28px));
+  width: min(416px, calc(100vw - 28px));
   overflow: hidden;
   isolation: isolate;
   border: 1px solid rgba(96, 165, 250, 0.32);
@@ -205,6 +325,9 @@ const go = async (to) => {
 .guide-head,
 .guide-answer,
 .guide-prompts,
+.guide-chat-log,
+.guide-chat,
+.guide-mode,
 .guide-actions {
   position: relative;
   z-index: 1;
@@ -344,6 +467,96 @@ const go = async (to) => {
   border-color: rgba(96, 165, 250, 0.52);
   color: #f8fbff;
   background: rgba(96, 165, 250, 0.1);
+}
+
+.guide-chat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 144px;
+  margin: 0 16px 12px;
+  padding: 10px;
+  overflow-y: auto;
+  border: 1px solid rgba(147, 197, 253, 0.14);
+  border-radius: 8px;
+  background: rgba(5, 8, 22, 0.34);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(96, 165, 250, 0.4) transparent;
+}
+
+.guide-chat-bubble {
+  max-width: 88%;
+  padding: 8px 10px;
+  border: 1px solid rgba(147, 197, 253, 0.14);
+  border-radius: 8px;
+  color: rgba(238, 247, 255, 0.84);
+  font-size: 12px;
+  line-height: 1.65;
+  word-break: break-word;
+}
+
+.guide-chat-bubble.user {
+  align-self: flex-end;
+  border-color: rgba(96, 165, 250, 0.32);
+  background: rgba(96, 165, 250, 0.14);
+}
+
+.guide-chat-bubble.assistant {
+  align-self: flex-start;
+  background: rgba(8, 14, 27, 0.62);
+}
+
+.guide-chat {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 70px;
+  gap: 8px;
+  padding: 0 16px 8px;
+}
+
+.guide-chat input,
+.guide-chat button {
+  min-height: 38px;
+  border-radius: 8px;
+  font-size: 12px;
+  outline: none;
+}
+
+.guide-chat input {
+  min-width: 0;
+  border: 1px solid rgba(147, 197, 253, 0.16);
+  background: rgba(5, 8, 22, 0.46);
+  color: #f8fbff;
+  padding: 0 12px;
+}
+
+.guide-chat input:focus {
+  border-color: rgba(96, 165, 250, 0.5);
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.08);
+}
+
+.guide-chat button {
+  border: 1px solid rgba(96, 165, 250, 0.42);
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.18), rgba(167, 139, 250, 0.18));
+  color: #eef7ff;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.22s var(--ease-out), border-color 0.22s, opacity 0.22s;
+}
+
+.guide-chat button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(147, 197, 253, 0.64);
+}
+
+.guide-chat button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.guide-mode {
+  margin: 0 16px 12px;
+  color: rgba(226, 239, 255, 0.4);
+  font: 700 10px/1.5 'SF Mono', 'Consolas', monospace;
 }
 
 .guide-actions {
@@ -540,6 +753,7 @@ const go = async (to) => {
   .guide-panel-leave-active,
   .guide-orb,
   .guide-prompts button,
+  .guide-chat button,
   .guide-actions button {
     transition: none !important;
   }

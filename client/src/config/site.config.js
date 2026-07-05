@@ -135,9 +135,9 @@ const tags = [
 const articles = [
   {
     id: 1,
-    title: 'Ethan Nexus：把个人博客升级成知识与项目档案',
+    title: 'Ethan 智域：把个人博客升级成知识与项目档案',
     summary: '这次改版把首页从普通文章入口升级为面向复试、求职和长期成长记录的个人技术枢纽。',
-    content: `# Ethan Nexus：把个人博客升级成知识与项目档案
+    content: `# Ethan 智域：把个人博客升级成知识与项目档案
 
 这个站点不只承担生活记录，更重要的是成为一个长期可访问的个人数字空间：展示项目、技术文章、学习路线、研究兴趣和成长时间线。
 
@@ -227,7 +227,7 @@ database/init.sql 是初始化 MySQL 数据的脚本，包含默认管理员账�
 const projects = [
   {
     id: 1,
-    name: 'Ethan Nexus',
+    name: 'Ethan 智域',
     description: '面向复试、求职和长期成长记录的个人技术博客，整合项目、文章、学习路线、研究兴趣和联系入口。',
     icon: '◇',
     tag: 'Portfolio',
@@ -305,7 +305,7 @@ const researchInterests = [
 const timeline = [
   {
     time: '2026',
-    title: 'Ethan Nexus 改版',
+    title: 'Ethan 智域改版',
     text: '把博客重构为作品集、学习档案与工程实践入口。',
   },
   {
@@ -355,7 +355,7 @@ const messages = [
     id: 1,
     nickname: 'Ethan',
     avatar,
-    content: '欢迎来到 Ethan Nexus。这里是一面便签墙，可以留下建议、问候或项目反馈。',
+    content: '欢迎来到 Ethan 智域。这里是一面便签墙，可以留下建议、问候或项目反馈。',
     createTime: '2026-07-03T10:00:00',
   },
   {

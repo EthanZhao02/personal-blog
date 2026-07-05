@@ -10,6 +10,19 @@
 
 基于 Vue3 + SpringBoot + MySQL 构建的个人博客系统，适合考研复试展示。
 
+## 真实 AI 聊天配置
+
+前端右下角的 Ethan 数字分身默认使用本地导览回答。要接入真实 AI，需要把密钥放在后端或 Cloudflare Pages Function，不能写进 Vue 前端代码。
+
+Cloudflare Pages 推荐配置：
+
+1. 在 Cloudflare Pages 项目里添加环境变量 `OPENAI_API_KEY`。
+2. 可选添加 `OPENAI_MODEL`，不配置时默认使用 `gpt-5.5`。
+3. 在前端生产环境变量里设置 `VITE_AI_CHAT_ENDPOINT=/api/ai/chat`。
+4. 重新部署后，页面聊天框会请求 `functions/api/ai/chat.js`，由 Cloudflare 代替前端调用 OpenAI Responses API。
+
+GitHub Pages 只能托管静态文件，不能运行 `functions/api/ai/chat.js`。如果只用 GitHub Pages，可以继续使用本地导览模式，或把 `VITE_AI_CHAT_ENDPOINT` 指向一个单独部署的 HTTPS 后端接口。
+
 ## 技术栈
 
 ### 前端
