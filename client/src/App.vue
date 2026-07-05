@@ -14,6 +14,13 @@
     <transition name="welcome">
       <section v-if="welcomeVisible" class="welcome-portal" aria-label="欢迎进入个人博客" @click.stop @touchstart.stop>
         <div class="portal-grid" aria-hidden="true"></div>
+        <div class="welcome-stage" aria-hidden="true">
+          <span class="stage-starfield"></span>
+          <span class="stage-mesh"></span>
+          <span class="stage-mountain mountain-back"></span>
+          <span class="stage-mountain mountain-front"></span>
+          <span class="stage-scanline"></span>
+        </div>
         <div class="portal-core" aria-hidden="true">
           <span class="portal-ring ring-a"></span>
           <span class="portal-ring ring-b"></span>
@@ -29,6 +36,12 @@
           <span class="welcome-code">{{ welcomeCopy.code }}</span>
           <h1>{{ welcomeCopy.title }}</h1>
           <p>{{ welcomeCopy.desc }}</p>
+          <div class="welcome-tech" aria-hidden="true">
+            <span>Vue.js</span>
+            <span>Spring Boot</span>
+            <span>NLP</span>
+            <span>Blender</span>
+          </div>
           <div class="welcome-progress" aria-hidden="true"><span></span></div>
           <button class="welcome-enter" type="button" @click="enterWelcome">
             <span>{{ welcomeCopy.action }}</span>
@@ -174,14 +187,19 @@ const showWelcome = ref(false)
 const showTimeGate = ref(false)
 const timeGateMode = ref('future')
 const siteStats = ref({ pageViews: null, uniqueVisitors: null })
+const scrollProgress = ref(0)
 let welcomeTimer = null
 let lastTrackedPath = ''
+let scrollFrame = null
 
 provide('siteLanguage', language)
 
 const pointerStyle = computed(() => ({
   '--cursor-x': pointer.value.x,
   '--cursor-y': pointer.value.y,
+  '--scroll-progress': scrollProgress.value.toFixed(4),
+  '--scroll-depth': `${Math.round(scrollProgress.value * 120)}px`,
+  '--scroll-drift': `${Math.round(scrollProgress.value * -80)}px`,
 }))
 
 const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
@@ -214,15 +232,15 @@ const themeTitle = computed(() => (themeMode.value === 'dark' ? '切换到柔和
 const welcomeVisible = computed(() => showWelcome.value && route.path === '/')
 const welcomeCopy = computed(() => language.value === 'zh'
   ? {
-      code: '个人博客 / 正在启动',
+      code: 'VL-INTERACTIF / ETHAN BLOG BOOT',
       title: '欢迎来到我的博客',
-      desc: '正在进入个人空间，接入文章、项目、生命轨迹与 AI 档案。',
+      desc: '正在接入文章、项目、生命轨迹与 AI 数字档案，准备进入 Ethan 的个人技术空间。',
       action: '进入博客',
     }
   : {
-      code: 'Personal Blog / Starting',
+      code: 'VL-INTERACTIF / ETHAN BLOG BOOT',
       title: 'Welcome to My Blog',
-      desc: 'Entering a personal space for articles, projects, timeline, and AI archive.',
+      desc: 'Connecting articles, projects, life timeline, and AI archive before entering Ethan personal tech space.',
       action: 'Enter Blog',
     })
 
@@ -444,12 +462,26 @@ const dropCandy = (e) => {
 const startWelcomeIfHome = () => {
   if (route.path !== '/') return
   showWelcome.value = true
-  welcomeTimer = window.setTimeout(enterWelcome, 7600)
+  welcomeTimer = window.setTimeout(enterWelcome, 8600)
+}
+
+const updateScrollProgress = () => {
+  const doc = document.documentElement
+  const max = Math.max(doc.scrollHeight - window.innerHeight, 1)
+  scrollProgress.value = Math.min(Math.max(window.scrollY / max, 0), 1)
+  scrollFrame = null
+}
+
+const handleScroll = () => {
+  if (scrollFrame) return
+  scrollFrame = window.requestAnimationFrame(updateScrollProgress)
 }
 
 onMounted(async () => {
   applyTheme()
   await router.isReady()
+  updateScrollProgress()
+  window.addEventListener('scroll', handleScroll, { passive: true })
   trackSiteVisit(route.fullPath)
   startWelcomeIfHome()
 
@@ -483,6 +515,8 @@ watch(() => route.fullPath, (path) => {
 
 onUnmounted(() => {
   if (welcomeTimer) clearTimeout(welcomeTimer)
+  if (scrollFrame) cancelAnimationFrame(scrollFrame)
+  window.removeEventListener('scroll', handleScroll)
 })
 </script>
 
@@ -522,13 +556,41 @@ onUnmounted(() => {
   overflow: hidden;
   padding: 28px;
   background:
-    radial-gradient(circle at 50% 48%, rgba(96, 165, 250, 0.22), transparent 30%),
-    radial-gradient(circle at 50% 48%, rgba(124, 58, 237, 0.22), transparent 52%),
-    linear-gradient(135deg, rgba(3, 7, 18, 0.98), rgba(6, 13, 34, 0.96));
+    radial-gradient(circle at 50% 44%, rgba(96, 165, 250, 0.24), transparent 30%),
+    radial-gradient(circle at 52% 54%, rgba(124, 58, 237, 0.22), transparent 52%),
+    linear-gradient(135deg, rgba(2, 6, 18, 0.99), rgba(8, 13, 35, 0.98));
+}
+
+.welcome-portal::before,
+.welcome-portal::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.welcome-portal::before {
+  z-index: 0;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(96, 165, 250, 0.16), transparent 26%),
+    radial-gradient(circle at 82% 28%, rgba(167, 139, 250, 0.14), transparent 28%),
+    radial-gradient(circle at 50% 100%, rgba(14, 165, 233, 0.14), transparent 38%);
+  animation: stageGlow 8.2s ease-in-out infinite;
+}
+
+.welcome-portal::after {
+  z-index: 4;
+  background:
+    linear-gradient(180deg, transparent 0 48%, rgba(147, 197, 253, 0.08) 49%, transparent 50% 100%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.026) 0 1px, transparent 1px 5px);
+  mix-blend-mode: screen;
+  opacity: 0.62;
+  animation: bootScan 3.6s linear infinite;
 }
 
 .portal-grid {
   position: absolute;
+  z-index: 1;
   inset: 0;
   background:
     linear-gradient(90deg, rgba(147, 197, 253, 0.05) 1px, transparent 1px) 0 0 / 72px 72px,
@@ -538,8 +600,78 @@ onUnmounted(() => {
   animation: portalGrid 7s linear infinite;
 }
 
+.welcome-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 900px;
+}
+
+.stage-starfield {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle, rgba(238, 247, 255, 0.72) 0 1px, transparent 1.6px) 10% 18% / 138px 138px,
+    radial-gradient(circle, rgba(147, 197, 253, 0.6) 0 1px, transparent 1.6px) 0 0 / 220px 220px;
+  opacity: 0.45;
+  animation: starDrift 18s linear infinite;
+}
+
+.stage-mesh {
+  position: absolute;
+  left: -12%;
+  right: -12%;
+  bottom: -12%;
+  height: 54%;
+  background:
+    linear-gradient(90deg, rgba(96, 165, 250, 0.18) 1px, transparent 1px) 0 0 / 72px 72px,
+    linear-gradient(0deg, rgba(167, 139, 250, 0.16) 1px, transparent 1px) 0 0 / 72px 72px;
+  transform: rotateX(66deg) translateY(8%);
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 0 28px rgba(96, 165, 250, 0.18));
+  mask-image: linear-gradient(180deg, transparent 0%, #000 36%, #000 86%, transparent 100%);
+  animation: meshRunway 6.8s linear infinite;
+}
+
+.stage-mountain {
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: 15%;
+  height: 32%;
+  clip-path: polygon(0 82%, 7% 58%, 15% 74%, 23% 32%, 33% 70%, 42% 44%, 51% 72%, 61% 24%, 72% 76%, 82% 48%, 91% 69%, 100% 38%, 100% 100%, 0 100%);
+  background:
+    linear-gradient(180deg, rgba(96, 165, 250, 0.22), rgba(7, 11, 30, 0.62)),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.18), rgba(167, 139, 250, 0.16));
+  opacity: 0.42;
+  filter: blur(0.2px) drop-shadow(0 0 32px rgba(96, 165, 250, 0.16));
+  animation: mountainDrift 9s ease-in-out infinite;
+}
+
+.mountain-front {
+  bottom: 5%;
+  height: 38%;
+  opacity: 0.58;
+  clip-path: polygon(0 74%, 9% 46%, 17% 66%, 27% 26%, 38% 72%, 49% 42%, 57% 66%, 68% 20%, 78% 70%, 88% 38%, 100% 72%, 100% 100%, 0 100%);
+  animation-delay: -2s;
+}
+
+.stage-scanline {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(147, 197, 253, 0.9), rgba(167, 139, 250, 0.7), transparent);
+  box-shadow: 0 0 22px rgba(96, 165, 250, 0.42);
+  animation: horizonScan 4.4s ease-in-out infinite;
+}
+
 .portal-core {
   position: absolute;
+  z-index: 2;
   width: min(70vw, 680px);
   aspect-ratio: 1;
   display: grid;
@@ -600,7 +732,7 @@ onUnmounted(() => {
 
 .welcome-copy {
   position: relative;
-  z-index: 1;
+  z-index: 5;
   width: min(920px, 100%);
   max-width: calc(100vw - 56px);
   text-align: center;
@@ -642,21 +774,51 @@ onUnmounted(() => {
   line-height: 1.9;
 }
 
+.welcome-tech {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px auto 0;
+}
+
+.welcome-tech span {
+  min-height: 30px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 12px;
+  border: 1px solid rgba(147, 197, 253, 0.22);
+  border-radius: 999px;
+  background: rgba(8, 14, 27, 0.34);
+  color: rgba(226, 239, 255, 0.68);
+  font: 800 10px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.1em;
+  box-shadow: inset 0 0 18px rgba(96, 165, 250, 0.04);
+  animation: techWake 3.8s ease-in-out infinite;
+}
+
+.welcome-tech span:nth-child(2) { animation-delay: 0.3s; }
+.welcome-tech span:nth-child(3) { animation-delay: 0.6s; }
+.welcome-tech span:nth-child(4) { animation-delay: 0.9s; }
+
 .welcome-progress {
   width: min(440px, 82%);
-  height: 2px;
+  height: 3px;
   margin: 28px auto 26px;
   overflow: hidden;
-  background: rgba(147, 197, 253, 0.15);
+  border-radius: 999px;
+  background: rgba(147, 197, 253, 0.12);
+  box-shadow: inset 0 0 18px rgba(96, 165, 250, 0.06);
 }
 
 .welcome-progress span {
   display: block;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #60a5fa, #a78bfa, #ffffff);
+  background: linear-gradient(90deg, #60a5fa, #a78bfa, #ffffff, #93c5fd);
+  box-shadow: 0 0 18px rgba(96, 165, 250, 0.46);
   transform-origin: left;
-  animation: portalLoad 7.2s var(--ease-out) forwards;
+  animation: portalLoad 8.2s var(--ease-out) forwards;
 }
 
 .welcome-enter {
@@ -723,6 +885,41 @@ onUnmounted(() => {
   to { transform: translate3d(72px, 72px, 0); }
 }
 
+@keyframes stageGlow {
+  0%, 100% { opacity: 0.78; filter: saturate(1); }
+  50% { opacity: 1; filter: saturate(1.18); }
+}
+
+@keyframes bootScan {
+  from { transform: translateY(-18%); }
+  to { transform: translateY(18%); }
+}
+
+@keyframes starDrift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-120px, 80px, 0); }
+}
+
+@keyframes meshRunway {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 72px, 0 72px; }
+}
+
+@keyframes mountainDrift {
+  0%, 100% { transform: translate3d(-1.2%, 0, 0) scale(1.02); }
+  50% { transform: translate3d(1.2%, 1.8%, 0) scale(1.04); }
+}
+
+@keyframes horizonScan {
+  0%, 100% { opacity: 0.22; transform: translateY(-90px) scaleX(0.72); }
+  48% { opacity: 0.92; transform: translateY(82px) scaleX(1); }
+}
+
+@keyframes techWake {
+  0%, 100% { opacity: 0.5; transform: translateY(0); }
+  50% { opacity: 0.94; transform: translateY(-2px); }
+}
+
 @keyframes portalSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -759,6 +956,8 @@ onUnmounted(() => {
     linear-gradient(145deg, transparent 0 58%, rgba(167, 139, 250, 0.05) 58.5% 59%, transparent 59.5% 100%) 80px 40px / 300px 300px,
     radial-gradient(circle, rgba(238, 247, 255, 0.32) 0 1px, transparent 1.6px) 0 0 / 138px 138px;
   opacity: 0.82;
+  transform: translate3d(0, var(--scroll-drift, 0px), 0);
+  transition: transform 0.12s linear;
 }
 
 .ambient-layer::before,
@@ -1522,6 +1721,13 @@ onUnmounted(() => {
 @media (prefers-reduced-motion: reduce) {
   .candy,
   .ambient-line,
+  .welcome-portal::before,
+  .welcome-portal::after,
+  .stage-starfield,
+  .stage-mesh,
+  .stage-mountain,
+  .stage-scanline,
+  .welcome-tech span,
   .portal-grid,
   .portal-ring,
   .portal-beam,

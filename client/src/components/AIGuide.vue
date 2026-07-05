@@ -9,7 +9,7 @@
             <span class="portrait-scan" aria-hidden="true"></span>
           </div>
           <div>
-            <span class="guide-code">ETHAN-AI / ONLINE</span>
+            <span class="guide-code">{{ copy.code }}</span>
             <h2>{{ copy.title }}</h2>
             <p>{{ copy.subtitle }}</p>
           </div>
@@ -115,6 +115,7 @@ const remoteChatEnabled = computed(() => Boolean(configuredChatEndpoint))
 const copy = computed(() => siteLanguage.value === 'en'
   ? {
       title: 'Ethan AI Guide',
+      code: remoteChatEnabled.value ? 'ETHAN-AI / ONLINE' : 'ETHAN-AI / LOCAL GUIDE',
       subtitle: 'A lightweight digital guide for projects, articles, links, and messages.',
       answerLabel: 'Response',
       promptLabel: 'Preset questions',
@@ -124,12 +125,13 @@ const copy = computed(() => siteLanguage.value === 'en'
       send: 'Send',
       thinking: 'Thinking',
       realMode: 'Real AI endpoint enabled.',
-      localMode: 'Local guide mode. Set VITE_AI_CHAT_ENDPOINT to enable real AI.',
+      localMode: 'Local guide mode. Stable site navigation is available now.',
       open: 'Open Ethan AI Guide',
       close: 'Close Ethan AI Guide',
     }
   : {
       title: 'Ethan 数字分身',
+      code: remoteChatEnabled.value ? 'ETHAN-AI / ONLINE' : 'ETHAN-AI / 本地导览',
       subtitle: '负责带你快速进入文章、项目、友链申请和留言入口。',
       answerLabel: '应答',
       promptLabel: '预设问题',
@@ -139,7 +141,7 @@ const copy = computed(() => siteLanguage.value === 'en'
       send: '发送',
       thinking: '思考中',
       realMode: '真实 AI 接口已启用。',
-      localMode: '本地导览模式。配置 VITE_AI_CHAT_ENDPOINT 后可接入真实 AI。',
+      localMode: '当前为本地导览模式，先稳定负责站内问答与跳转。',
       open: '打开 Ethan 数字分身',
       close: '关闭 Ethan 数字分身',
     })
@@ -299,25 +301,67 @@ const go = async (to) => {
   z-index: 2;
   right: 0;
   bottom: 92px;
-  width: min(416px, calc(100vw - 28px));
+  width: min(440px, calc(100vw - 28px));
   overflow: hidden;
   isolation: isolate;
-  border: 1px solid rgba(96, 165, 250, 0.32);
+  border: 0;
   border-radius: 8px;
   background:
-    linear-gradient(135deg, rgba(11, 22, 43, 0.94), rgba(4, 8, 20, 0.92)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)),
+    linear-gradient(135deg, rgba(10, 20, 42, 0.76), rgba(3, 7, 18, 0.82)),
     repeating-linear-gradient(90deg, rgba(147, 197, 253, 0.05) 0 1px, transparent 1px 64px);
-  box-shadow: 0 28px 88px rgba(0, 0, 0, 0.48), inset 0 0 80px rgba(96, 165, 250, 0.06);
+  background-blend-mode: luminosity, normal, normal;
+  box-shadow: 0 30px 96px rgba(0, 0, 0, 0.52), inset 0 1px 1px rgba(255, 255, 255, 0.1), inset 0 0 80px rgba(96, 165, 250, 0.06);
   backdrop-filter: blur(18px) saturate(1.22);
+  -webkit-backdrop-filter: blur(18px) saturate(1.22);
+}
+
+.guide-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.45) 0%,
+    rgba(255,255,255,0.15) 20%,
+    rgba(255,255,255,0) 40%,
+    rgba(255,255,255,0) 60%,
+    rgba(255,255,255,0.15) 80%,
+    rgba(255,255,255,0.45) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.guide-panel::after {
+  content: '';
+  position: absolute;
+  inset: -40% -20% auto;
+  z-index: 1;
+  height: 42%;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, transparent, rgba(96, 165, 250, 0.16), transparent),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.075) 0 1px, transparent 1px 12px);
+  opacity: 0.48;
+  transform: rotate(-7deg);
+  animation: guidePanelScan 5.4s ease-in-out infinite;
+  mix-blend-mode: screen;
 }
 
 .guide-panel-bg {
   position: absolute;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 20% 10%, rgba(96, 165, 250, 0.22), transparent 34%),
-    radial-gradient(circle at 88% 42%, rgba(167, 139, 250, 0.16), transparent 32%),
+    radial-gradient(circle at 20% 10%, rgba(96, 165, 250, 0.24), transparent 34%),
+    radial-gradient(circle at 88% 42%, rgba(167, 139, 250, 0.18), transparent 32%),
     linear-gradient(120deg, transparent 0 44%, rgba(147, 197, 253, 0.08) 48%, transparent 56%);
   opacity: 0.9;
 }
@@ -330,27 +374,47 @@ const go = async (to) => {
 .guide-mode,
 .guide-actions {
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
 
 .guide-head {
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr) 34px;
-  gap: 12px;
+  grid-template-columns: 76px minmax(0, 1fr) 34px;
+  gap: 13px;
   align-items: center;
-  padding: 16px;
+  padding: 17px;
   border-bottom: 1px solid rgba(147, 197, 253, 0.16);
 }
 
 .guide-portrait {
   position: relative;
-  width: 72px;
-  height: 86px;
+  width: 76px;
+  height: 92px;
   overflow: hidden;
   border: 1px solid rgba(147, 197, 253, 0.34);
   border-radius: 8px;
   background: rgba(5, 8, 22, 0.6);
   box-shadow: 0 0 28px rgba(96, 165, 250, 0.14);
+}
+
+.guide-portrait::before,
+.guide-portrait::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  z-index: 2;
+  border: 1px solid rgba(147, 197, 253, 0.2);
+  border-radius: 999px;
+  pointer-events: none;
+  animation: radarSpin 8s linear infinite;
+}
+
+.guide-portrait::after {
+  inset: 17px 7px;
+  border-style: dashed;
+  border-color: rgba(167, 139, 250, 0.26);
+  animation-duration: 5.6s;
+  animation-direction: reverse;
 }
 
 .guide-portrait img {
@@ -359,6 +423,8 @@ const go = async (to) => {
   object-fit: cover;
   object-position: 52% 18%;
   filter: saturate(1.05) contrast(1.05) brightness(0.92);
+  transform: scale(1.02);
+  animation: guideAvatarBreath 5.6s ease-in-out infinite;
 }
 
 .portrait-scan {
@@ -373,7 +439,7 @@ const go = async (to) => {
 .guide-code {
   display: block;
   margin-bottom: 7px;
-  color: rgba(147, 197, 253, 0.78);
+  color: rgba(191, 219, 254, 0.82);
   font: 800 10px/1 'SF Mono', 'Consolas', monospace;
   letter-spacing: 0.16em;
 }
@@ -415,10 +481,11 @@ const go = async (to) => {
 
 .guide-answer {
   margin: 14px 16px 12px;
-  padding: 13px 14px;
+  padding: 14px 15px;
   border: 1px solid rgba(96, 165, 250, 0.18);
   border-radius: 8px;
-  background: rgba(5, 8, 22, 0.44);
+  background: rgba(5, 8, 22, 0.34);
+  box-shadow: inset 0 0 28px rgba(96, 165, 250, 0.045);
 }
 
 .answer-label {
@@ -453,8 +520,8 @@ const go = async (to) => {
   min-height: 32px;
   padding: 0 10px;
   border: 1px solid rgba(147, 197, 253, 0.18);
-  border-radius: 8px;
-  background: rgba(8, 14, 27, 0.54);
+  border-radius: 999px;
+  background: rgba(8, 14, 27, 0.42);
   color: rgba(226, 239, 255, 0.72);
   font-size: 12px;
   cursor: pointer;
@@ -479,7 +546,7 @@ const go = async (to) => {
   overflow-y: auto;
   border: 1px solid rgba(147, 197, 253, 0.14);
   border-radius: 8px;
-  background: rgba(5, 8, 22, 0.34);
+  background: rgba(5, 8, 22, 0.28);
   scrollbar-width: thin;
   scrollbar-color: rgba(96, 165, 250, 0.4) transparent;
 }
@@ -488,7 +555,7 @@ const go = async (to) => {
   max-width: 88%;
   padding: 8px 10px;
   border: 1px solid rgba(147, 197, 253, 0.14);
-  border-radius: 8px;
+  border-radius: 10px;
   color: rgba(238, 247, 255, 0.84);
   font-size: 12px;
   line-height: 1.65;
@@ -516,7 +583,7 @@ const go = async (to) => {
 .guide-chat input,
 .guide-chat button {
   min-height: 38px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 12px;
   outline: none;
 }
@@ -575,7 +642,7 @@ const go = async (to) => {
   padding: 9px;
   border: 1px solid rgba(96, 165, 250, 0.16);
   border-radius: 8px;
-  background: rgba(8, 14, 27, 0.48);
+  background: rgba(8, 14, 27, 0.38);
   color: rgba(238, 247, 255, 0.78);
   text-align: left;
   cursor: pointer;
@@ -623,17 +690,18 @@ const go = async (to) => {
 .guide-orb {
   position: relative;
   z-index: 3;
-  width: 74px;
-  height: 74px;
+  width: 78px;
+  height: 78px;
   display: grid;
   place-items: center;
   overflow: visible;
   border: 1px solid rgba(147, 197, 253, 0.42);
   border-radius: 999px;
   background:
-    radial-gradient(circle at 50% 20%, rgba(147, 197, 253, 0.18), transparent 42%),
+    conic-gradient(from 110deg, rgba(96, 165, 250, 0.28), rgba(167, 139, 250, 0.1), rgba(96, 165, 250, 0.28)),
+    radial-gradient(circle at 50% 20%, rgba(147, 197, 253, 0.22), transparent 42%),
     rgba(5, 8, 22, 0.82);
-  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.44), 0 0 34px rgba(96, 165, 250, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.48), 0 0 38px rgba(96, 165, 250, 0.24);
   cursor: pointer;
   transition: transform 0.24s var(--ease-out), box-shadow 0.24s, border-color 0.24s;
 }
@@ -654,8 +722,8 @@ const go = async (to) => {
 }
 
 .guide-orb img {
-  width: 56px;
-  height: 56px;
+  width: 58px;
+  height: 58px;
   border-radius: 999px;
   object-fit: cover;
   object-position: 52% 18%;
@@ -712,16 +780,26 @@ const go = async (to) => {
   to { transform: rotate(360deg); }
 }
 
+@keyframes guidePanelScan {
+  0% { transform: translateY(-60%) rotate(-7deg); opacity: 0; }
+  20% { opacity: 0.5; }
+  100% { transform: translateY(360%) rotate(-7deg); opacity: 0; }
+}
+
+@keyframes guideAvatarBreath {
+  0%, 100% { transform: scale(1.02) translateY(0); filter: saturate(1.05) contrast(1.05) brightness(0.92); }
+  50% { transform: scale(1.055) translateY(-2px); filter: saturate(1.16) contrast(1.08) brightness(0.98); }
+}
+
 @media (max-width: 640px) {
   .ai-guide {
-    right: 12px;
-    bottom: calc(14px + env(safe-area-inset-bottom));
+    right: 10px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
   }
 
   .guide-panel {
     bottom: 86px;
     width: calc(100vw - 24px);
-    border-color: rgba(147, 197, 253, 0.42);
     background:
       linear-gradient(135deg, rgba(8, 17, 34, 0.98), rgba(3, 7, 18, 0.97)),
       repeating-linear-gradient(90deg, rgba(147, 197, 253, 0.055) 0 1px, transparent 1px 56px);
@@ -741,10 +819,34 @@ const go = async (to) => {
   .guide-actions {
     grid-template-columns: 1fr;
   }
+
+  .guide-orb {
+    width: 64px;
+    height: 64px;
+  }
+
+  .guide-orb img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .orb-radar {
+    inset: -7px;
+  }
+
+  .orb-text {
+    min-width: 24px;
+    height: 18px;
+    font-size: 9px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .portrait-scan,
+  .guide-panel::after,
+  .guide-portrait img,
+  .guide-portrait::before,
+  .guide-portrait::after,
   .orb-radar {
     animation: none !important;
   }

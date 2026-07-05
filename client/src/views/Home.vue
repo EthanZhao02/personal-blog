@@ -3,10 +3,29 @@
     <canvas ref="starCanvas" class="star-canvas" aria-hidden="true"></canvas>
 
     <div class="hero-video-bg" aria-hidden="true">
-      <video autoplay muted loop playsinline>
+      <video
+        ref="heroVideo"
+        autoplay
+        muted
+        playsinline
+        preload="metadata"
+        :style="{ opacity: videoOpacity }"
+        @loadeddata="onHeroVideoLoaded"
+        @timeupdate="onHeroVideoTimeUpdate"
+        @ended="onHeroVideoEnded"
+      >
         <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-futuristic-devices-99786-large.mp4" type="video/mp4">
       </video>
       <div class="video-overlay"></div>
+    </div>
+
+    <div class="hero-mesh-scene" aria-hidden="true">
+      <span class="mesh-horizon"></span>
+      <span class="mesh-mountain mountain-back"></span>
+      <span class="mesh-mountain mountain-front"></span>
+      <span class="mesh-plane"></span>
+      <span class="mesh-pulse pulse-a"></span>
+      <span class="mesh-pulse pulse-b"></span>
     </div>
 
     <div class="hero-ambient" aria-hidden="true">
@@ -19,7 +38,7 @@
       <div class="hero-copy reveal-up">
         <div class="hero-kicker">
           <span class="kicker-dot"></span>
-          {{ currentTime || '00:00:00' }} / ONLINE ARCHIVE
+          {{ currentTime || '00:00:00' }} / ETHAN NEXUS ONLINE
         </div>
 
         <h1>
@@ -30,8 +49,8 @@
         <p class="hero-role">{{ siteConfig.role }}</p>
         <p class="hero-slogan">{{ siteConfig.subtitle }}</p>
 
-        <div class="terminal-line" aria-label="Typing intro">
-          <span class="terminal-prompt">~/ethan-zhiyu</span>
+        <div class="signal-line" aria-label="AI route signal">
+          <span class="signal-prompt">{{ ui.signalPrompt }}</span>
           <strong>{{ typedText }}</strong>
           <span class="cursor-blink">_</span>
         </div>
@@ -41,10 +60,10 @@
             <span>{{ ui.viewProjects }}</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
           </router-link>
-          <router-link to="/posts" class="hero-btn">
-            <span>{{ ui.readNotes }}</span>
+          <a href="#journey" class="hero-btn">
+            <span>{{ ui.viewTimeline }}</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14M5 12h14M5 19h9"/></svg>
-          </router-link>
+          </a>
           <router-link to="/about" class="hero-btn">
             <span>{{ ui.about }}</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0"/></svg>
@@ -52,7 +71,7 @@
         </div>
 
         <div class="hero-metrics" aria-label="Learning stages">
-          <div v-for="item in journeyMetrics" :key="item.label" class="metric-item">
+          <div v-for="item in journeyMetrics" :key="item.label" class="metric-item liquid-glass">
             <span class="metric-line"></span>
             <strong>{{ item.value }}</strong>
             <span>{{ item.label }}</span>
@@ -66,11 +85,28 @@
             <span></span>
             <span></span>
             <span></span>
-            <strong>ETHAN-ZHIYU / 2026</strong>
+            <strong>{{ ui.coreStatus }}</strong>
           </div>
 
           <img :src="activePhoto" alt="Ethan 智域 visual" class="visual-image" />
+          <div class="digital-slices" aria-hidden="true">
+            <span class="slice-a"></span>
+            <span class="slice-b"></span>
+            <span class="slice-c"></span>
+          </div>
+          <div class="face-vector" aria-hidden="true">
+            <span v-for="point in 18" :key="point"></span>
+          </div>
+          <div class="holo-rain" aria-hidden="true">
+            <span v-for="line in 12" :key="line"></span>
+          </div>
+          <div class="energy-outline" aria-hidden="true"></div>
           <div class="visual-grid" aria-hidden="true"></div>
+          <div class="avatar-orbit" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
           <div class="scanner-dial" aria-hidden="true">
             <span></span>
             <span></span>
@@ -82,12 +118,16 @@
           </button>
 
           <div class="visual-readout">
-            <span>ETHAN 智域</span>
-            <strong>{{ activePhotoIndex }}</strong>
+            <span>{{ ui.digitalTwin }}</span>
+            <strong>{{ ui.online }}</strong>
           </div>
         </div>
 
-        <div class="journey-panel">
+        <div class="signal-stack" aria-label="Ethan capability signals">
+          <span v-for="item in heroSignals" :key="item">{{ item }}</span>
+        </div>
+
+        <div class="journey-panel liquid-glass">
           <div class="journey-panel-head">
             <span>2021 -> 2026</span>
             <strong>WEB / BACKEND / AI</strong>
@@ -102,8 +142,8 @@
       </div>
     </section>
 
-    <section class="timeline-section" :class="{ 'content-enter': contentVisible }">
-      <div class="section-head">
+    <section id="journey" class="timeline-section" :class="{ 'content-enter': contentVisible }">
+      <div class="section-head scroll-trigger">
         <div>
           <span>{{ ui.timelineBadge }}</span>
           <h2>{{ ui.timelineTitle }}</h2>
@@ -113,10 +153,10 @@
 
       <div class="life-timeline-track">
         <article
-          class="life-timeline-item"
+          class="life-timeline-item scroll-trigger"
           v-for="(item, idx) in timelineItems"
           :key="item.year"
-          :style="{ animationDelay: `${idx * 80}ms` }"
+          :style="{ '--reveal-delay': `${idx * 90}ms` }"
         >
           <div class="life-node">
             <span>{{ item.year }}</span>
@@ -133,7 +173,7 @@
     </section>
 
     <section class="bento-grid showcase-grid" :class="{ 'content-enter': contentVisible }" aria-label="Portfolio overview">
-      <article class="bento-card feature-card">
+      <article class="bento-card feature-card scroll-trigger">
         <div class="card-heading">
           <span>{{ ui.featuredProject }}</span>
           <router-link to="/projects">{{ ui.allProjects }}</router-link>
@@ -153,7 +193,7 @@
         </div>
       </article>
 
-      <article class="bento-card articles-card">
+      <article class="bento-card articles-card scroll-trigger">
         <div class="card-heading">
           <span>{{ ui.latestArticles }}</span>
           <router-link to="/posts">{{ ui.archive }}</router-link>
@@ -176,7 +216,7 @@
         <div v-if="!latestArticles.length" class="empty-hint">{{ ui.noArticles }}</div>
       </article>
 
-      <article id="connect" class="bento-card connect-card">
+      <article id="connect" class="bento-card connect-card scroll-trigger">
         <div class="card-heading">
           <span>{{ ui.quickLinks }}</span>
           <router-link to="/about">{{ ui.more }}</router-link>
@@ -202,26 +242,36 @@ import { getArticleList } from '../api/article'
 import { getProjects } from '../api/project'
 
 const starCanvas = ref(null)
+const heroVideo = ref(null)
+const videoOpacity = ref(0)
 const currentPhoto = ref(0)
 const currentTime = ref('')
 const heroVisible = ref(false)
 const contentVisible = ref(false)
 const typedText = ref('')
-const mouse = ref({ x: '52vw', y: '42vh' })
+const mouse = ref({ x: '52vw', y: '42vh', tiltX: '0deg', tiltY: '0deg' })
 const siteLanguage = inject('siteLanguage', ref(localStorage.getItem('ethan-language') || 'zh'))
 
 let timeTimer = null
 let carouselTimer = null
 let typeTimer = null
 let rafId = null
+let videoFadeFrame = null
+let videoResetTimer = null
 let resizeHandler = null
+let revealObserver = null
+let fadingOutVideo = false
 let stars = []
 
 const ui = computed(() => siteLanguage.value === 'en'
   ? {
       viewProjects: 'View Projects',
-      readNotes: 'Read Notes',
+      viewTimeline: 'Life Timeline',
       about: 'About',
+      signalPrompt: 'AI ROUTE',
+      coreStatus: 'DIGITAL TWIN CORE',
+      digitalTwin: 'AI Digital Twin',
+      online: 'ONLINE',
       timelineBadge: 'Life Timeline',
       timelineTitle: 'Life Timeline',
       timelineDesc: 'From frontend and database basics, to backend languages, then into AI / NLP and project practice.',
@@ -236,8 +286,12 @@ const ui = computed(() => siteLanguage.value === 'en'
     }
   : {
       viewProjects: '查看项目',
-      readNotes: '阅读文章',
+      viewTimeline: '生命轨迹',
       about: '关于我',
+      signalPrompt: 'AI 航线',
+      coreStatus: '数字分身核心',
+      digitalTwin: 'AI 数字分身',
+      online: '在线',
       timelineBadge: 'Life Timeline',
       timelineTitle: '生命轨迹',
       timelineDesc: '从前端和数据库入门，到后端语言基础，再到 AI / NLP 与项目实践。',
@@ -254,7 +308,6 @@ const ui = computed(() => siteLanguage.value === 'en'
 const fullText = computed(() => ui.value.typing)
 
 const articles = ref([])
-const projectsCount = ref(siteConfig.projects?.length || 0)
 const projectsData = ref([])
 
 const timelineItems = computed(() => siteLanguage.value === 'en'
@@ -337,6 +390,8 @@ const quickLinks = computed(() => {
 const spotlightStyle = computed(() => ({
   '--mouse-x': mouse.value.x,
   '--mouse-y': mouse.value.y,
+  '--tilt-x': mouse.value.tiltX,
+  '--tilt-y': mouse.value.tiltY,
 }))
 
 const journeyMetrics = computed(() => [
@@ -346,12 +401,14 @@ const journeyMetrics = computed(() => [
   { value: 'AI', label: siteLanguage.value === 'en' ? 'NLP / Projects' : 'NLP / 项目' },
 ])
 
+const heroSignals = computed(() => siteLanguage.value === 'en'
+  ? ['Digital Twin', 'Web / Backend', 'NLP Direction']
+  : ['AI 数字分身', 'Web / 后端', 'NLP 方向'])
+
 const activePhoto = computed(() => siteConfig.photos[currentPhoto.value] || siteConfig.photos[0] || '')
 const hasMultiplePhotos = computed(() => siteConfig.photos.length > 1)
-const activePhotoIndex = computed(() => `${String(currentPhoto.value + 1).padStart(2, '0')} / ${String(siteConfig.photos.length || 1).padStart(2, '0')}`)
 const featuredProject = computed(() => projectsData.value[0] || siteConfig.projects?.[0] || {})
 const latestArticles = computed(() => articles.value.slice(0, 4))
-const totalArticles = computed(() => articles.value.length || siteConfig.content.articles?.length || 0)
 const projectTech = computed(() => {
   const ts = featuredProject.value?.techStack
   if (!ts) return []
@@ -382,14 +439,93 @@ const formatDate = (value) => {
 }
 
 const onPointerMove = (event) => {
+  const px = event.clientX / Math.max(window.innerWidth, 1) - 0.5
+  const py = event.clientY / Math.max(window.innerHeight, 1) - 0.5
   mouse.value = {
     x: `${event.clientX}px`,
     y: `${event.clientY}px`,
+    tiltX: `${(-py * 5.4).toFixed(2)}deg`,
+    tiltY: `${(px * 7.2).toFixed(2)}deg`,
   }
 }
 
 const scrollHomeToTop = () => {
   window.scrollTo(0, 0)
+}
+
+const fadeHeroVideoTo = (targetOpacity, duration = 500) => {
+  if (videoFadeFrame) {
+    cancelAnimationFrame(videoFadeFrame)
+    videoFadeFrame = null
+  }
+
+  const start = performance.now()
+  const from = Number(videoOpacity.value) || 0
+  const change = targetOpacity - from
+
+  const tick = (now) => {
+    const progress = Math.min((now - start) / duration, 1)
+    const eased = 1 - Math.pow(1 - progress, 3)
+    videoOpacity.value = Number((from + change * eased).toFixed(3))
+
+    if (progress < 1) {
+      videoFadeFrame = requestAnimationFrame(tick)
+      return
+    }
+
+    videoFadeFrame = null
+  }
+
+  videoFadeFrame = requestAnimationFrame(tick)
+}
+
+const fadeInHeroVideo = () => {
+  fadingOutVideo = false
+  fadeHeroVideoTo(0.34)
+}
+
+const fadeOutHeroVideo = () => {
+  if (fadingOutVideo) return
+  fadingOutVideo = true
+  fadeHeroVideoTo(0)
+}
+
+const onHeroVideoLoaded = () => {
+  const video = heroVideo.value
+  if (!video) return
+  videoOpacity.value = 0
+  video.play?.().catch(() => {})
+  fadeInHeroVideo()
+}
+
+const onHeroVideoTimeUpdate = () => {
+  const video = heroVideo.value
+  if (!video || !Number.isFinite(video.duration) || video.duration <= 0) return
+  if (video.duration - video.currentTime <= 0.55) {
+    fadeOutHeroVideo()
+  }
+}
+
+const onHeroVideoEnded = () => {
+  const video = heroVideo.value
+  if (!video) return
+
+  if (videoFadeFrame) {
+    cancelAnimationFrame(videoFadeFrame)
+    videoFadeFrame = null
+  }
+  if (videoResetTimer) {
+    clearTimeout(videoResetTimer)
+  }
+
+  videoOpacity.value = 0
+  videoResetTimer = window.setTimeout(() => {
+    const nextVideo = heroVideo.value
+    if (!nextVideo) return
+    nextVideo.currentTime = 0
+    nextVideo.play?.().catch(() => {})
+    fadeInHeroVideo()
+  }, 100)
 }
 
 const startTyping = () => {
@@ -497,6 +633,38 @@ const setupConstellation = () => {
   rafId = requestAnimationFrame(draw)
 }
 
+const setupScrollReveals = () => {
+  if (revealObserver) {
+    revealObserver.disconnect()
+  }
+
+  const targets = document.querySelectorAll('.home-page .scroll-trigger')
+  if (!targets.length) return
+
+  if (!('IntersectionObserver' in window)) {
+    targets.forEach((target) => target.classList.add('is-visible'))
+    return
+  }
+
+  revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return
+      entry.target.classList.add('is-visible')
+      revealObserver?.unobserve(entry.target)
+    })
+  }, {
+    threshold: 0.18,
+    rootMargin: '0px 0px -10% 0px',
+  })
+
+  targets.forEach((target, index) => {
+    if (!target.style.getPropertyValue('--reveal-delay')) {
+      target.style.setProperty('--reveal-delay', `${Math.min(index * 80, 280)}ms`)
+    }
+    revealObserver.observe(target)
+  })
+}
+
 onMounted(async () => {
   if ('scrollRestoration' in window.history) {
     window.history.scrollRestoration = 'manual'
@@ -528,18 +696,16 @@ onMounted(async () => {
     const projRes = await getProjects('/project/list')
     if ((projRes.code === 200 || projRes.code === 0) && projRes.data?.length) {
       projectsData.value = projRes.data
-      projectsCount.value = projRes.data.length
     } else if (siteConfig.projects?.length) {
       projectsData.value = siteConfig.projects
-      projectsCount.value = siteConfig.projects.length
     }
   } catch (e) {
     projectsData.value = siteConfig.projects || []
-    projectsCount.value = siteConfig.projects?.length || 0
   }
 
   await nextTick()
   setupConstellation()
+  setupScrollReveals()
 })
 
 onUnmounted(() => {
@@ -547,7 +713,10 @@ onUnmounted(() => {
   if (carouselTimer) clearInterval(carouselTimer)
   if (typeTimer) clearInterval(typeTimer)
   if (rafId) cancelAnimationFrame(rafId)
+  if (videoFadeFrame) cancelAnimationFrame(videoFadeFrame)
+  if (videoResetTimer) clearTimeout(videoResetTimer)
   if (resizeHandler) window.removeEventListener('resize', resizeHandler)
+  if (revealObserver) revealObserver.disconnect()
 })
 </script>
 
@@ -567,14 +736,15 @@ onUnmounted(() => {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(circle 360px at var(--mouse-x, 52vw) var(--mouse-y, 42vh), rgba(96, 165, 250, 0.14), transparent 68%),
-    linear-gradient(135deg, rgba(255, 189, 102, 0.08), transparent 34%),
-    linear-gradient(225deg, rgba(147, 197, 253, 0.1), transparent 42%);
+    radial-gradient(circle 380px at var(--mouse-x, 52vw) var(--mouse-y, 42vh), rgba(96, 165, 250, 0.17), transparent 68%),
+    radial-gradient(circle at 78% 24%, rgba(167, 139, 250, 0.12), transparent 32%),
+    linear-gradient(225deg, rgba(147, 197, 253, 0.11), transparent 42%);
   transition: background 0.18s linear;
 }
 
 .star-canvas,
 .hero-video-bg,
+.hero-mesh-scene,
 .hero-ambient {
   position: fixed;
   inset: 0;
@@ -595,18 +765,103 @@ onUnmounted(() => {
 
 .hero-video-bg video {
   width: 100%;
-  height: 100%;
+  height: 112%;
   object-fit: cover;
-  opacity: 0.25;
-  filter: saturate(0.85) contrast(1.15) brightness(0.7);
+  object-position: center center;
+  filter: saturate(1.05) contrast(1.18) brightness(0.58) hue-rotate(8deg);
+  transform: translateY(17%) scale(1.035);
+  will-change: opacity;
 }
 
 .video-overlay {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(7, 8, 18, 0.3) 0%, rgba(7, 8, 18, 0.82) 58%, rgba(7, 8, 18, 0.98) 100%),
+    radial-gradient(circle at 72% 42%, rgba(96, 165, 250, 0.18), transparent 36%),
+    radial-gradient(circle at 35% 72%, rgba(167, 139, 250, 0.1), transparent 38%),
+    linear-gradient(180deg, rgba(2, 6, 18, 0.42) 0%, rgba(4, 8, 20, 0.74) 48%, rgba(7, 8, 18, 0.98) 100%),
+    linear-gradient(90deg, rgba(2, 6, 18, 0.96), transparent 34%, rgba(2, 6, 18, 0.78)),
     repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 5px);
+}
+
+.hero-mesh-scene {
+  z-index: -1;
+  overflow: hidden;
+  opacity: 0.92;
+  transform: translate3d(0, calc(var(--scroll-drift, 0px) * 0.22), 0);
+  transition: transform 0.14s linear;
+}
+
+.mesh-horizon {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 58%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.64), rgba(167, 139, 250, 0.42), transparent);
+  box-shadow: 0 0 28px rgba(96, 165, 250, 0.34);
+  animation: meshHorizon 5.8s ease-in-out infinite;
+}
+
+.mesh-plane {
+  position: absolute;
+  left: -16%;
+  right: -16%;
+  bottom: -14%;
+  height: 46%;
+  background:
+    linear-gradient(90deg, rgba(96, 165, 250, 0.14) 1px, transparent 1px) 0 0 / 72px 72px,
+    linear-gradient(0deg, rgba(167, 139, 250, 0.12) 1px, transparent 1px) 0 0 / 72px 72px;
+  transform: rotateX(66deg);
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 0 26px rgba(96, 165, 250, 0.16));
+  mask-image: linear-gradient(180deg, transparent, #000 24%, #000 82%, transparent);
+  animation: meshPlane 7.2s linear infinite;
+}
+
+.mesh-mountain {
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  bottom: 18%;
+  height: 30%;
+  clip-path: polygon(0 82%, 8% 58%, 17% 72%, 27% 33%, 38% 78%, 48% 44%, 58% 70%, 69% 28%, 79% 75%, 88% 50%, 100% 78%, 100% 100%, 0 100%);
+  background:
+    linear-gradient(180deg, rgba(96, 165, 250, 0.16), rgba(7, 10, 28, 0.58)),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.18), rgba(167, 139, 250, 0.12));
+  opacity: 0.36;
+  filter: drop-shadow(0 0 32px rgba(96, 165, 250, 0.12));
+  animation: meshMountain 9s ease-in-out infinite;
+}
+
+.hero-mesh-scene .mountain-front {
+  bottom: 7%;
+  height: 36%;
+  opacity: 0.5;
+  clip-path: polygon(0 76%, 9% 48%, 17% 68%, 29% 22%, 39% 74%, 49% 40%, 58% 68%, 69% 16%, 80% 72%, 90% 42%, 100% 74%, 100% 100%, 0 100%);
+  animation-delay: -2.5s;
+}
+
+.mesh-pulse {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border: 1px solid rgba(96, 165, 250, 0.28);
+  border-radius: 999px;
+  filter: blur(0.2px) drop-shadow(0 0 24px rgba(96, 165, 250, 0.2));
+  opacity: 0;
+  animation: meshPulse 6s ease-out infinite;
+}
+
+.pulse-a {
+  left: 16%;
+  top: 46%;
+}
+
+.pulse-b {
+  right: 18%;
+  top: 34%;
+  animation-delay: 2.2s;
 }
 
 .hero-ambient {
@@ -619,7 +874,7 @@ onUnmounted(() => {
   display: block;
   height: 1px;
   width: 42vw;
-  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.52), rgba(255, 189, 102, 0.28), transparent);
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.58), rgba(167, 139, 250, 0.34), transparent);
   filter: drop-shadow(0 0 18px rgba(96, 165, 250, 0.32));
   animation: railFloat 8s ease-in-out infinite;
 }
@@ -671,6 +926,46 @@ onUnmounted(() => {
   transform: translateY(0);
 }
 
+.liquid-glass {
+  position: relative;
+  overflow: hidden;
+  border: 0 !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)),
+    rgba(255, 255, 255, 0.01) !important;
+  background-blend-mode: luminosity;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 20px 54px rgba(0, 0, 0, 0.28) !important;
+  backdrop-filter: blur(4px) saturate(1.22);
+  -webkit-backdrop-filter: blur(4px) saturate(1.22);
+}
+
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.45) 0%,
+    rgba(255,255,255,0.15) 20%,
+    rgba(255,255,255,0) 40%,
+    rgba(255,255,255,0) 60%,
+    rgba(255,255,255,0.15) 80%,
+    rgba(255,255,255,0.45) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.liquid-glass > * {
+  position: relative;
+  z-index: 3;
+}
+
 .hero-copy,
 .hero-visual {
   min-width: 0;
@@ -683,9 +978,10 @@ onUnmounted(() => {
   gap: 9px;
   margin-bottom: 18px;
   padding: 8px 11px;
-  border: 1px solid rgba(147, 197, 253, 0.26);
+  border: 1px solid rgba(147, 197, 253, 0.28);
   border-radius: 999px;
-  background: rgba(8, 14, 27, 0.5);
+  background: rgba(8, 14, 27, 0.32);
+  backdrop-filter: blur(12px);
   color: rgba(199, 251, 255, 0.72);
   font: 700 11px/1 'SF Mono', 'Consolas', monospace;
   letter-spacing: 0.12em;
@@ -704,15 +1000,17 @@ onUnmounted(() => {
   max-width: 760px;
   margin: 0;
   color: #f8fbff;
-  font-size: 6.4rem;
+  font-size: clamp(4.8rem, 8vw, 7.4rem);
   line-height: 0.9;
   font-weight: 900;
+  letter-spacing: 0;
+  text-shadow: 0 0 38px rgba(96, 165, 250, 0.13);
 }
 
 .hero-copy h1 span {
   display: block;
   color: transparent;
-  background: linear-gradient(90deg, #ffffff, #60a5fa 42%, #ffbd66 86%);
+  background: linear-gradient(90deg, #ffffff, #93c5fd 46%, #a78bfa 88%);
   -webkit-background-clip: text;
   background-clip: text;
   text-shadow: 0 0 34px rgba(96, 165, 250, 0.12);
@@ -733,25 +1031,27 @@ onUnmounted(() => {
   line-height: 1.86;
 }
 
-.terminal-line {
+.signal-line {
   width: min(650px, 100%);
-  min-height: 46px;
+  min-height: 50px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 24px;
-  padding: 12px 14px;
-  border: 1px solid rgba(96, 165, 250, 0.2);
-  border-radius: 8px;
-  background: rgba(5, 8, 22, 0.54);
+  padding: 12px 16px;
+  border: 1px solid rgba(147, 197, 253, 0.18);
+  border-radius: 999px;
+  background: rgba(5, 8, 22, 0.38);
   color: rgba(238, 247, 255, 0.82);
   font: 700 13px/1.5 'SF Mono', 'Consolas', monospace;
-  box-shadow: inset 0 0 34px rgba(96, 165, 250, 0.035);
+  box-shadow: inset 0 0 28px rgba(96, 165, 250, 0.045), 0 18px 46px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(16px);
 }
 
-.terminal-prompt {
-  color: var(--amber);
+.signal-prompt {
+  color: #93c5fd;
+  letter-spacing: 0.12em;
 }
 
 .cursor-blink {
@@ -772,15 +1072,16 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 46px;
-  padding: 0 18px;
+  min-height: 48px;
+  padding: 0 20px;
   overflow: hidden;
   border: 1px solid rgba(148, 226, 255, 0.22);
-  border-radius: 8px;
-  background: rgba(8, 14, 27, 0.58);
+  border-radius: 999px;
+  background: rgba(8, 14, 27, 0.38);
   color: rgba(238, 247, 255, 0.86);
   font-weight: 800;
   text-decoration: none;
+  backdrop-filter: blur(12px);
   transition: transform 0.22s var(--ease-out), border-color 0.22s, box-shadow 0.22s, background 0.22s;
 }
 
@@ -809,9 +1110,9 @@ onUnmounted(() => {
 
 .hero-btn.primary {
   border-color: rgba(96, 165, 250, 0.6);
-  background: linear-gradient(135deg, #60a5fa, #93c5fd);
-  color: #04101f;
-  box-shadow: 0 18px 46px rgba(96, 165, 250, 0.18);
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.92), rgba(167, 139, 250, 0.86));
+  color: #06101f;
+  box-shadow: 0 18px 46px rgba(96, 165, 250, 0.2);
 }
 
 .hero-btn:hover {
@@ -833,9 +1134,7 @@ onUnmounted(() => {
   min-height: 94px;
   padding: 16px 14px;
   overflow: hidden;
-  border: 1px solid rgba(148, 226, 255, 0.16);
   border-radius: 8px;
-  background: rgba(8, 14, 27, 0.46);
 }
 
 .metric-line {
@@ -844,7 +1143,7 @@ onUnmounted(() => {
   top: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, #60a5fa, #93c5fd, #ffbd66);
+  background: linear-gradient(90deg, #60a5fa, #93c5fd, #a78bfa);
   transform: scaleX(0.4);
   transform-origin: left;
   transition: transform 0.28s var(--ease-out);
@@ -876,23 +1175,32 @@ onUnmounted(() => {
 .visual-frame {
   position: relative;
   aspect-ratio: 4 / 5;
-  min-height: 520px;
+  min-height: 540px;
   overflow: hidden;
-  border: 1px solid rgba(148, 226, 255, 0.28);
+  border: 1px solid rgba(148, 226, 255, 0.32);
   border-radius: 8px;
-  background: rgba(7, 11, 21, 0.76);
-  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.46), inset 0 0 76px rgba(96, 165, 250, 0.08);
+  background:
+    radial-gradient(circle at 48% 25%, rgba(96, 165, 250, 0.18), transparent 32%),
+    rgba(7, 11, 21, 0.58);
+  box-shadow: 0 34px 96px rgba(0, 0, 0, 0.5), inset 0 0 84px rgba(96, 165, 250, 0.1);
+  backdrop-filter: blur(10px) saturate(1.18);
   transform-style: preserve-3d;
+  transform: perspective(1100px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 0.18s linear, border-color 0.3s, box-shadow 0.3s;
   animation: frameHover 8s ease-in-out infinite;
 }
 
 .visual-frame::before {
   content: '';
   position: absolute;
-  inset: 16px;
-  z-index: 4;
-  border: 1px solid rgba(148, 226, 255, 0.14);
-  border-radius: 8px;
+  inset: 0;
+  z-index: 5;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.12) 22%, transparent 43%, transparent 58%, rgba(255,255,255,0.14) 78%, rgba(255,255,255,0.42));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
   pointer-events: none;
 }
 
@@ -919,13 +1227,13 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   right: 0;
-  height: 44px;
+  height: 48px;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 0 16px;
   border-bottom: 1px solid rgba(148, 226, 255, 0.16);
-  background: rgba(5, 8, 22, 0.62);
+  background: rgba(5, 8, 22, 0.44);
   backdrop-filter: blur(16px);
 }
 
@@ -942,7 +1250,7 @@ onUnmounted(() => {
 }
 
 .frame-topbar span:nth-child(3) {
-  background: #ffbd66;
+  background: #a78bfa;
 }
 
 .frame-topbar strong {
@@ -956,8 +1264,8 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(0.98) contrast(1.08) brightness(0.72);
-  transform: scale(1.055) translate3d(0, 0, 0);
+  filter: saturate(1.02) contrast(1.12) brightness(0.76) hue-rotate(2deg);
+  transform: scale(1.06) translate3d(0, 0, 0);
   transform-origin: 50% 38%;
   will-change: transform, filter;
   animation: portraitDrift 9.6s ease-in-out infinite;
@@ -965,9 +1273,151 @@ onUnmounted(() => {
 }
 
 .visual-frame:hover .visual-image {
-  filter: saturate(1.08) contrast(1.12) brightness(0.78);
+  filter: saturate(1.18) contrast(1.16) brightness(0.86) hue-rotate(-3deg);
   transform: scale(1.09) translate3d(1.5%, -1.5%, 0);
   animation-play-state: paused;
+}
+
+.digital-slices {
+  position: absolute;
+  inset: 56px 0 88px;
+  z-index: 2;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.digital-slices span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 16%;
+  background:
+    linear-gradient(90deg, rgba(96, 165, 250, 0.02), rgba(147, 197, 253, 0.22), rgba(167, 139, 250, 0.12), transparent),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 10px);
+  opacity: 0;
+  filter: blur(0.2px);
+  clip-path: inset(0 0 0 0);
+  animation: sliceGlitch 5.4s ease-in-out infinite;
+}
+
+.digital-slices .slice-a {
+  top: 16%;
+}
+
+.digital-slices .slice-b {
+  top: 42%;
+  animation-delay: 1.4s;
+}
+
+.digital-slices .slice-c {
+  top: 64%;
+  animation-delay: 2.8s;
+}
+
+.face-vector {
+  position: absolute;
+  z-index: 3;
+  inset: 18% 18% 24%;
+  pointer-events: none;
+  opacity: 0.82;
+  mix-blend-mode: screen;
+}
+
+.face-vector span {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(219, 234, 254, 0.9);
+  box-shadow: 0 0 16px rgba(96, 165, 250, 0.74);
+  animation: vectorPulse 3.6s ease-in-out infinite;
+}
+
+.face-vector span:nth-child(1) { left: 38%; top: 18%; animation-delay: 0.05s; }
+.face-vector span:nth-child(2) { left: 55%; top: 18%; animation-delay: 0.15s; }
+.face-vector span:nth-child(3) { left: 31%; top: 29%; animation-delay: 0.25s; }
+.face-vector span:nth-child(4) { left: 64%; top: 29%; animation-delay: 0.35s; }
+.face-vector span:nth-child(5) { left: 44%; top: 36%; animation-delay: 0.45s; }
+.face-vector span:nth-child(6) { left: 52%; top: 36%; animation-delay: 0.55s; }
+.face-vector span:nth-child(7) { left: 48%; top: 48%; animation-delay: 0.65s; }
+.face-vector span:nth-child(8) { left: 38%; top: 58%; animation-delay: 0.75s; }
+.face-vector span:nth-child(9) { left: 58%; top: 58%; animation-delay: 0.85s; }
+.face-vector span:nth-child(10) { left: 43%; top: 68%; animation-delay: 0.95s; }
+.face-vector span:nth-child(11) { left: 53%; top: 68%; animation-delay: 1.05s; }
+.face-vector span:nth-child(12) { left: 28%; top: 45%; animation-delay: 1.15s; }
+.face-vector span:nth-child(13) { left: 68%; top: 45%; animation-delay: 1.25s; }
+.face-vector span:nth-child(14) { left: 34%; top: 76%; animation-delay: 1.35s; }
+.face-vector span:nth-child(15) { left: 62%; top: 76%; animation-delay: 1.45s; }
+.face-vector span:nth-child(16) { left: 20%; top: 62%; animation-delay: 1.55s; }
+.face-vector span:nth-child(17) { left: 76%; top: 62%; animation-delay: 1.65s; }
+.face-vector span:nth-child(18) { left: 48%; top: 82%; animation-delay: 1.75s; }
+
+.face-vector::before,
+.face-vector::after {
+  content: '';
+  position: absolute;
+  inset: 12% 18% 18%;
+  border: 1px solid rgba(147, 197, 253, 0.22);
+  border-radius: 45% 45% 46% 46%;
+  filter: drop-shadow(0 0 14px rgba(96, 165, 250, 0.22));
+  animation: vectorFace 4.8s ease-in-out infinite;
+}
+
+.face-vector::after {
+  inset: 24% 26% 26%;
+  border-style: dashed;
+  border-color: rgba(167, 139, 250, 0.25);
+  animation-delay: -1.2s;
+}
+
+.holo-rain {
+  position: absolute;
+  inset: 54px 20px 90px;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.58;
+  mix-blend-mode: screen;
+}
+
+.holo-rain span {
+  position: absolute;
+  top: -22%;
+  width: 1px;
+  height: 72px;
+  background: linear-gradient(180deg, transparent, rgba(147, 197, 253, 0.76), transparent);
+  animation: rainFall 4.6s linear infinite;
+}
+
+.holo-rain span:nth-child(1) { left: 8%; animation-delay: 0s; }
+.holo-rain span:nth-child(2) { left: 16%; animation-delay: 1.1s; height: 52px; }
+.holo-rain span:nth-child(3) { left: 24%; animation-delay: 0.4s; }
+.holo-rain span:nth-child(4) { left: 34%; animation-delay: 1.8s; height: 64px; }
+.holo-rain span:nth-child(5) { left: 42%; animation-delay: 0.7s; }
+.holo-rain span:nth-child(6) { left: 52%; animation-delay: 2.1s; height: 58px; }
+.holo-rain span:nth-child(7) { left: 61%; animation-delay: 0.2s; }
+.holo-rain span:nth-child(8) { left: 69%; animation-delay: 1.5s; height: 54px; }
+.holo-rain span:nth-child(9) { left: 78%; animation-delay: 0.9s; }
+.holo-rain span:nth-child(10) { left: 86%; animation-delay: 2.5s; height: 68px; }
+.holo-rain span:nth-child(11) { left: 92%; animation-delay: 1.2s; }
+.holo-rain span:nth-child(12) { left: 48%; animation-delay: 3s; height: 46px; }
+
+.energy-outline {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 47%;
+  width: 62%;
+  height: 70%;
+  transform: translate(-50%, -50%);
+  border-radius: 46% 46% 40% 40%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 20%, transparent 42%, rgba(96, 165, 250, 0.14) 43%, transparent 50%),
+    linear-gradient(90deg, transparent 0 16%, rgba(96, 165, 250, 0.42) 17%, transparent 19% 81%, rgba(167, 139, 250, 0.38) 83%, transparent 85%);
+  filter: drop-shadow(0 0 24px rgba(96, 165, 250, 0.25));
+  opacity: 0.66;
+  animation: outlineBreathe 4.8s ease-in-out infinite;
 }
 
 .visual-grid {
@@ -991,6 +1441,40 @@ onUnmounted(() => {
   opacity: 0.58;
   mix-blend-mode: screen;
   animation: holoBreath 5.8s ease-in-out infinite;
+}
+
+.avatar-orbit {
+  position: absolute;
+  z-index: 3;
+  inset: 68px 42px 112px;
+  pointer-events: none;
+  opacity: 0.76;
+}
+
+.avatar-orbit span {
+  position: absolute;
+  border-radius: 999px;
+  border: 1px solid rgba(147, 197, 253, 0.28);
+  box-shadow: inset 0 0 34px rgba(96, 165, 250, 0.06), 0 0 24px rgba(96, 165, 250, 0.1);
+  animation: scanSpin 12s linear infinite;
+}
+
+.avatar-orbit span:nth-child(1) {
+  inset: 7% 15%;
+}
+
+.avatar-orbit span:nth-child(2) {
+  inset: 18% 6%;
+  border-style: dashed;
+  border-color: rgba(167, 139, 250, 0.34);
+  animation-duration: 8s;
+  animation-direction: reverse;
+}
+
+.avatar-orbit span:nth-child(3) {
+  inset: 31% 23%;
+  border-color: rgba(255, 255, 255, 0.18);
+  animation-duration: 5.6s;
 }
 
 .scanner-dial {
@@ -1098,11 +1582,26 @@ onUnmounted(() => {
 
 .journey-panel {
   padding: 16px;
-  border: 1px solid rgba(148, 226, 255, 0.18);
   border-radius: 8px;
-  background: rgba(8, 14, 27, 0.62);
-  backdrop-filter: blur(18px);
-  box-shadow: var(--shadow);
+}
+
+.signal-stack {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.signal-stack span {
+  min-height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(147, 197, 253, 0.16);
+  border-radius: 999px;
+  background: rgba(5, 8, 22, 0.34);
+  color: rgba(226, 239, 255, 0.72);
+  font: 800 11px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(12px);
 }
 
 .journey-panel-head {
@@ -1166,6 +1665,24 @@ onUnmounted(() => {
   padding: 10px 0 20px;
 }
 
+.scroll-trigger {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0) rotateX(2deg);
+  filter: blur(6px);
+  transition:
+    opacity 0.72s var(--ease-out),
+    transform 0.72s var(--ease-out),
+    filter 0.72s var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform, opacity, filter;
+}
+
+.scroll-trigger.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) rotateX(0deg);
+  filter: blur(0);
+}
+
 .section-head {
   display: flex;
   align-items: end;
@@ -1216,7 +1733,6 @@ onUnmounted(() => {
 
 .life-timeline-item {
   position: relative;
-  animation: fadeInUp 0.7s var(--ease-out) both;
 }
 
 .life-node {
@@ -1560,8 +2076,57 @@ onUnmounted(() => {
 }
 
 @keyframes frameHover {
-  0%, 100% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
-  50% { transform: translateY(-8px) rotateX(1deg) rotateY(-1.2deg); }
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -8px; }
+}
+
+@keyframes meshHorizon {
+  0%, 100% { opacity: 0.32; transform: translateY(-18px) scaleX(0.82); }
+  50% { opacity: 0.88; transform: translateY(18px) scaleX(1); }
+}
+
+@keyframes meshPlane {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 72px, 0 72px; }
+}
+
+@keyframes meshMountain {
+  0%, 100% { transform: translate3d(-1%, 0, 0) scale(1.02); }
+  50% { transform: translate3d(1.2%, 1.5%, 0) scale(1.04); }
+}
+
+@keyframes meshPulse {
+  0% { opacity: 0; transform: scale(0.25); }
+  12% { opacity: 0.52; }
+  100% { opacity: 0; transform: scale(1.8); }
+}
+
+@keyframes sliceGlitch {
+  0%, 72%, 100% { opacity: 0; transform: translate3d(0, 0, 0) skewX(0deg); }
+  76% { opacity: 0.7; transform: translate3d(-4%, 0, 0) skewX(-8deg); }
+  79% { opacity: 0.36; transform: translate3d(5%, 0, 0) skewX(7deg); }
+  84% { opacity: 0; transform: translate3d(0, 0, 0) skewX(0deg); }
+}
+
+@keyframes vectorPulse {
+  0%, 100% { opacity: 0.28; transform: scale(0.72); }
+  48% { opacity: 1; transform: scale(1.18); }
+}
+
+@keyframes vectorFace {
+  0%, 100% { opacity: 0.3; transform: scale(0.98); }
+  50% { opacity: 0.66; transform: scale(1.03); }
+}
+
+@keyframes rainFall {
+  from { transform: translateY(-18%); opacity: 0; }
+  18% { opacity: 0.74; }
+  to { transform: translateY(140%); opacity: 0; }
+}
+
+@keyframes outlineBreathe {
+  0%, 100% { opacity: 0.48; transform: translate(-50%, -50%) scale(0.98); }
+  50% { opacity: 0.82; transform: translate(-50%, -50%) scale(1.025); }
 }
 
 @keyframes portraitDrift {
@@ -1588,7 +2153,7 @@ onUnmounted(() => {
   to { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 980px) {
   .hero-section {
     grid-template-columns: 1fr;
     min-height: auto;
@@ -1615,12 +2180,12 @@ onUnmounted(() => {
 
 @media (max-width: 760px) {
   .home-page {
-    padding: 74px 14px 78px;
+    padding: 42px 14px 78px;
   }
 
   .hero-section {
-    gap: 30px;
-    padding-top: 28px;
+    gap: 26px;
+    padding-top: 14px;
   }
 
   .hero-kicker {
@@ -1630,18 +2195,31 @@ onUnmounted(() => {
   }
 
   .hero-copy h1 {
-    font-size: 3.05rem;
+    font-size: 2.86rem;
     line-height: 0.98;
     overflow-wrap: break-word;
   }
 
   .hero-role {
+    margin-top: 18px;
     font-size: 0.98rem;
+  }
+
+  .hero-slogan {
+    margin-top: 12px;
+    line-height: 1.72;
+  }
+
+  .signal-line {
+    min-height: 46px;
+    margin-top: 20px;
   }
 
   .hero-actions {
     display: grid;
     grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 24px;
   }
 
   .hero-btn {
@@ -1649,12 +2227,20 @@ onUnmounted(() => {
   }
 
   .hero-metrics,
+  .signal-stack,
   .quick-nav {
     grid-template-columns: 1fr;
   }
 
   .visual-frame {
-    min-height: 340px;
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+    aspect-ratio: 4 / 5;
+  }
+
+  .avatar-orbit {
+    inset: 68px 24px 104px;
   }
 
   .scanner-dial {
@@ -1711,10 +2297,21 @@ onUnmounted(() => {
 
 @media (prefers-reduced-motion: reduce) {
   .ambient-bar,
+  .mesh-horizon,
+  .mesh-plane,
+  .mesh-mountain,
+  .mesh-pulse,
   .kicker-dot,
   .cursor-blink,
+  .digital-slices span,
+  .face-vector span,
+  .face-vector::before,
+  .face-vector::after,
+  .holo-rain span,
+  .energy-outline,
   .scanner-dial::before,
   .scanner-dial span,
+  .avatar-orbit span,
   .visual-frame,
   .visual-frame::after,
   .visual-grid::after,
