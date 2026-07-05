@@ -42,6 +42,18 @@
             <span>NLP</span>
             <span>Blender</span>
           </div>
+          <div class="welcome-connect" :aria-label="welcomeCopy.connectLabel">
+            <span class="connect-label">{{ welcomeCopy.connectLabel }}</span>
+            <a
+              v-for="item in welcomeConnectLinks"
+              :key="item.name"
+              :href="item.url"
+              target="_blank"
+              rel="noopener"
+            >
+              {{ item.name }}
+            </a>
+          </div>
           <div class="welcome-progress" aria-hidden="true"><span></span></div>
           <button class="welcome-enter" type="button" @click="enterWelcome">
             <span>{{ welcomeCopy.action }}</span>
@@ -173,7 +185,7 @@ import { computed, provide, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router'
 import { useUserStore } from './stores/user'
-import { isStaticMode } from './config/site.config'
+import { isStaticMode, visibleSocials } from './config/site.config'
 import { getSiteStats, recordSiteVisit } from './api/siteStats'
 import AIGuide from './components/AIGuide.vue'
 
@@ -204,6 +216,18 @@ const pointerStyle = computed(() => ({
 
 const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
 const rssUrl = computed(() => `${baseUrl || ''}/rss.xml`)
+const welcomeConnectLinks = computed(() => {
+  const preferred = ['GitHub', '邮箱', '语雀']
+  const socials = preferred
+    .map(name => visibleSocials.find(item => item.name === name))
+    .filter(Boolean)
+    .map(item => ({ name: item.name === '邮箱' && language.value === 'en' ? 'Email' : item.name, url: item.url }))
+
+  return [
+    ...socials,
+    { name: 'RSS', url: rssUrl.value },
+  ]
+})
 
 const navText = {
   zh: [
@@ -236,12 +260,14 @@ const welcomeCopy = computed(() => language.value === 'zh'
       title: '欢迎来到我的博客',
       desc: '正在接入文章、项目、生命轨迹与 AI 数字档案，准备进入 Ethan 的个人技术空间。',
       action: '进入博客',
+      connectLabel: '连接入口',
     }
   : {
       code: 'VL-INTERACTIF / ETHAN BLOG BOOT',
       title: 'Welcome to My Blog',
       desc: 'Connecting articles, projects, life timeline, and AI archive before entering Ethan personal tech space.',
       action: 'Enter Blog',
+      connectLabel: 'Connect',
     })
 
 const railCopy = computed(() => language.value === 'zh'
@@ -800,6 +826,53 @@ onUnmounted(() => {
 .welcome-tech span:nth-child(2) { animation-delay: 0.3s; }
 .welcome-tech span:nth-child(3) { animation-delay: 0.6s; }
 .welcome-tech span:nth-child(4) { animation-delay: 0.9s; }
+
+.welcome-connect {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: min(560px, 100%);
+  margin: 18px auto 0;
+  padding: 8px;
+  border: 1px solid rgba(147, 197, 253, 0.16);
+  border-radius: 999px;
+  background: rgba(5, 8, 22, 0.22);
+  box-shadow: inset 0 0 22px rgba(96, 165, 250, 0.04);
+  backdrop-filter: blur(10px);
+}
+
+.connect-label,
+.welcome-connect a {
+  min-height: 28px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 11px;
+  border-radius: 999px;
+  font: 800 10px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.connect-label {
+  color: rgba(147, 197, 253, 0.58);
+}
+
+.welcome-connect a {
+  border: 1px solid rgba(147, 197, 253, 0.16);
+  color: rgba(226, 239, 255, 0.74);
+  text-decoration: none;
+  background: rgba(8, 14, 27, 0.28);
+  transition: transform 0.22s var(--ease-out), border-color 0.22s, color 0.22s, background 0.22s;
+}
+
+.welcome-connect a:hover {
+  transform: translateY(-2px);
+  border-color: rgba(96, 165, 250, 0.52);
+  color: #f8fbff;
+  background: rgba(96, 165, 250, 0.1);
+}
 
 .welcome-progress {
   width: min(440px, 82%);
@@ -1693,6 +1766,20 @@ onUnmounted(() => {
   .welcome-copy[data-language="zh"] h1 {
     font-size: clamp(2rem, 9.4vw, 3.6rem);
     white-space: normal;
+  }
+
+  .welcome-connect {
+    gap: 6px;
+    max-width: 100%;
+    padding: 7px;
+    border-radius: 18px;
+  }
+
+  .connect-label,
+  .welcome-connect a {
+    min-height: 26px;
+    padding: 0 9px;
+    font-size: 9px;
   }
 
   .time-gate-panel {
