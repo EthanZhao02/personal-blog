@@ -27,3 +27,9 @@ Thumbs.db
 *.bat
 test-*.bat
 check-*.bat
+
+# Cloudflare Wrangler 本地缓存
+.wrangler/
+
+# 本地 PowerShell 辅助脚本
+build.ps1
