@@ -12,7 +12,14 @@
     </div>
 
     <transition name="welcome">
-      <section v-if="welcomeVisible" class="welcome-portal" aria-label="欢迎进入个人博客" @click.stop @touchstart.stop>
+      <section
+        v-if="welcomeVisible"
+        class="welcome-portal"
+        :class="{ 'is-leaving': welcomeLeaving }"
+        aria-label="欢迎进入个人博客"
+        @click.stop
+        @touchstart.stop
+      >
         <div class="portal-grid" aria-hidden="true"></div>
         <div class="welcome-stage" aria-hidden="true">
           <span class="stage-starfield"></span>
@@ -33,9 +40,9 @@
           <span class="portal-node node-c"></span>
         </div>
         <div class="welcome-copy" :data-language="language">
-          <span class="welcome-code">{{ welcomeCopy.code }}</span>
-          <h1>{{ welcomeCopy.title }}</h1>
-          <p>{{ welcomeCopy.desc }}</p>
+          <span class="welcome-code">{{ welcomeLeaving ? welcomeCopy.exitCode : welcomeCopy.code }}</span>
+          <h1>{{ welcomeLeaving ? welcomeCopy.exitTitle : welcomeCopy.title }}</h1>
+          <p>{{ welcomeLeaving ? welcomeCopy.exitDesc : welcomeCopy.desc }}</p>
           <div class="welcome-tech" aria-hidden="true">
             <span>Vue.js</span>
             <span>Spring Boot</span>
@@ -55,12 +62,12 @@
             </a>
           </div>
           <div class="welcome-progress" aria-hidden="true"><span></span></div>
-          <button class="welcome-enter" type="button" @click="enterWelcome">
-            <span>{{ welcomeCopy.action }}</span>
+          <button class="welcome-enter" type="button" :disabled="welcomeLeaving" @click="enterWelcome">
+            <span>{{ welcomeLeaving ? welcomeCopy.entering : welcomeCopy.action }}</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
           </button>
         </div>
-        <button class="welcome-skip" type="button" @click="enterWelcome">SKIP</button>
+        <button class="welcome-skip" type="button" :disabled="welcomeLeaving" @click="enterWelcome">SKIP</button>
       </section>
     </transition>
 
@@ -196,11 +203,13 @@ const pointer = ref({ x: '50vw', y: '40vh' })
 const language = ref(localStorage.getItem('ethan-language') || 'zh')
 const themeMode = ref(localStorage.getItem('ethan-theme') || 'dark')
 const showWelcome = ref(false)
+const welcomeLeaving = ref(false)
 const showTimeGate = ref(false)
 const timeGateMode = ref('future')
 const siteStats = ref({ pageViews: null, uniqueVisitors: null })
 const scrollProgress = ref(0)
 let welcomeTimer = null
+let welcomeLaunchTimer = null
 let lastTrackedPath = ''
 let scrollFrame = null
 
@@ -260,6 +269,10 @@ const welcomeCopy = computed(() => language.value === 'zh'
       title: '欢迎来到我的博客',
       desc: '正在接入文章、项目、生命轨迹与 AI 数字档案，准备进入 Ethan 的个人技术空间。',
       action: '进入博客',
+      entering: '正在进入',
+      exitCode: 'ETHAN NEXUS / CHANNEL OPEN',
+      exitTitle: '正在进入 Ethan 智域',
+      exitDesc: '通道已打开，正在同步首页场景、数字分身与未来航线。',
       connectLabel: '连接入口',
     }
   : {
@@ -267,6 +280,10 @@ const welcomeCopy = computed(() => language.value === 'zh'
       title: 'Welcome to My Blog',
       desc: 'Connecting articles, projects, life timeline, and AI archive before entering Ethan personal tech space.',
       action: 'Enter Blog',
+      entering: 'Entering',
+      exitCode: 'ETHAN NEXUS / CHANNEL OPEN',
+      exitTitle: 'Entering Ethan Nexus',
+      exitDesc: 'Channel opened. Syncing the hero scene, digital twin, and future route.',
       connectLabel: 'Connect',
     })
 
@@ -362,11 +379,20 @@ const applyTheme = () => {
 }
 
 const enterWelcome = () => {
-  showWelcome.value = false
+  if (welcomeLeaving.value) return
+  welcomeLeaving.value = true
   if (welcomeTimer) {
     clearTimeout(welcomeTimer)
     welcomeTimer = null
   }
+  if (welcomeLaunchTimer) {
+    clearTimeout(welcomeLaunchTimer)
+  }
+  welcomeLaunchTimer = window.setTimeout(() => {
+    showWelcome.value = false
+    welcomeLeaving.value = false
+    welcomeLaunchTimer = null
+  }, 920)
 }
 
 const openTimeGate = (mode) => {
@@ -487,6 +513,9 @@ const dropCandy = (e) => {
 
 const startWelcomeIfHome = () => {
   if (route.path !== '/') return
+  if (welcomeTimer) clearTimeout(welcomeTimer)
+  if (welcomeLaunchTimer) clearTimeout(welcomeLaunchTimer)
+  welcomeLeaving.value = false
   showWelcome.value = true
   welcomeTimer = window.setTimeout(enterWelcome, 8600)
 }
@@ -531,7 +560,10 @@ watch(themeMode, (value) => {
 
 watch(() => route.path, (path) => {
   if (path !== '/' && showWelcome.value) {
-    enterWelcome()
+    showWelcome.value = false
+    welcomeLeaving.value = false
+    if (welcomeTimer) clearTimeout(welcomeTimer)
+    if (welcomeLaunchTimer) clearTimeout(welcomeLaunchTimer)
   }
 })
 
@@ -541,6 +573,7 @@ watch(() => route.fullPath, (path) => {
 
 onUnmounted(() => {
   if (welcomeTimer) clearTimeout(welcomeTimer)
+  if (welcomeLaunchTimer) clearTimeout(welcomeLaunchTimer)
   if (scrollFrame) cancelAnimationFrame(scrollFrame)
   window.removeEventListener('scroll', handleScroll)
 })
@@ -587,6 +620,10 @@ onUnmounted(() => {
     linear-gradient(135deg, rgba(2, 6, 18, 0.99), rgba(8, 13, 35, 0.98));
 }
 
+.welcome-portal.is-leaving {
+  cursor: wait;
+}
+
 .welcome-portal::before,
 .welcome-portal::after {
   content: '';
@@ -614,6 +651,14 @@ onUnmounted(() => {
   animation: bootScan 3.6s linear infinite;
 }
 
+.welcome-portal.is-leaving::before {
+  animation: launchGlow 0.92s var(--ease-out) forwards;
+}
+
+.welcome-portal.is-leaving::after {
+  animation: launchScan 0.92s var(--ease-out) forwards;
+}
+
 .portal-grid {
   position: absolute;
   z-index: 1;
@@ -624,6 +669,10 @@ onUnmounted(() => {
     repeating-linear-gradient(115deg, transparent 0 12px, rgba(255, 255, 255, 0.025) 12px 13px);
   mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 70%);
   animation: portalGrid 7s linear infinite;
+}
+
+.welcome-portal.is-leaving .portal-grid {
+  animation: portalGrid 0.58s linear infinite, gridLaunch 0.92s var(--ease-out) forwards;
 }
 
 .welcome-stage {
@@ -705,6 +754,22 @@ onUnmounted(() => {
   filter: drop-shadow(0 0 34px rgba(56, 189, 248, 0.18));
 }
 
+.welcome-portal.is-leaving .portal-core {
+  animation: portalCoreLaunch 0.92s var(--ease-out) forwards;
+}
+
+.welcome-portal.is-leaving .stage-mesh {
+  animation: meshRunway 0.46s linear infinite, runwayLaunch 0.92s var(--ease-out) forwards;
+}
+
+.welcome-portal.is-leaving .stage-mountain {
+  animation: mountainLaunch 0.92s var(--ease-out) forwards;
+}
+
+.welcome-portal.is-leaving .stage-scanline {
+  animation: horizonLaunch 0.92s var(--ease-out) forwards;
+}
+
 .portal-ring {
   position: absolute;
   border-radius: 999px;
@@ -763,6 +828,10 @@ onUnmounted(() => {
   max-width: calc(100vw - 56px);
   text-align: center;
   padding: clamp(28px, 5vw, 48px);
+}
+
+.welcome-portal.is-leaving .welcome-copy {
+  animation: copyLaunch 0.92s var(--ease-out) forwards;
 }
 
 .welcome-code {
@@ -894,6 +963,15 @@ onUnmounted(() => {
   animation: portalLoad 8.2s var(--ease-out) forwards;
 }
 
+.welcome-portal.is-leaving .welcome-progress {
+  background: rgba(147, 197, 253, 0.2);
+  box-shadow: 0 0 26px rgba(96, 165, 250, 0.18), inset 0 0 18px rgba(96, 165, 250, 0.08);
+}
+
+.welcome-portal.is-leaving .welcome-progress span {
+  animation: launchLoad 0.92s var(--ease-out) forwards;
+}
+
 .welcome-enter {
   display: inline-flex;
   align-items: center;
@@ -909,6 +987,18 @@ onUnmounted(() => {
   cursor: pointer;
   box-shadow: 0 18px 44px rgba(96, 165, 250, 0.13);
   transition: transform 0.22s var(--ease-out), border-color 0.22s, background 0.22s;
+}
+
+.welcome-enter:disabled,
+.welcome-skip:disabled {
+  cursor: wait;
+}
+
+.welcome-portal.is-leaving .welcome-enter {
+  border-color: rgba(147, 197, 253, 0.72);
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.18), rgba(167, 139, 250, 0.2));
+  box-shadow: 0 0 34px rgba(96, 165, 250, 0.2);
+  animation: buttonLaunch 0.92s var(--ease-out) forwards;
 }
 
 .welcome-enter svg {
@@ -991,6 +1081,62 @@ onUnmounted(() => {
 @keyframes techWake {
   0%, 100% { opacity: 0.5; transform: translateY(0); }
   50% { opacity: 0.94; transform: translateY(-2px); }
+}
+
+@keyframes launchGlow {
+  0% { opacity: 0.82; filter: saturate(1); }
+  48% { opacity: 1; filter: saturate(1.45) brightness(1.18); }
+  100% { opacity: 0.22; filter: saturate(1.1) brightness(0.82); }
+}
+
+@keyframes launchScan {
+  0% { opacity: 0.62; transform: translateY(-12%); }
+  42% { opacity: 0.92; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(18%); }
+}
+
+@keyframes gridLaunch {
+  0% { opacity: 1; transform: scale(1); filter: blur(0); }
+  100% { opacity: 0.18; transform: scale(1.18); filter: blur(5px); }
+}
+
+@keyframes portalCoreLaunch {
+  0% { opacity: 1; transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 34px rgba(56, 189, 248, 0.18)); }
+  46% { opacity: 1; transform: scale(0.88) rotate(8deg); filter: drop-shadow(0 0 56px rgba(96, 165, 250, 0.5)); }
+  100% { opacity: 0; transform: scale(1.46) rotate(18deg); filter: blur(10px) drop-shadow(0 0 80px rgba(147, 197, 253, 0.58)); }
+}
+
+@keyframes runwayLaunch {
+  0% { opacity: 1; transform: rotateX(66deg) translateY(8%); }
+  100% { opacity: 0.28; transform: rotateX(66deg) translateY(28%) scale(1.12); }
+}
+
+@keyframes mountainLaunch {
+  0% { opacity: 0.52; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(36px) scale(1.08); }
+}
+
+@keyframes horizonLaunch {
+  0% { opacity: 0.74; transform: translateY(0) scaleX(1); }
+  58% { opacity: 1; transform: translateY(-2px) scaleX(1.14); }
+  100% { opacity: 0; transform: translateY(-2px) scaleX(0.2); }
+}
+
+@keyframes copyLaunch {
+  0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  42% { opacity: 1; transform: translateY(-4px) scale(1.015); filter: blur(0); }
+  100% { opacity: 0; transform: translateY(-18px) scale(0.96); filter: blur(8px); }
+}
+
+@keyframes launchLoad {
+  0% { transform: scaleX(0.72); opacity: 0.88; }
+  45% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+
+@keyframes buttonLaunch {
+  0%, 100% { transform: translateY(0); }
+  46% { transform: translateY(-2px) scale(1.02); }
 }
 
 @keyframes portalSpin {
@@ -1815,6 +1961,16 @@ onUnmounted(() => {
   .stage-mountain,
   .stage-scanline,
   .welcome-tech span,
+  .welcome-portal.is-leaving::before,
+  .welcome-portal.is-leaving::after,
+  .welcome-portal.is-leaving .portal-grid,
+  .welcome-portal.is-leaving .portal-core,
+  .welcome-portal.is-leaving .stage-mesh,
+  .welcome-portal.is-leaving .stage-mountain,
+  .welcome-portal.is-leaving .stage-scanline,
+  .welcome-portal.is-leaving .welcome-copy,
+  .welcome-portal.is-leaving .welcome-progress span,
+  .welcome-portal.is-leaving .welcome-enter,
   .portal-grid,
   .portal-ring,
   .portal-beam,
