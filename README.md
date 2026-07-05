@@ -121,7 +121,7 @@ personal-blog/
 ### 环境要求
 
 - Node.js 16+
-- JDK 1.8+
+- JDK 17+
 - MySQL 8.0+
 - Maven 3.6+
 
@@ -140,6 +140,10 @@ source database/init.sql
 ```bash
 cd server
 
+# Windows PowerShell 示例：JWT_SECRET 至少 32 位；ADMIN_DEFAULT_PASSWORD 只在首次创建 admin 时使用
+$env:JWT_SECRET="replace-with-a-random-secret-at-least-32-bytes"
+$env:ADMIN_DEFAULT_PASSWORD="replace-with-a-strong-admin-password"
+
 # 安装依赖
 mvn clean install
 
@@ -148,6 +152,8 @@ mvn spring-boot:run
 ```
 
 后端运行在 http://localhost:8080
+
+生产环境必须配置 `JWT_SECRET`；首次部署如需自动创建管理员，请配置 `ADMIN_DEFAULT_PASSWORD`，不要在 SQL 或公开仓库里写死管理员密码。
 
 ### 3. 启动前端
 
@@ -285,7 +291,8 @@ npm run dev
 
 ### 3. 登录失败
 - 检查数据库是否有用户数据
-- 检查密码是否正确（默认 123456）
+- 如果首次部署没有管理员账号，检查是否已设置 `ADMIN_DEFAULT_PASSWORD`
+- 检查密码是否正确；项目不再提供公开默认密码
 
 ## 上传到 GitHub
 
@@ -319,21 +326,8 @@ git remote add origin https://github.com/YOUR_USERNAME/personal-blog.git
 git push -u origin master
 ```
 
-#### 3. 如果遇到 Token 失效问题
-GitHub 已于 2021 年取消密码认证，需使用 Personal Access Token：
-
-1. 打开 https://github.com/settings/tokens/new
-2. 输入 Token 名称（如：my-pc）
-3. 勾选 `repo` 全部权限
-4. 点击 "Generate token"，**复制保存好 Token**
-
-推送时，URL 格式改为：
-```
-https://ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@github.com/YOUR_USERNAME/personal-blog.git
-```
-把 `ghp_xxx...` 换成你的 Token。
-
-或者用 GitHub CLI 登录：
+#### 3. 如果遇到 GitHub 认证问题
+不要把 Personal Access Token 写进远程仓库 URL。推荐用 GitHub CLI 登录，让 Git 自己走凭据管理：
 ```bash
 # 安装 GitHub CLI（Windows）
 winget install GitHub.cli
@@ -344,6 +338,13 @@ gh auth login
 # 之后 push 就不需要手动输入密码了
 git push origin master
 ```
+
+远程地址应保持为普通地址：
+```bash
+git remote set-url origin https://github.com/YOUR_USERNAME/personal-blog.git
+```
+
+如果 token 曾经出现在命令行、日志或远程 URL 里，应到 GitHub 设置中立即撤销并重新生成。
 
 ### 方法二：可视化工具
 

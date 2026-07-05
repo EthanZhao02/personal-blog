@@ -9,7 +9,7 @@ import com.blog.entity.User;
 import com.blog.mapper.UserMapper;
 import com.blog.service.UserService;
 import com.blog.utils.JwtUtil;
-import com.blog.utils.MD5Util;
+import com.blog.utils.PasswordUtil;
 import com.blog.vo.UserVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 创建用户
         User user = new User();
         user.setUsername(registerDTO.getUsername());
-        user.setPassword(MD5Util.encrypt(registerDTO.getPassword()));
+        user.setPassword(PasswordUtil.hash(registerDTO.getPassword()));
         user.setNickname(registerDTO.getNickname() != null ? registerDTO.getNickname() : registerDTO.getUsername());
         user.setEmail(registerDTO.getEmail());
         user.setCreateTime(LocalDateTime.now());
@@ -66,8 +66,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         // 验证密码
-        if (!MD5Util.verify(loginDTO.getPassword(), user.getPassword())) {
+        if (!PasswordUtil.matches(loginDTO.getPassword(), user.getPassword())) {
             return Result.error("密码错误");
+        }
+
+        if (PasswordUtil.needsRehash(user.getPassword())) {
+            user.setPassword(PasswordUtil.hash(loginDTO.getPassword()));
+            user.setUpdateTime(LocalDateTime.now());
+            this.updateById(user);
         }
 
         // 返回用户信息

@@ -38,10 +38,13 @@ mybatis-plus:
       id-type: auto
 
 jwt:
-  secret: ${JWT_SECRET:change-this-jwt-secret-before-production-use-2026}
+  secret: ${JWT_SECRET:}
   expiration: ${JWT_EXPIRATION:604800000}
+
+admin:
+  default-password: ${ADMIN_DEFAULT_PASSWORD:}
 
 file:
   upload:
-    path: uploads/
+    path: ${FILE_UPLOAD_PATH:uploads/}
     base-url: /uploads/

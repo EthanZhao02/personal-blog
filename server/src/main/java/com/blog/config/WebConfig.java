@@ -75,8 +75,8 @@ public class WebConfig implements WebMvcConfigurer {
                         // 个人资料 - 公开读取，写由 Controller 层鉴权
                         "/profile",
                         "/profile/**",
-                        // 上传文件 - 公开
-                        "/upload/**",
+                        // 已上传文件公开读取；上传动作需要登录
+                        "/upload/file/**",
                         "/uploads/**",
                         // 错误页面
                         "/error"

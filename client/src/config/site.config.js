@@ -183,7 +183,7 @@ const articles = [
 
 ## database
 
-database/init.sql 是初始化 MySQL 数据的脚本，包含默认管理员账号 admin / 123456。线上如果只部署 GitHub Pages，站内账号登录不会生效；如果要启用账号登录，需要单独部署后端和 MySQL，并设置 VITE_API_BASE_URL。`,
+database/init.sql 是初始化 MySQL 数据的脚本。管理员账号不再写死默认密码，首次部署请通过后端环境变量 ADMIN_DEFAULT_PASSWORD 创建。线上如果只部署 GitHub Pages，站内账号登录不会生效；如果要启用账号登录，需要单独部署后端和 MySQL，并设置 VITE_API_BASE_URL。`,
     categoryId: 1,
     categoryName: 'Tech 技术',
     authorName: 'Ethan',

@@ -7,22 +7,29 @@ import com.blog.entity.User;
 import com.blog.service.UserService;
 import com.blog.utils.JwtUtil;
 import com.blog.vo.UserVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * 用户控制器
  */
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
+    private static final Set<String> IMAGE_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".gif", ".webp");
 
     @Autowired
     private UserService userService;
@@ -80,6 +87,9 @@ public class UserController {
         if (file.isEmpty()) {
             return Result.error("请选择文件");
         }
+        if (file.getSize() > 10 * 1024 * 1024) {
+            return Result.error("文件大小不能超过10MB");
+        }
 
         try {
             // 获取用户ID
@@ -91,25 +101,30 @@ public class UserController {
 
             // 生成文件名
             String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase(Locale.ROOT);
+            }
+            if (!IMAGE_EXTENSIONS.contains(extension)) {
+                return Result.error("不支持的头像文件类型");
+            }
             String filename = UUID.randomUUID().toString() + extension;
 
             // 保存文件
-            String uploadPath = "./uploads/avatar/";
-            File dir = new File(uploadPath);
-            if (!dir.exists()) {
-                dir.mkdirs();
+            Path root = Paths.get("./uploads/avatar/").toAbsolutePath().normalize();
+            Files.createDirectories(root);
+            Path dest = root.resolve(filename).normalize();
+            if (!dest.startsWith(root)) {
+                return Result.error("上传路径不合法");
             }
-
-            File dest = new File(uploadPath + filename);
-            file.transferTo(dest);
+            file.transferTo(dest.toFile());
 
             // 更新用户头像
             String avatarUrl = "/uploads/avatar/" + filename;
             return userService.updateAvatar(userId, avatarUrl);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Avatar upload failed", e);
             return Result.error("上传失败");
         }
     }

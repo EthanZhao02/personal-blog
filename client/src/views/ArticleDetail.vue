@@ -387,8 +387,6 @@ const downloadFile = async (attachment) => {
 
     const downloadUrl = resolveContentUrl(url)
     
-    console.log('下载附件:', downloadUrl)
-    
     // 创建临时a标签下载
     const link = document.createElement('a')
     link.href = downloadUrl
@@ -513,9 +511,7 @@ const submitComment = async () => {
       payload.parentId = parentId
     }
     
-    console.log('提交评论数据:', payload)
     const res = await addComment(payload)
-    console.log('评论返回:', res)
 
     // 清空回复状态，保留昵称/邮箱/内容（支持连续回复）
     replyingTo.value = null

@@ -179,9 +179,9 @@ CREATE TABLE project (
 -- 初始数据
 -- ============================================
 
--- 插入默认用户（用户名: admin  密码: 123456）
-INSERT INTO user (username, password, nickname, email, create_time) VALUES
-('admin', 'e10adc3949ba59abbe56e057f20f883e', '博主', 'admin@example.com', NOW());
+-- 管理员账号不在 SQL 中写死。
+-- 生产环境请通过后端环境变量 ADMIN_DEFAULT_PASSWORD 自动创建 admin，
+-- 或者在后端启动后通过受控方式创建管理员，避免公开仓库携带默认密码。
 
 -- 插入默认分类
 INSERT INTO category (name, sort, create_time) VALUES

@@ -1,5 +1,6 @@
 package com.blog.config;
 
+import com.blog.utils.PasswordUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,9 +8,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.DigestUtils;
-
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -86,7 +84,7 @@ public class DatabaseInitializer implements CommandLineRunner {
     }
 
     /**
-     * 确保 admin 用户存在，不存在则自动创建（默认密码 123456）
+     * 确保 admin 用户存在；密码必须从环境变量读取，不在代码中写死。
      */
     private void ensureAdminUserExists() {
         try {
@@ -105,7 +103,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                     log.warn("未设置 ADMIN_DEFAULT_PASSWORD 环境变量，跳过自动创建 admin 用户");
                     return;
                 }
-                String hash = DigestUtils.md5DigestAsHex(pwd.getBytes(StandardCharsets.UTF_8));
+                String hash = PasswordUtil.hash(pwd);
                 jdbcTemplate.update(
                     "INSERT INTO " + USER_TABLE + " (username, password, nickname, email, is_admin, create_time, update_time) " +
                     "VALUES (?, ?, ?, ?, ?, NOW(), NOW())",

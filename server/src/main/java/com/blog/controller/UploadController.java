@@ -1,6 +1,7 @@
 package com.blog.controller;
 
 import com.blog.common.Result;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +16,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * 文件上传控制器
  */
+@Slf4j
 @RestController
 @RequestMapping("/upload")
 public class UploadController {
+    private static final Set<String> IMAGE_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".gif", ".webp");
+    private static final Set<String> ATTACHMENT_EXTENSIONS = Set.of(
+            ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".zip", ".rar", ".7z"
+    );
 
     @Value("${file.upload.path:uploads/}")
     private String uploadPath;
@@ -35,7 +43,7 @@ public class UploadController {
      */
     @PostMapping("/image")
     public Result<String> uploadImage(@RequestParam("file") MultipartFile file) {
-        return uploadFile(file, "images");
+        return uploadFile(file, "images", IMAGE_EXTENSIONS);
     }
 
     /**
@@ -43,20 +51,7 @@ public class UploadController {
      */
     @PostMapping("/attachment")
     public Result<String> uploadAttachment(@RequestParam("file") MultipartFile file) {
-        return uploadFile(file, "attachments");
-    }
-
-    /**
-     * 调试端点：查看文件实际存在哪里
-     */
-    @GetMapping("/debug/path")
-    public Result<String> debugPath() {
-        File f = new File(uploadPath + "images");
-        String absolute = f.getAbsolutePath();
-        String canonical = "";
-        try { canonical = f.getCanonicalPath(); } catch (IOException e) {}
-        boolean exists = f.exists();
-        return Result.success("uploadPath=[" + uploadPath + "] absolute=[" + absolute + "] canonical=[" + canonical + "] exists=" + exists);
+        return uploadFile(file, "attachments", ATTACHMENT_EXTENSIONS);
     }
 
     /**
@@ -69,9 +64,17 @@ public class UploadController {
         // uri: /upload/file/uploads/images/2026-04-10/xxx.png
         // uploadPath: uploads/  实际文件在: server/uploads/images/2026-04-10/xxx.png
         String afterPrefix = uri.substring("/upload/file".length()); // /uploads/images/2026-04-10/xxx.png
+        if (!afterPrefix.startsWith("/uploads/")) {
+            return ResponseEntity.notFound().build();
+        }
         // 去掉 /uploads 前缀，得到相对路径
         String relative = afterPrefix.substring("/uploads".length()); // /images/2026-04-10/xxx.png
-        File file = Paths.get(uploadPath + relative).toFile(); // uploads/images/2026-04-10/xxx.png
+        Path root = Paths.get(uploadPath).toAbsolutePath().normalize();
+        Path filePath = root.resolve(relative.replaceFirst("^/+", "")).normalize();
+        if (!filePath.startsWith(root)) {
+            return ResponseEntity.notFound().build();
+        }
+        File file = filePath.toFile();
         if (!file.exists() || !file.isFile()) {
             return ResponseEntity.notFound().build();
         }
@@ -92,7 +95,7 @@ public class UploadController {
     /**
      * 通用文件上传
      */
-    private Result<String> uploadFile(MultipartFile file, String subDir) {
+    private Result<String> uploadFile(MultipartFile file, String subDir, Set<String> allowedExtensions) {
         if (file.isEmpty()) {
             return Result.error("文件不能为空");
         }
@@ -102,30 +105,35 @@ public class UploadController {
             return Result.error("文件大小不能超过10MB");
         }
 
-        // 创建上传目录
-        String datePath = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        String fullDir = uploadPath + subDir + "/" + datePath;
-        File dir = new File(fullDir);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-
         // 生成唯一文件名
         String originalFilename = file.getOriginalFilename();
         String extension = "";
         if (originalFilename != null && originalFilename.contains(".")) {
-            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase(Locale.ROOT);
+        }
+        if (!allowedExtensions.contains(extension)) {
+            return Result.error("不支持的文件类型");
         }
         String filename = UUID.randomUUID().toString() + extension;
 
         // 保存文件
         try {
-            Path filePath = Paths.get(fullDir, filename);
+            String datePath = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+            Path root = Paths.get(uploadPath).toAbsolutePath().normalize();
+            Path dirPath = root.resolve(subDir).resolve(datePath).normalize();
+            if (!dirPath.startsWith(root)) {
+                return Result.error("上传路径不合法");
+            }
+            Files.createDirectories(dirPath);
+            Path filePath = dirPath.resolve(filename).normalize();
+            if (!filePath.startsWith(root)) {
+                return Result.error("上传路径不合法");
+            }
             Files.write(filePath, file.getBytes());
             String url = "/upload/file" + baseUrl + subDir + "/" + datePath + "/" + filename;
             return Result.success(url);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("File upload failed", e);
             return Result.error("上传失败: " + e.getMessage());
         }
     }
