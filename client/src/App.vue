@@ -1043,6 +1043,125 @@ onUnmounted(() => {
   filter: blur(10px);
 }
 
+/* Phase 4 welcome: restrained data channel instead of fake 3D scenery. */
+.welcome-portal {
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(96, 165, 250, 0.2), transparent 44%),
+    radial-gradient(circle at 50% 78%, rgba(167, 139, 250, 0.11), transparent 36%),
+    linear-gradient(135deg, #020611 0%, #071024 48%, #09091a 100%);
+}
+
+.portal-grid {
+  opacity: 0.24;
+  background:
+    linear-gradient(90deg, rgba(147, 197, 253, 0.035) 1px, transparent 1px) 0 0 / 96px 96px,
+    linear-gradient(0deg, rgba(147, 197, 253, 0.03) 1px, transparent 1px) 0 0 / 96px 96px,
+    radial-gradient(circle, rgba(238, 247, 255, 0.2) 0 1px, transparent 1.6px) 0 0 / 154px 154px;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  animation-duration: 14s;
+}
+
+.stage-mesh,
+.stage-mountain,
+.portal-core {
+  display: none;
+}
+
+.welcome-stage::before,
+.welcome-stage::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.welcome-stage::before {
+  left: 8%;
+  right: 8%;
+  top: 25%;
+  bottom: 25%;
+  border-top: 1px solid rgba(147, 197, 253, 0.16);
+  border-bottom: 1px solid rgba(167, 139, 250, 0.12);
+  background:
+    linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.1), transparent),
+    repeating-linear-gradient(90deg, transparent 0 76px, rgba(147, 197, 253, 0.13) 76px 77px),
+    repeating-linear-gradient(0deg, transparent 0 34px, rgba(167, 139, 250, 0.055) 34px 35px);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  opacity: 0.48;
+  animation: dataChannel 7.8s ease-in-out infinite;
+}
+
+.welcome-stage::after {
+  left: 12%;
+  right: 12%;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(219, 234, 254, 0.92), rgba(96, 165, 250, 0.9), rgba(167, 139, 250, 0.72), transparent);
+  box-shadow: 0 0 26px rgba(96, 165, 250, 0.42);
+  opacity: 0.72;
+  animation: dataSweep 4.8s ease-in-out infinite;
+}
+
+.stage-starfield {
+  opacity: 0.34;
+  filter: none;
+}
+
+.stage-scanline {
+  left: 18%;
+  right: 18%;
+  top: 50%;
+  height: clamp(96px, 22vh, 180px);
+  transform: translateY(-50%);
+  border-top: 1px solid rgba(147, 197, 253, 0.12);
+  border-bottom: 1px solid rgba(147, 197, 253, 0.08);
+  background:
+    linear-gradient(180deg, transparent, rgba(96, 165, 250, 0.055) 50%, transparent),
+    repeating-linear-gradient(90deg, rgba(147, 197, 253, 0.08) 0 1px, transparent 1px 30px);
+  box-shadow: none;
+  opacity: 0.52;
+  animation: channelPulse 5.4s ease-in-out infinite;
+}
+
+.welcome-copy {
+  text-shadow: 0 0 32px rgba(5, 8, 22, 0.48);
+}
+
+.welcome-portal.is-leaving .welcome-stage::before {
+  animation: channelLaunch 0.92s var(--ease-out) forwards;
+}
+
+.welcome-portal.is-leaving .welcome-stage::after,
+.welcome-portal.is-leaving .stage-scanline {
+  animation: dataOpen 0.92s var(--ease-out) forwards;
+}
+
+@keyframes dataChannel {
+  0%, 100% { opacity: 0.34; transform: translateY(0); }
+  50% { opacity: 0.56; transform: translateY(-4px); }
+}
+
+@keyframes dataSweep {
+  0%, 100% { opacity: 0.34; transform: scaleX(0.76); }
+  48% { opacity: 0.86; transform: scaleX(1); }
+}
+
+@keyframes channelPulse {
+  0%, 100% { opacity: 0.34; background-position: 0 0, 0 0; }
+  50% { opacity: 0.58; background-position: 0 0, 32px 0; }
+}
+
+@keyframes channelLaunch {
+  0% { opacity: 0.48; transform: translateY(0) scaleX(1); filter: blur(0); }
+  52% { opacity: 0.76; transform: translateY(-2px) scaleX(1.04); filter: blur(0); }
+  100% { opacity: 0; transform: translateY(-18px) scaleX(1.16); filter: blur(8px); }
+}
+
+@keyframes dataOpen {
+  0% { opacity: 0.58; transform: translateY(-50%) scaleX(0.92); filter: blur(0); }
+  46% { opacity: 0.88; transform: translateY(-50%) scaleX(1.08); filter: blur(0); }
+  100% { opacity: 0; transform: translateY(-50%) scaleX(1.42); filter: blur(10px); }
+}
+
 @keyframes portalGrid {
   from { transform: translate3d(0, 0, 0); }
   to { transform: translate3d(72px, 72px, 0); }

@@ -2295,6 +2295,78 @@ onUnmounted(() => {
   }
 }
 
+/* Phase 4: keep the hero cinematic, remove fake CSS mountains and orbit scenery. */
+.hero-mesh-scene {
+  opacity: 0.58;
+}
+
+.mesh-plane,
+.mesh-mountain,
+.mesh-pulse {
+  display: none;
+}
+
+.hero-mesh-scene::before,
+.hero-mesh-scene::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.hero-mesh-scene::before {
+  left: 7%;
+  right: 7%;
+  top: 28%;
+  height: 42%;
+  border-top: 1px solid rgba(147, 197, 253, 0.1);
+  border-bottom: 1px solid rgba(167, 139, 250, 0.08);
+  background:
+    linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.075), transparent),
+    repeating-linear-gradient(90deg, transparent 0 84px, rgba(147, 197, 253, 0.085) 84px 85px),
+    repeating-linear-gradient(0deg, transparent 0 38px, rgba(147, 197, 253, 0.035) 38px 39px);
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  animation: heroDataChannel 8.4s ease-in-out infinite;
+}
+
+.hero-mesh-scene::after {
+  left: 0;
+  right: 0;
+  top: 56%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.7), rgba(167, 139, 250, 0.34), transparent);
+  box-shadow: 0 0 22px rgba(96, 165, 250, 0.22);
+  opacity: 0.55;
+  animation: heroDataSweep 5.2s ease-in-out infinite;
+}
+
+.mesh-horizon {
+  top: 56%;
+  left: 10%;
+  right: 10%;
+  opacity: 0.46;
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.22);
+}
+
+.avatar-orbit {
+  opacity: 0.22;
+}
+
+.avatar-orbit span,
+.scanner-dial::before,
+.scanner-dial span {
+  animation: none !important;
+}
+
+@keyframes heroDataChannel {
+  0%, 100% { opacity: 0.28; transform: translateY(0); }
+  50% { opacity: 0.48; transform: translateY(-5px); }
+}
+
+@keyframes heroDataSweep {
+  0%, 100% { opacity: 0.32; transform: scaleX(0.78); }
+  48% { opacity: 0.68; transform: scaleX(1); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ambient-bar,
   .mesh-horizon,

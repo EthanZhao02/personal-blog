@@ -1544,3 +1544,295 @@ textarea { resize: vertical; min-height: 100px; }
     display: none !important;
   }
 }
+
+/* Phase 4: restrained future style for functional pages. */
+:root {
+  --surface-restraint: rgba(10, 18, 34, 0.72);
+  --surface-restraint-strong: rgba(12, 22, 42, 0.86);
+  --border-restraint: rgba(147, 197, 253, 0.16);
+}
+
+body {
+  background:
+    linear-gradient(125deg, rgba(96, 165, 250, 0.1) 0%, transparent 30%),
+    linear-gradient(235deg, rgba(139, 92, 246, 0.1) 0%, transparent 34%),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.035) 1px, transparent 1px) 0 0 / 86px 86px,
+    linear-gradient(0deg, rgba(147, 197, 253, 0.026) 1px, transparent 1px) 0 0 / 86px 86px,
+    var(--bg) !important;
+}
+
+body::before {
+  background:
+    linear-gradient(115deg, rgba(7, 8, 18, 0.06), rgba(12, 21, 39, 0.54) 50%, rgba(96, 165, 250, 0.04)) !important;
+}
+
+body::after {
+  opacity: 0.22 !important;
+  background-image:
+    radial-gradient(circle, rgba(238, 247, 255, 0.26) 0 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(96, 165, 250, 0.16) 0 1px, transparent 1.5px) !important;
+  background-size: 220px 220px, 320px 320px !important;
+}
+
+.posts-page .page-header,
+.projects-page .page-header,
+.friends-page .page-header,
+.message-page .page-header,
+.about-page .page-header,
+.write-page .page-header {
+  padding: clamp(18px, 3.4vw, 32px) 0 24px !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(147, 197, 253, 0.18) !important;
+  border-radius: 0 !important;
+  background:
+    linear-gradient(90deg, rgba(96, 165, 250, 0.065), transparent 66%) !important;
+  box-shadow: none !important;
+}
+
+.page-header::before {
+  inset: auto 0 -1px 0 !important;
+  height: 1px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.68), rgba(167, 139, 250, 0.28), transparent) !important;
+}
+
+.page-header::after {
+  display: none !important;
+}
+
+.page-title {
+  text-shadow: 0 0 20px rgba(96, 165, 250, 0.12) !important;
+}
+
+.page-desc,
+.signal-copy small,
+.bubble-content,
+.item-meta,
+.article-meta {
+  color: rgba(226, 239, 255, 0.66) !important;
+}
+
+.filter-panel,
+.apply-panel,
+.resume-panel,
+.auth-card,
+.article-main,
+.aside-card,
+.comment-form,
+.article-attachments,
+.project-cell,
+.project-card,
+.friend-node,
+.article-card,
+.note-composer,
+.message-note,
+.editor-main,
+.article-sidebar,
+.toolbar,
+.composer-signal {
+  border-color: var(--border-restraint) !important;
+  border-radius: 8px !important;
+  clip-path: none !important;
+  background:
+    linear-gradient(135deg, var(--surface-restraint-strong), var(--surface-restraint)),
+    rgba(6, 10, 22, 0.68) !important;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+}
+
+.filter-panel::before,
+.apply-panel::before,
+.resume-panel::before,
+.auth-card::before,
+.article-main::before,
+.aside-card::before,
+.comment-form::before,
+.article-attachments::before,
+.project-cell::before,
+.friend-node::before,
+.article-card::before {
+  opacity: 0.12 !important;
+  transform: none !important;
+  transition: opacity 0.25s var(--ease-out) !important;
+  background:
+    linear-gradient(180deg, rgba(147, 197, 253, 0.075), transparent 38%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.014) 0 1px, transparent 1px 8px) !important;
+}
+
+.filter-panel:hover::before,
+.apply-panel:hover::before,
+.resume-panel:hover::before,
+.auth-card:hover::before,
+.article-main:hover::before,
+.aside-card:hover::before,
+.comment-form:hover::before,
+.article-attachments:hover::before,
+.project-cell:hover::before,
+.friend-node:hover::before,
+.article-card:hover::before {
+  opacity: 0.18 !important;
+  transform: none !important;
+}
+
+.article-main::after,
+.resume-panel::after,
+.auth-card::after,
+.project-cell::after,
+.friend-node::after {
+  display: none !important;
+}
+
+.article-card:hover,
+.project-cell:hover,
+.friend-node:hover,
+.connect-card:hover,
+.tool-item:hover,
+.hobby-card:hover,
+.tag-pill:hover,
+.message-note:hover,
+.send-btn:hover:not(:disabled) {
+  transform: translateY(-2px) !important;
+  border-color: rgba(96, 165, 250, 0.34) !important;
+  box-shadow: 0 18px 48px rgba(96, 165, 250, 0.1), 0 16px 42px rgba(0, 0, 0, 0.3) !important;
+}
+
+.send-btn,
+.btn-submit,
+.apply-btn,
+.action-btn,
+.btn-block,
+.btn-primary,
+.btn-ghost,
+.btn-new,
+.attach-btn,
+.tag-btn,
+.tool-btn {
+  transition: transform 0.18s var(--ease-out), border-color 0.18s, background 0.18s, color 0.18s, box-shadow 0.18s !important;
+}
+
+.send-btn::after,
+.btn-submit::after,
+.apply-btn::after,
+.action-btn::after,
+.btn-block::after {
+  display: none !important;
+}
+
+.message-lab::before,
+.board-network,
+.composer-signal::before,
+.friend-node .node-avatar::after,
+.sidebar-avatar::before,
+.sidebar-avatar::after,
+.skill-bar::after {
+  display: none !important;
+}
+
+.message-lab {
+  gap: clamp(16px, 3vw, 26px) !important;
+}
+
+.note-composer {
+  padding: clamp(18px, 3vw, 24px) !important;
+}
+
+.composer-signal {
+  background:
+    linear-gradient(100deg, rgba(96, 165, 250, 0.08), transparent 58%),
+    rgba(5, 8, 22, 0.34) !important;
+}
+
+.signal-stack span {
+  animation: none !important;
+  box-shadow: 0 0 14px rgba(96, 165, 250, 0.26) !important;
+}
+
+.note-board {
+  min-height: 520px !important;
+  max-height: none !important;
+  padding: 4px 0 20px !important;
+}
+
+.note-grid {
+  gap: clamp(14px, 2.4vw, 20px) !important;
+}
+
+.message-note,
+.message-note:nth-child(3n + 2),
+.message-note:nth-child(4n) {
+  margin-top: 0 !important;
+  transform: none !important;
+}
+
+.message-note {
+  min-height: 170px !important;
+  background:
+    linear-gradient(145deg, rgba(18, 32, 58, 0.88), rgba(9, 15, 29, 0.82)),
+    linear-gradient(180deg, rgba(147, 197, 253, 0.035), transparent) !important;
+}
+
+.note-pin {
+  opacity: 0.76 !important;
+  box-shadow: 0 0 12px rgba(147, 197, 253, 0.42) !important;
+}
+
+.friend-node {
+  transform: none !important;
+}
+
+.friend-node:nth-child(2n),
+.friend-node:nth-child(3n) {
+  animation-delay: 0ms !important;
+}
+
+.friend-node .node-avatar,
+.project-cell .cell-icon,
+.sidebar-avatar,
+.about-avatar .avatar-wrapper {
+  filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.14)) !important;
+}
+
+.article-sidebar,
+.editor-main {
+  background:
+    linear-gradient(135deg, rgba(11, 20, 40, 0.86), rgba(5, 9, 22, 0.8)) !important;
+}
+
+.write-status span,
+.header-stats,
+.form-input,
+.form-textarea,
+.meta-field select,
+.new-tag-input,
+.content-textarea,
+.preview-content,
+.summary-textarea,
+.attachment-item {
+  border-color: rgba(147, 197, 253, 0.14) !important;
+  background: rgba(5, 10, 23, 0.5) !important;
+}
+
+.content-textarea,
+.preview-content {
+  box-shadow: inset 0 0 30px rgba(96, 165, 250, 0.018) !important;
+}
+
+.auth-card .ornament,
+.avatar-frame img,
+.avatar-placeholder,
+.skill-bar,
+.article-card,
+.project-cell,
+.friend-node {
+  animation-duration: 0.42s !important;
+}
+
+@media (max-width: 900px) {
+  .page-header::after {
+    display: none !important;
+  }
+
+  .message-lab {
+    grid-template-columns: 1fr !important;
+  }
+}
