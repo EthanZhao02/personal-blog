@@ -6,8 +6,9 @@
         <h2 class="page-title">{{ isEdit ? t('editTitle') : t('writeTitle') }}</h2>
       </div>
       <div class="write-status">
-        <span>{{ t('autosave') }}</span>
-        <span>{{ t('splitView') }}</span>
+        <span>{{ draftState }}</span>
+        <span>{{ contentStats.words }} {{ t('words') }}</span>
+        <span>{{ contentStats.readingMinutes }} {{ t('readingUnit') }}</span>
       </div>
     </div>
 
@@ -137,6 +138,25 @@
           <input ref="imageInput" type="file" accept="image/*" hidden @change="(e) => onFilePicked(e, 0)" />
         </div>
 
+        <div class="writing-console" aria-label="writing console">
+          <div class="writing-metrics">
+            <span><strong>{{ contentStats.characters }}</strong>{{ t('characters') }}</span>
+            <span><strong>{{ contentStats.headings }}</strong>{{ t('headings') }}</span>
+            <span><strong>{{ contentStats.images }}</strong>{{ t('images') }}</span>
+          </div>
+          <div class="template-strip">
+            <span>{{ t('templateLabel') }}</span>
+            <button
+              v-for="template in writingTemplates"
+              :key="template.key"
+              type="button"
+              @click="insertTemplate(template)"
+            >
+              {{ template.name }}
+            </button>
+          </div>
+        </div>
+
         <!-- 内容编辑：左编辑右预览 -->
         <div class="editor-container">
           <div class="editor-pane">
@@ -212,8 +232,6 @@ import { getCategoryList } from '../api/category'
 import { getTagList, addTag } from '../api/tag'
 import { uploadImage, uploadAttachment } from '../api/upload'
 import CropDialog from '../components/CropDialog.vue'
-import { marked } from 'marked'
-import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
 
 const route = useRoute()
@@ -253,7 +271,21 @@ const translations = {
     autosave: '自动草稿',
     splitView: '双栏预览',
     markdownLabel: 'Markdown',
-    previewLabel: '预览'
+    previewLabel: '预览',
+    words: '词',
+    readingUnit: '分钟阅读',
+    characters: '字',
+    headings: '标题',
+    images: '图片',
+    draftStandby: '草稿待命',
+    draftSaved: '草稿已保存',
+    templateLabel: '内容模板',
+    templateTech: '技术笔记',
+    templateProject: '项目复盘',
+    templateAi: 'AI 学习日志',
+    previewEmpty: '预览区域',
+    previewLoading: '正在加载 Markdown 引擎...',
+    previewFailed: '预览渲染失败，请检查 Markdown 内容。'
   },
   en: {
     editTitle: 'Edit Article',
@@ -285,7 +317,21 @@ const translations = {
     autosave: 'Auto Draft',
     splitView: 'Split Preview',
     markdownLabel: 'Markdown',
-    previewLabel: 'Preview'
+    previewLabel: 'Preview',
+    words: 'words',
+    readingUnit: 'min read',
+    characters: 'chars',
+    headings: 'headings',
+    images: 'images',
+    draftStandby: 'Draft ready',
+    draftSaved: 'Draft saved',
+    templateLabel: 'Templates',
+    templateTech: 'Tech Note',
+    templateProject: 'Project Review',
+    templateAi: 'AI Learning Log',
+    previewEmpty: 'Preview area',
+    previewLoading: 'Loading Markdown engine...',
+    previewFailed: 'Preview render failed. Check the Markdown content.'
   }
 }
 
@@ -307,6 +353,8 @@ const saving = ref(false)
 const editingId = ref(null)
 const showNewTagInput = ref(false)
 const newTagName = ref('')
+const renderedContent = ref('')
+const draftSavedAt = ref(null)
 
 const coverInput = ref(null)
 const imageInput = ref(null)
@@ -361,27 +409,218 @@ const resolveUploadUrl = (url) => {
   return url
 }
 
+const insertTemplate = (template) => {
+  const templateContent = template.content.trim()
+  if (!article.value.title.trim()) article.value.title = template.title
+  if (!article.value.summary.trim()) article.value.summary = template.summary
+
+  if (!article.value.content.trim()) {
+    article.value.content = templateContent
+    setTimeout(() => contentTextarea.value?.focus(), 0)
+    return
+  }
+
+  insertAtCursor(`\n\n${templateContent}`)
+}
+
 const isEdit = computed(() => !!editingId.value)
 
-// 简单的 Markdown → HTML 渲染（支持标题、粗斜体、图片、代码块、列表、链接）
-// 配置 marked + highlight.js
-marked.setOptions({
-  breaks: true,
-  gfm: true,
-  highlight: (code, lang) => {
-    if (lang && hljs.getLanguage(lang)) {
-      try {
-        return hljs.highlight(code, { language: lang }).value
-      } catch {}
-    }
-    return hljs.highlightAuto(code).value
+const emptyPreviewHtml = computed(() => `<p class="preview-empty">${t('previewEmpty')}</p>`)
+
+const contentStats = computed(() => {
+  const content = article.value.content || ''
+  const plain = content
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
+    .replace(/\[[^\]]*]\([^)]*\)/g, ' ')
+    .replace(/[#>*_`~\-[\]()!|]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const chineseChars = (plain.match(/[\u4e00-\u9fa5]/g) || []).length
+  const latinWords = (plain.replace(/[\u4e00-\u9fa5]/g, ' ').match(/[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*/g) || []).length
+  const words = chineseChars + latinWords
+
+  return {
+    characters: content.replace(/\s/g, '').length,
+    words,
+    readingMinutes: Math.max(1, Math.ceil(words / 350)),
+    headings: (content.match(/^#{1,6}\s+/gm) || []).length,
+    images: (content.match(/!\[[^\]]*]\(/g) || []).length
   }
 })
 
-const renderedContent = computed(() => {
-  if (!article.value.content) return '<p style="color:var(--text-lighter);font-style:italic">预览区域</p>'
-  return marked.parse(article.value.content)
+const draftState = computed(() => {
+  if (!draftSavedAt.value) return t('draftStandby')
+  return `${t('draftSaved')} ${new Date(draftSavedAt.value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
 })
+
+const writingTemplates = computed(() => {
+  if (lang.value === 'en') {
+    return [
+      {
+        key: 'tech',
+        name: t('templateTech'),
+        title: 'Technical Note',
+        summary: 'A focused note about one technical problem, implementation path, and final takeaway.',
+        content: '## Background\n\nWhat problem did I run into, and why does it matter?\n\n## Approach\n\n- Key idea:\n- Implementation detail:\n- Trade-off:\n\n## Result\n\nWhat changed after this solution?\n\n## Reflection\n\nWhat should I remember next time?'
+      },
+      {
+        key: 'project',
+        name: t('templateProject'),
+        title: 'Project Review',
+        summary: 'A project review covering motivation, architecture, features, issues, and next steps.',
+        content: '## Project Goal\n\nWhat is this project trying to solve?\n\n## Architecture\n\n- Frontend:\n- Backend:\n- Data:\n\n## Core Features\n\n1. \n2. \n3. \n\n## Problems And Fixes\n\nWhat was difficult, and how did I handle it?\n\n## Next Step\n\nWhat will be improved next?'
+      },
+      {
+        key: 'ai',
+        name: t('templateAi'),
+        title: 'AI Learning Log',
+        summary: 'A learning log about AI concepts, experiments, observations, and future questions.',
+        content: '## Learning Topic\n\nToday I focused on...\n\n## Key Concepts\n\n- Concept 1:\n- Concept 2:\n- Concept 3:\n\n## Experiment\n\nWhat did I try, and what did I observe?\n\n## Notes\n\nWhat is still unclear?\n\n## Next Question\n\nWhat should I explore next?'
+      }
+    ]
+  }
+
+  return [
+    {
+      key: 'tech',
+      name: t('templateTech'),
+      title: '技术笔记',
+      summary: '围绕一个技术问题，记录背景、实现路径、取舍和复盘结论。',
+      content: '## 背景\n\n这次遇到的问题是什么？为什么值得记录？\n\n## 解决思路\n\n- 核心思路：\n- 实现细节：\n- 技术取舍：\n\n## 最终效果\n\n这个方案解决了什么？还有哪些限制？\n\n## 复盘\n\n下次遇到类似问题，我应该注意什么？'
+    },
+    {
+      key: 'project',
+      name: t('templateProject'),
+      title: '项目复盘',
+      summary: '记录项目目标、架构、核心功能、问题处理和下一步优化方向。',
+      content: '## 项目目标\n\n这个项目要解决什么问题？面向谁使用？\n\n## 技术架构\n\n- 前端：\n- 后端：\n- 数据：\n\n## 核心功能\n\n1. \n2. \n3. \n\n## 问题与解决\n\n开发中遇到了什么问题？最后怎么处理？\n\n## 下一步\n\n后续准备如何优化？'
+    },
+    {
+      key: 'ai',
+      name: t('templateAi'),
+      title: 'AI 学习日志',
+      summary: '记录 AI 方向的概念理解、实验过程、观察结果和下一步问题。',
+      content: '## 学习主题\n\n今天主要学习了什么？\n\n## 关键概念\n\n- 概念 1：\n- 概念 2：\n- 概念 3：\n\n## 实验记录\n\n我尝试了什么？观察到了什么现象？\n\n## 思考\n\n哪些地方还没有完全理解？\n\n## 下一步问题\n\n接下来要继续验证什么？'
+    }
+  ]
+})
+
+let markdownEnginePromise = null
+let renderTimer = null
+let renderToken = 0
+
+const loadMarkdownEngine = async () => {
+  if (!markdownEnginePromise) {
+    markdownEnginePromise = (async () => {
+      const [
+        markedModule,
+        highlightCore,
+        javascript,
+        typescript,
+        xml,
+        css,
+        bash,
+        python,
+        java,
+        cpp,
+        json,
+        markdown,
+        sql
+      ] = await Promise.all([
+        import('marked'),
+        import('highlight.js/lib/core'),
+        import('highlight.js/lib/languages/javascript'),
+        import('highlight.js/lib/languages/typescript'),
+        import('highlight.js/lib/languages/xml'),
+        import('highlight.js/lib/languages/css'),
+        import('highlight.js/lib/languages/bash'),
+        import('highlight.js/lib/languages/python'),
+        import('highlight.js/lib/languages/java'),
+        import('highlight.js/lib/languages/cpp'),
+        import('highlight.js/lib/languages/json'),
+        import('highlight.js/lib/languages/markdown'),
+        import('highlight.js/lib/languages/sql')
+      ])
+
+      const hljs = highlightCore.default || highlightCore
+      const languages = {
+        javascript,
+        js: javascript,
+        typescript,
+        ts: typescript,
+        html: xml,
+        xml,
+        css,
+        bash,
+        shell: bash,
+        sh: bash,
+        python,
+        py: python,
+        java,
+        cpp,
+        c: cpp,
+        json,
+        markdown,
+        md: markdown,
+        sql
+      }
+
+      Object.entries(languages).forEach(([name, mod]) => {
+        try {
+          hljs.registerLanguage(name, mod.default || mod)
+        } catch {}
+      })
+
+      const marked = markedModule.marked
+      marked.setOptions({
+        breaks: true,
+        gfm: true,
+        highlight: (code, language) => {
+          const langName = language && hljs.getLanguage(language) ? language : ''
+          try {
+            return langName
+              ? hljs.highlight(code, { language: langName }).value
+              : hljs.highlightAuto(code).value
+          } catch {
+            return code
+          }
+        }
+      })
+
+      return { marked }
+    })()
+  }
+
+  return markdownEnginePromise
+}
+
+const renderMarkdownNow = async (content = article.value.content) => {
+  const currentToken = ++renderToken
+  if (!content.trim()) {
+    renderedContent.value = emptyPreviewHtml.value
+    return
+  }
+
+  renderedContent.value = `<p class="preview-loading">${t('previewLoading')}</p>`
+  try {
+    const { marked } = await loadMarkdownEngine()
+    if (currentToken !== renderToken) return
+    renderedContent.value = marked.parse(content)
+  } catch (error) {
+    console.error('Markdown preview failed:', error)
+    if (currentToken === renderToken) {
+      renderedContent.value = `<p class="preview-error">${t('previewFailed')}</p>`
+    }
+  }
+}
+
+const scheduleRender = () => {
+  clearTimeout(renderTimer)
+  renderTimer = setTimeout(() => {
+    renderMarkdownNow()
+  }, 180)
+}
 
 // 上传相关
 const triggerCoverUpload = () => coverInput.value?.click()
@@ -747,15 +986,23 @@ const autoSaveDraft = () => {
       timestamp: Date.now()
     }
     localStorage.setItem(AUTO_DRAFT_KEY, JSON.stringify(draft))
+    draftSavedAt.value = Date.now()
   }, 1500)
 }
 
-watch(() => article.value.content, autoSaveDraft)
+watch(() => article.value.content, () => {
+  autoSaveDraft()
+  scheduleRender()
+})
 watch(() => article.value.title, autoSaveDraft)
+watch(lang, () => {
+  renderMarkdownNow()
+})
 
 const clearDraft = () => localStorage.removeItem(AUTO_DRAFT_KEY)
 
 onMounted(async () => {
+  renderedContent.value = emptyPreviewHtml.value
   await Promise.all([loadCategories(), loadTags(), loadMyArticles()])
   const id = route.params.id
   if (id) {
@@ -784,11 +1031,14 @@ onMounted(async () => {
       }
     } catch {}
   }
+  renderMarkdownNow()
   document.addEventListener('keydown', handleKeydown)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleKeydown)
+  clearTimeout(draftTimer)
+  clearTimeout(renderTimer)
 })
 </script>
 
@@ -1596,6 +1846,68 @@ onBeforeUnmount(() => {
   background: rgba(96, 165, 250, 0.08);
 }
 
+.writing-console {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 0 16px;
+  padding: 12px;
+  border: 1px solid rgba(147, 197, 253, 0.14);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(96, 165, 250, 0.055), transparent 54%),
+    rgba(5, 10, 23, 0.42);
+}
+
+.writing-metrics,
+.template-strip {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.writing-metrics span,
+.template-strip span,
+.template-strip button {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid rgba(147, 197, 253, 0.14);
+  border-radius: 7px;
+  background: rgba(3, 8, 20, 0.42);
+  color: rgba(226, 239, 255, 0.64);
+  font: 800 10px/1 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.writing-metrics strong {
+  color: #bfdbfe;
+  font-size: 13px;
+}
+
+.template-strip span {
+  border-color: transparent;
+  background: transparent;
+  color: rgba(147, 197, 253, 0.64);
+}
+
+.template-strip button {
+  cursor: pointer;
+  transition: transform 0.18s var(--ease-out), border-color 0.18s, color 0.18s, background 0.18s;
+}
+
+.template-strip button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(96, 165, 250, 0.42);
+  color: #f8fbff;
+  background: rgba(96, 165, 250, 0.08);
+}
+
 .editor-container {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -1612,6 +1924,32 @@ onBeforeUnmount(() => {
   min-height: 470px;
   border-radius: 8px;
   box-shadow: inset 0 0 42px rgba(96, 165, 250, 0.025);
+}
+
+.preview-content :deep(.preview-empty),
+.preview-content :deep(.preview-loading),
+.preview-content :deep(.preview-error) {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  border: 1px dashed rgba(147, 197, 253, 0.16);
+  border-radius: 8px;
+  color: rgba(226, 239, 255, 0.48);
+  font: 800 12px/1.6 'SF Mono', 'Consolas', monospace;
+  letter-spacing: 0.1em;
+  background:
+    linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.045), transparent),
+    rgba(3, 8, 20, 0.32);
+}
+
+.preview-content :deep(.preview-loading) {
+  color: rgba(191, 219, 254, 0.68);
+}
+
+.preview-content :deep(.preview-error) {
+  color: rgba(248, 113, 113, 0.86);
+  border-color: rgba(248, 113, 113, 0.24);
 }
 
 .content-textarea:focus,
@@ -1679,6 +2017,11 @@ onBeforeUnmount(() => {
 
   .toolbar {
     overflow-x: auto;
+  }
+
+  .writing-console {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 </style>
