@@ -1062,10 +1062,115 @@ onUnmounted(() => {
 }
 
 .stage-mesh,
-.stage-mountain,
-.portal-core {
+.stage-mountain {
   display: none;
 }
+
+.portal-core {
+  left: 50%;
+  top: 50%;
+  width: min(48vw, 430px);
+  display: grid;
+  opacity: 0.54;
+  translate: -50% -50%;
+  filter: drop-shadow(0 0 26px rgba(96, 165, 250, 0.18));
+  mix-blend-mode: screen;
+  animation: syncCoreBreathe 6.4s ease-in-out infinite;
+}
+
+.portal-core::before,
+.portal-core::after {
+  content: '';
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.portal-core::before {
+  width: 16%;
+  aspect-ratio: 1;
+  background:
+    radial-gradient(circle, rgba(248, 251, 255, 0.95) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(147, 197, 253, 0.26), transparent 68%);
+  box-shadow:
+    0 0 20px rgba(147, 197, 253, 0.42),
+    0 0 54px rgba(96, 165, 250, 0.14);
+  animation: syncCorePulse 2.8s ease-in-out infinite;
+}
+
+.portal-core::after {
+  width: 78%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(191, 219, 254, 0.72), rgba(255, 189, 102, 0.2), transparent);
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.26);
+  opacity: 0.38;
+  animation: syncCalibration 5.8s ease-in-out infinite;
+}
+
+.welcome-portal.is-leaving .portal-core {
+  z-index: 6;
+  animation: syncRingLaunch 0.92s var(--ease-out) forwards;
+}
+
+.portal-ring {
+  border-width: 1px;
+  border-color: rgba(147, 197, 253, 0.2);
+  box-shadow:
+    inset 0 0 26px rgba(96, 165, 250, 0.045),
+    0 0 24px rgba(96, 165, 250, 0.08);
+}
+
+.portal-ring::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: conic-gradient(from 18deg, transparent 0 68%, rgba(147, 197, 253, 0.92) 73%, rgba(255, 189, 102, 0.4) 78%, transparent 84% 100%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  opacity: 0.72;
+}
+
+.ring-a {
+  inset: 8%;
+  animation: syncRingSpin 18s linear infinite;
+}
+
+.ring-b {
+  inset: 22%;
+  border-style: dashed;
+  border-color: rgba(191, 219, 254, 0.25);
+  animation: syncRingSpin 11s linear infinite reverse;
+}
+
+.ring-c {
+  inset: 36%;
+  border-color: rgba(255, 189, 102, 0.2);
+  animation: syncInnerPulse 3.2s ease-in-out infinite;
+}
+
+.portal-beam {
+  width: 42%;
+  opacity: 0.22;
+  background: linear-gradient(90deg, transparent, rgba(191, 219, 254, 0.62), transparent);
+  filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.34));
+}
+
+.beam-a { transform: rotate(18deg); animation: beamSweep 6.2s ease-in-out infinite; }
+.beam-b { transform: rotate(108deg); animation: beamSweep 7.4s ease-in-out 0.8s infinite reverse; }
+.beam-c { display: none; }
+
+.portal-node {
+  width: 6px;
+  height: 6px;
+  background: #dbeafe;
+  box-shadow: 0 0 16px rgba(96, 165, 250, 0.58), 0 0 28px rgba(255, 189, 102, 0.1);
+  opacity: 0.72;
+}
+
+.node-a { transform: translate(134px, -92px); animation: nodeFloat 4.8s ease-in-out infinite; }
+.node-b { transform: translate(-128px, 76px); animation: nodeFloat 5.6s ease-in-out 0.6s infinite reverse; }
+.node-c { transform: translate(18px, 144px); animation: nodeFloat 5.2s ease-in-out 1.1s infinite; }
 
 .welcome-stage::before,
 .welcome-stage::after {
@@ -1160,6 +1265,52 @@ onUnmounted(() => {
   0% { opacity: 0.58; transform: translateY(-50%) scaleX(0.92); filter: blur(0); }
   46% { opacity: 0.88; transform: translateY(-50%) scaleX(1.08); filter: blur(0); }
   100% { opacity: 0; transform: translateY(-50%) scaleX(1.42); filter: blur(10px); }
+}
+
+@keyframes syncCoreBreathe {
+  0%, 100% { opacity: 0.42; scale: 0.985; }
+  48% { opacity: 0.62; scale: 1.015; }
+}
+
+@keyframes syncCorePulse {
+  0%, 100% { opacity: 0.72; scale: 0.88; }
+  50% { opacity: 1; scale: 1.12; }
+}
+
+@keyframes syncCalibration {
+  0%, 100% { opacity: 0.2; rotate: -8deg; scale: 0.78 1; }
+  45% { opacity: 0.52; rotate: 8deg; scale: 1.04 1; }
+}
+
+@keyframes syncRingSpin {
+  from { rotate: 0deg; }
+  to { rotate: 360deg; }
+}
+
+@keyframes syncInnerPulse {
+  0%, 100% { opacity: 0.34; scale: 0.94; }
+  50% { opacity: 0.76; scale: 1.04; }
+}
+
+@keyframes syncRingLaunch {
+  0% {
+    opacity: 0.58;
+    rotate: 0deg;
+    scale: 1;
+    filter: drop-shadow(0 0 26px rgba(96, 165, 250, 0.18));
+  }
+  46% {
+    opacity: 0.86;
+    rotate: 12deg;
+    scale: 0.9;
+    filter: drop-shadow(0 0 48px rgba(147, 197, 253, 0.34));
+  }
+  100% {
+    opacity: 0;
+    rotate: 34deg;
+    scale: 1.42;
+    filter: blur(9px) drop-shadow(0 0 70px rgba(191, 219, 254, 0.4));
+  }
 }
 
 @keyframes portalGrid {
@@ -2021,7 +2172,8 @@ onUnmounted(() => {
   }
 
   .portal-core {
-    width: min(104vw, 520px);
+    width: min(86vw, 330px);
+    opacity: 0.4;
   }
 
   .welcome-copy {
@@ -2079,6 +2231,9 @@ onUnmounted(() => {
   .stage-mesh,
   .stage-mountain,
   .stage-scanline,
+  .portal-core,
+  .portal-core::before,
+  .portal-core::after,
   .welcome-tech span,
   .welcome-portal.is-leaving::before,
   .welcome-portal.is-leaving::after,
