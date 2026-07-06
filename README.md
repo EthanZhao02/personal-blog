@@ -1,12 +1,17 @@
 # 个人博客系统
 
+> This repository is publicly visible for portfolio/source review only. It is not open-source licensed.
+> 本仓库公开可见仅用于作品集展示与源码审阅，不是开源项目或可复用模板。
+
 地址：https://ethanzhao02.github.io/personal-blog/#/
 
-## 授权声明
+## 仓库定位与授权
 
-本仓库仅用于个人作品展示、学习记录与项目演示。仓库公开可见不代表允许自由克隆、下载、二次分发、部署、商用或改造成衍生项目。
+本仓库是 Ethan Zhao 个人博客系统的作品集源码展示、学习记录与项目演示。仓库公开可见不代表允许自由克隆、下载、复制、二次分发、部署、商用、改造成衍生项目或作为训练数据使用。
 
-未经作者 Ethan Zhao 书面同意，禁止将本项目用于商业售卖、课程资料、二次发布、私有部署、训练数据或其他再分发场景。如需下载、克隆、部署或购买使用权，请先联系作者申请授权。
+未经作者 Ethan Zhao 书面同意，禁止将本项目用于商业售卖、课程资料、二次发布、私有部署、模型训练或其他再分发场景。如需下载、克隆、部署或购买使用权，请先联系作者申请授权。
+
+完整许可条款见 [LICENSE](LICENSE)。
 
 基于 Vue3 + SpringBoot + MySQL 构建的个人博客系统，适合考研复试展示。
 
@@ -17,11 +22,19 @@
 Cloudflare Pages 推荐配置：
 
 1. 在 Cloudflare Pages 项目里添加环境变量 `OPENAI_API_KEY`。
-2. 可选添加 `OPENAI_MODEL`，不配置时默认使用 `gpt-5.5`。
+2. 可选添加 `OPENAI_MODEL`，不配置时按后端函数里的默认模型执行。
 3. 在前端生产环境变量里设置 `VITE_AI_CHAT_ENDPOINT=/api/ai/chat`。
 4. 重新部署后，页面聊天框会请求 `functions/api/ai/chat.js`，由 Cloudflare 代替前端调用 OpenAI Responses API。
 
 GitHub Pages 只能托管静态文件，不能运行 `functions/api/ai/chat.js`。如果只用 GitHub Pages，可以继续使用本地导览模式，或把 `VITE_AI_CHAT_ENDPOINT` 指向一个单独部署的 HTTPS 后端接口。
+
+## 环境配置
+
+本仓库不提交真实 `.env` 或 `.env.production`。本地开发请参考 `client/.env.example`，生产环境配置请放在 Render、Cloudflare Pages、GitHub Actions 或服务器控制台的环境变量里。
+
+- 前端 `VITE_*` 变量会被打包进浏览器端，只能放公开可见的配置，例如 API 地址或路由模式。
+- 后端密钥、数据库密码、JWT 密钥、OpenAI API Key、管理员初始密码必须只放在服务端环境变量里。
+- GitHub Pages 构建所需的公开前端变量由 `.github/workflows/deploy.yml` 提供，不需要提交 `.env.production`。
 
 ## 技术栈
 
@@ -117,6 +130,8 @@ personal-blog/
 ```
 
 ## 快速开始
+
+以下步骤仅用于作者本人或获得授权后的本地开发、演示和排查。
 
 ### 环境要求
 
@@ -294,70 +309,12 @@ npm run dev
 - 如果首次部署没有管理员账号，检查是否已设置 `ADMIN_DEFAULT_PASSWORD`
 - 检查密码是否正确；项目不再提供公开默认密码
 
-## 上传到 GitHub
+## 维护说明
 
-### 方法一：命令行（推荐）
-
-#### 1. 在 GitHub 创建仓库
-1. 打开 https://github.com/new
-2. 填写仓库名称：`personal-blog`
-3. 选择 Private（私有）或 Public（公开）
-4. **不要勾选** "Add a README file"（项目已有）
-5. 点击 "Create repository"
-
-#### 2. 本地初始化并推送
-```bash
-# 进入项目目录
-cd personal-blog
-
-# 初始化 Git 仓库（如果还没有）
-git init
-
-# 添加所有文件
-git add .
-
-# 提交
-git commit -m "first commit: 个人博客系统"
-
-# 关联远程仓库（把下面这段复制到 GitHub 创建仓库后显示的指令）
-git remote add origin https://github.com/YOUR_USERNAME/personal-blog.git
-
-# 推送到 GitHub
-git push -u origin master
-```
-
-#### 3. 如果遇到 GitHub 认证问题
-不要把 Personal Access Token 写进远程仓库 URL。推荐用 GitHub CLI 登录，让 Git 自己走凭据管理：
-```bash
-# 安装 GitHub CLI（Windows）
-winget install GitHub.cli
-
-# 登录
-gh auth login
-
-# 之后 push 就不需要手动输入密码了
-git push origin master
-```
-
-远程地址应保持为普通地址：
-```bash
-git remote set-url origin https://github.com/YOUR_USERNAME/personal-blog.git
-```
-
-如果 token 曾经出现在命令行、日志或远程 URL 里，应到 GitHub 设置中立即撤销并重新生成。
-
-### 方法二：可视化工具
-
-#### GitHub Desktop
-1. 下载 https://desktop.github.com
-2. File → Add Local Repository → 选择 personal-blog 文件夹
-3. Publish repository 到 GitHub
-
-#### VS Code
-1. 用 VS Code 打开 personal-blog 文件夹
-2. 侧边栏 Source Control 点 ✓
-3. 输入提交信息，点击提交
-4. 点击 Publish to GitHub
+- 当前仓库已连接到 `EthanZhao02/personal-blog`，不要在 README 中放置重新初始化、复制推送或带 token 的远程地址教程。
+- 公开仓库只作为作品集展示和源码审阅入口，不作为开源脚手架、课程模板或可复用项目分发。
+- 生产部署相关的密钥、数据库连接、JWT Secret、OpenAI API Key 和管理员初始密码只允许存在于部署平台的环境变量中。
+- 本地 `.env`、`.env.production` 等配置文件不提交 Git；公开仓库只保留安全示例文件。
 
 ---
 
